@@ -1,5 +1,6 @@
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
+import { hasClientAccess } from './site-access';
 
 export interface PublicKeycloakConfig { url: string; realm: string; clientId: string; }
 export const KEYCLOAK_FACTORY = new InjectionToken<(config: PublicKeycloakConfig) => Keycloak>(
@@ -18,6 +19,7 @@ export class AuthService {
   private keycloak?: Keycloak;
   private readonly authenticated = signal(false);
   private readonly user = signal('');
+  private readonly resourceAccess = signal<unknown>(undefined);
   readonly isAuthenticated = this.authenticated.asReadonly();
   readonly username = this.user.asReadonly();
 
@@ -50,11 +52,19 @@ export class AuthService {
     await this.requireKeycloak().logout({ redirectUri: window.location.origin + '/' });
     this.authenticated.set(false);
     this.user.set('');
+    this.resourceAccess.set(undefined);
+  }
+
+  hasSiteAccess(clientId: string): boolean {
+    return this.isAuthenticated() && hasClientAccess(this.resourceAccess(), clientId);
   }
 
   async getValidToken(): Promise<string | undefined> {
     const keycloak = this.requireKeycloak();
-    if (!keycloak.authenticated) return undefined;
+    if (!keycloak.authenticated) {
+      this.syncSession();
+      return undefined;
+    }
     try {
       await keycloak.updateToken(30);
       this.syncSession();
@@ -73,6 +83,7 @@ export class AuthService {
 
   private syncSession(): void {
     this.authenticated.set(this.keycloak?.authenticated === true);
+    this.resourceAccess.set(this.authenticated() ? this.keycloak?.tokenParsed?.['resource_access'] : undefined);
     this.user.set(this.authenticated() ? this.keycloak?.tokenParsed?.['preferred_username'] ?? '' : '');
   }
 }

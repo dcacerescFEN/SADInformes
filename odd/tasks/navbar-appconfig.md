@@ -9,8 +9,8 @@ S3. "appconfig"
 S4. "SADInformes /DEV"
 
 ## Tasks
-T1 | S1-S4 | inline | completado | commit: por registrar | Leer menú propio de AppConfig mediante endpoint autenticado.
-T2 | S1-S4 | inline | pendiente | commit: pendiente | Incorporar navbar, acceso por cliente, tema y sesión.
+T1 | S1-S4 | inline | completado | commit: 096a0ef | Leer menú propio de AppConfig mediante endpoint autenticado.
+T2 | S1-S4 | inline | en progreso | commit: pendiente | Incorporar navbar, acceso por cliente, tema y sesión.
 T3 | S1-S4 | verificación independiente + revisión nativa | pendiente | commit: pendiente | Verificar API, navbar responsive, regresiones y documentación.
 
 ## Log
@@ -24,3 +24,5 @@ L7. Menú sin destinos/client IDs inferidos; solo las 16 claves centrales conoci
 L8. Conexión AppConfig no definida en el proceso. Se comprobará con estado aislado; prueba real de SQL requiere configuración del operador. HTTPS 7070/4200 y cliente Keycloak SADInformes se conservan.
 L9. RED HTTP inicial: /api/config/site devolvía 404 en vez de 401. RED del lector: 7 fallos de comportamiento sobre 19 pruebas al usar el proveedor sin consulta; comprobadas selección/activos, duplicados y respuesta sanitizada. GREEN en curso tras implementar consulta EF de solo lectura.
 L10. GREEN T1: 19 pruebas .NET y 7 Node aprobadas. Estado aislado EF InMemory, sin conexión ni escrituras en SQL real.
+L11. T1 aceptado por verificador independiente sin bloqueadores. Revisión nativa de 096a0ef no disponible (package-local-binary-missing). La prueba SQL real queda a cargo del entorno con conexión autorizada.
+L12. T2 (núcleo de navegación): RED con 23 fallos; GREEN 47 pruebas de sesión/acceso y carga HTTP. IDs exactos y -iis separados, roles nuevos, URLs seguras/deshabilitadas y fallo AppConfig sin enlaces obsoletos.

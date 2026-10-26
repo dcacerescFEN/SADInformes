@@ -13,7 +13,7 @@ describe('Sesión Keycloak', () => {
   let auth: AuthService;
   let adapter: {
     authenticated: boolean; token: string | undefined;
-    tokenParsed: { preferred_username: string };
+    tokenParsed: { preferred_username: string; resource_access?: unknown };
     init: ReturnType<typeof vi.fn>; updateToken: ReturnType<typeof vi.fn>;
     login: ReturnType<typeof vi.fn>; logout: ReturnType<typeof vi.fn>;
     clearToken: ReturnType<typeof vi.fn>;
@@ -90,6 +90,46 @@ describe('Sesión Keycloak', () => {
     expect(adapter.login).toHaveBeenCalledTimes(1);
     await auth.logout();
     expect(adapter.logout).toHaveBeenCalledWith({ redirectUri: location.origin + '/' });
+  });
+
+  it.each([
+    ['SADAlumnos', { SADAlumnos: { roles: ['ROLE_STUDENT_ADMIN'] } }, true],
+    ['SADAlumnos', { SADAlumnos: { roles: ['ROLE_STUDENT_SUPERADMIN'] } }, true],
+    ['SADAlumnos', { SADAlumnos: { roles: ['PERMISSION_STUDENT_ACCESS_STUDENT_MODULE'] } }, true],
+    ['SADAdministracion', { SADAdministracion: { roles: ['PERMISSION_ADMINISTRATION_ACCESS'] } }, true],
+    ['SADProfesores', { SADProfesores: { roles: ['ROLE_TEACHER_ADMIN'] } }, true],
+    ['SADCursos', { SADCursos: { roles: ['ROLE_COURSE_SUPERADMIN'] } }, true],
+    ['SADExamenes', { SADExamenes: { roles: ['ROLE_EXAM_ADMIN'] } }, true],
+    ['SADActividades', { SADActividades: { roles: ['ROLE_ACTIVITY_ADMIN'] } }, true],
+    ['SADAyudantes', { SADAyudantes: { roles: ['ROLE_ASSISTANT_ADMIN'] } }, true],
+    ['SADProcesos', { SADProcesos: { roles: ['ROLE_PROCESS_ADMIN'] } }, true],
+    ['NewSAD', { NewSAD: { roles: ['PERMISSION_SAD_ACCESS'] } }, true],
+    ['SADAlumnos', { SADAlumnos: { roles: ['administrator', 'superadmin', 'STUDENT_ADMIN'] } }, false],
+    ['SADAlumnos', { SADAdministracion: { roles: ['ROLE_STUDENT_ADMIN'] } }, false],
+    ['SADAlumnos-iis', { SADAlumnos: { roles: ['ROLE_STUDENT_ADMIN'] } }, false],
+    ['SADAlumnos', { 'SADAlumnos-iis': { roles: ['ROLE_STUDENT_ADMIN'] } }, false],
+    ['SADAlumnos-iis', { 'SADAlumnos-iis': { roles: ['ROLE_STUDENT_ADMIN'] } }, true],
+    ['SADInformes', { SADInformes: { roles: ['ROLE_REPORT_ADMIN'] } }, false],
+    ['SADProfesores', { SADProfesores: { roles: ['PERMISSION_TEACHER_ACCESS'] } }, false],
+    ['SADAlumnos', { SADAlumnos: { roles: 'ROLE_STUDENT_ADMIN' } }, false],
+    ['SADAlumnos', [], false],
+    ['', { SADAlumnos: { roles: ['ROLE_STUDENT_ADMIN'] } }, false],
+  ])('filtra cliente físico y roles nuevos: %s', async (clientId, resourceAccess, allowed) => {
+    adapter.tokenParsed.resource_access = resourceAccess;
+    await auth.initialize();
+    expect(auth.hasSiteAccess(clientId as string)).toBe(allowed);
+  });
+
+  it('actualiza acceso tras renovar y lo retira al cerrar sesión', async () => {
+    adapter.tokenParsed.resource_access = { SADAlumnos: { roles: ['ROLE_STUDENT_ADMIN'] } };
+    await auth.initialize();
+    expect(auth.hasSiteAccess('SADAlumnos')).toBe(true);
+    adapter.tokenParsed.resource_access = {};
+    await auth.getValidToken();
+    expect(auth.hasSiteAccess('SADAlumnos')).toBe(false);
+    adapter.authenticated = false;
+    adapter.onAuthLogout?.();
+    expect(auth.hasSiteAccess('SADAlumnos')).toBe(false);
   });
 
   it('refleja el cierre de sesión del adaptador', async () => {

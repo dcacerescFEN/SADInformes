@@ -92,6 +92,34 @@ genérico, sin detalles SQL. Health y Keycloak no dependen de AppConfig. Las pru
 del lector usan una base EF InMemory aislada y el endpoint HTTP real, no el SQL
 institucional.
 
+### Acceso a los destinos de la navbar
+
+Se consulta el cliente físico exacto configurado en `resource_access` del token.
+La variante `-iis` solo se normaliza para elegir la política: sus roles no se
+mezclan con los del cliente sin sufijo. Se admiten los roles nuevos
+`ROLE_<MÓDULO>_ADMIN` y `ROLE_<MÓDULO>_SUPERADMIN`.
+
+| Cliente lógico | Módulo | Permiso de entrada adicional |
+| --- | --- | --- |
+| NewSAD | SAD | PERMISSION_SAD_ACCESS |
+| SADAlumnos | STUDENT | PERMISSION_STUDENT_ACCESS_STUDENT_MODULE |
+| SADAdministracion | ADMINISTRATION | PERMISSION_ADMINISTRATION_ACCESS |
+| SADProfesores | TEACHER | — |
+| SADCursos | COURSE | — |
+| SADExamenes | EXAM | — |
+| SADActividades | ACTIVITY | — |
+| SADAyudantes | ASSISTANT | — |
+| SADProcesos | PROCESS | — |
+
+Un destino sin clientId, desconocido, sin cliente en el token o con roles antiguos
+se oculta. No se infiere una política de informes: el acceso a SADInformes sigue
+siendo la sesión ya integrada. La marca lleva al inicio del sistema actual.
+
+Las URLs deben ser HTTP(S) absolutas, sin credenciales, espacios ni caracteres
+de control. Si existe acceso pero falta una URL válida, el enlace queda sin
+`href`, deshabilitado y fuera del recorrido de tabulación. El filtro de la navbar
+no sustituye la autorización de cada API destino.
+
 ## Requisitos
 
 SDK .NET 10, Node.js compatible con Angular 22
