@@ -8,8 +8,10 @@ S2. "Inicia Etapa 3"
 S3. "appconfig"
 S4. "SADInformes /DEV"
 
+S5. "sigue el formato de esta en SADAlumnos, Ocupa los EndpointExtension y IEdnpoint, ademas ConfigurationInitialiser tambien agrega el valor por defecto"
+
 ## Tasks
-T1 | S1-S4 | inline | completado | commit: 096a0ef | Leer menú propio de AppConfig mediante endpoint autenticado.
+T1 | S1-S5 | inline | en progreso | commit: 096a0ef; corrección pendiente | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
 T2 | S1-S4 | inline | completado | commit: 25226f0 (núcleo), 63981f6 (UI) | Incorporar navbar, acceso por cliente, tema y sesión.
 T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
 
@@ -32,3 +34,10 @@ L15. UI GREEN: suite Angular completa y build aprobados tras RED de 8 pruebas. A
 L16. Smoke final y build solución aprobados: 7 Node y 1 smoke HTTPS; sirve logo original y JavaScript, mantiene health/config Keycloak y rechaza menú anónimo con 401 por el proxy.
 L17. Verificador independiente aceptó T2-T3 frontend (25226f0 y 63981f6), S1-S4, sin bloqueadores. Revisión nativa de 63981f6 no disponible por package-local-binary-missing; no autoridad creada ni aprobación nativa afirmada.
 L18. Pendiente externo para cerrar T3: definir ConnectionStrings__AppConfig en el proceso WebApi con acceso de lectura y confirmar registros SADInformes/DEV; validar navbar real en navegador institucional. No se copiaron credenciales ni se modificaron filas. La modificación humana de SADInformes.slnx se conserva fuera de commits. No push.
+L19. "sigue el formato de esta en SADAlumnos, Ocupa los EndpointExtension y IEdnpoint, ademas ConfigurationInitialiser tambien agrega el valor por defecto"
+L20. Corrección S5 sustituye la decisión L7 de no usar defaults. Se reutilizan solo defaults públicos de ParseSiteSettings; no credenciales ni configuración de alumnos, correo o informes. Inicio: inicialización y publicación única por instancia de aplicación; error de carga conserva 503 del menú y health/sesión operativos.
+L21. RED observado: prueba estructural de AddEndpoints/MapEndpoints falló; 8 de 23 pruebas HTTP fallaron por defaults ausentes, overrides sin recorte y URL explícitamente vacía aceptada. Implementación de carga inicial por host en curso de verificación GREEN.
+L22. GREEN inicial: 23 pruebas .NET y 8 Node aprobadas, incluidas todas las rutas existentes y defaults completos. Se añadió prueba HTTP de publicación única (cambios posteriores en fixture aislado no alteran snapshot) y diferencial contra commit base en copia temporal dentro del proyecto; ambos en curso.
+L23. GREEN final backend: 24 pruebas .NET aprobadas, incluido snapshot único por host. Diferencial HTTP contra b4d94c3 aprobado para seis rutas: status, Content-Type, challenge y cuerpo idénticos, stderr y terminación iguales. La copia temporal dentro del proyecto se eliminó al terminar.
+L24. Compilación emite NU1902/NU1903 por System.Security.Cryptography.Pkcs 9.0.11 transitivo. No se cambian versiones ni se ocultan avisos como parte de S5; se registra para decisión separada.
+L25. Verificador independiente S5: cumplido, sin bloqueadores; confirma versiones PackageReference sin cambios y singleton por host. Smoke HTTPS aprobado tras el refactor; se mantienen puertos7070/4200 y proxy, assets y autorizaciones previas.

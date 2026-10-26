@@ -77,6 +77,15 @@ test('El perfil de WebApi activa el SPA proxy hacia el frontend configurado', ()
   assert.match(ignore, /\*\*\/\.certs\//);
 });
 
+test('WebApi descubre IEndpoint e inicializa configuración antes de servir', () => {
+  const program = read('src/Web/WebApi/Program.cs');
+  assert.match(program, /\.AddEndpoints\(/);
+  assert.match(program, /\.MapEndpoints\(/);
+  assert.match(program, /await app\.InitialiseConfigurationAsync\(/);
+  assert.doesNotMatch(program, /app\.MapGet\(|MapSiteConfiguration/);
+  assert.match(read('src/Web/WebApi/Extension/IEndpoint.cs'), /interface IEndpoint/);
+});
+
 test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () => {
   const packageJson = json('src/Web/WebUI/package.json');
   assert.equal(packageJson.name, 'sadinformes');

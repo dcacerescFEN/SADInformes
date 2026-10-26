@@ -83,13 +83,38 @@ Claves centrales admitidas, en pares URL/clientId:
 | Procesos | ProcessesMenuUrl | ProcessesMenuClientId |
 | Administración | AdministrationMenuUrl | AdministrationMenuClientId |
 
-No se crean tablas, migraciones, registros ni valores predeterminados. El modelo
-EF conserva nombres y relaciones de AppConfig en SADAlumnos. Las claves se
-interpretan sin distinguir mayúsculas; duplicados activos de una misma clave
-rechazan el menú. Otras claves, incluidas credenciales, nunca se publican.
+`ConfigurationInitialiser` carga AppConfig una vez durante el arranque mediante
+`await app.InitialiseConfigurationAsync(...)`. Prepara todos los valores antes
+de publicarlos en `SiteSettings`, singleton aislado por aplicación, no estático
+global al proceso. `SiteMenuProvider` devuelve esa configuración ya inicializada.
+Los cambios de AppConfig se aplican al reiniciar el proceso.
 
-Sin conexión o ante errores de AppConfig, el endpoint devuelve 503 con un mensaje
-genérico, sin detalles SQL. Health y Keycloak no dependen de AppConfig. Las pruebas
+Las claves ausentes o nulas usan los mismos defaults públicos de SADAlumnos:
+
+| Destino | URL predeterminada | ClientId predeterminado |
+| --- | --- | --- |
+| Alumnos | https://sadalumnos-dev.fen.uchile.cl | SADAlumnos |
+| Profesores | https://sadprofesores-dev.fen.uchile.cl | SADProfesores |
+| Cursos | https://sadcursos-dev.fen.uchile.cl | SADCursos |
+| Exámenes | https://sadexamenes-dev.fen.uchile.cl | SADExamenes |
+| Actividades | https://sadactividades-dev.fen.uchile.cl | SADActividades |
+| Ayudantes | https://sadayudantes-dev.fen.uchile.cl | SADAyudantes |
+| Procesos | https://sadprocesos-dev.fen.uchile.cl | SADProcesos |
+| Administración | https://sadadministracion-dev.fen.uchile.cl | SADAdministracion |
+
+`StatusSite` usa `1` como default operativo, sin añadirlo al contrato público
+del menú. Los valores de AppConfig tienen prioridad; las URLs se recortan y una
+URL explícitamente vacía rechaza la inicialización. Un clientId explícitamente
+vacío se conserva para ocultar el destino, no se reemplaza por el default.
+
+No se crean tablas, migraciones ni registros. El modelo EF conserva nombres y
+relaciones de AppConfig en SADAlumnos. Las claves se interpretan sin distinguir
+mayúsculas; duplicados activos rechazan la inicialización completa. No se
+publican valores parciales ni otras claves, incluidas credenciales.
+
+Sin conexión o ante errores de AppConfig, no se usan defaults para ocultar el
+error: el menú devuelve 503 con un mensaje genérico, sin detalles SQL. Health y
+Keycloak siguen disponibles después del intento de inicialización. Las pruebas
 del lector usan una base EF InMemory aislada y el endpoint HTTP real, no el SQL
 institucional.
 
@@ -135,6 +160,18 @@ almacenamiento, el tema funciona durante la sesión sin persistirlo.
 Ante fallo de AppConfig, se muestra `No se pudo cargar la navegación.`;
 los controles de usuario y tema siguen disponibles y no se conservan enlaces
 obsoletos. Un fallo al cerrar sesión muestra un aviso sin ocultarlo.
+
+### Convención de endpoints
+
+Los endpoints implementan `WebApi.Extension.IEndpoint`.
+`builder.Services.AddEndpoints(typeof(Program).Assembly)` descubre los tipos
+concretos y `app.MapEndpoints()` registra sus rutas. `Program.cs` no declara
+rutas directamente. Health y configuración pública de Keycloak siguen anónimos;
+sesión y configuración del sitio siguen requiriendo autenticación.
+
+La infraestructura se registra con `AddInfrastructureServices`; no se copian
+inicializadores de datos académicos, tareas periódicas, correos ni credenciales
+de SADAlumnos.
 
 ## Requisitos
 
