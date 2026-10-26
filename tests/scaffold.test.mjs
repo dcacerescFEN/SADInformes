@@ -94,6 +94,19 @@ test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
   assert.match(styles, /padding:\s*0\.375rem 0\.75rem/);
 });
 
+test('La sidebar conserva anchos de referencia y el shell evita superposición del header', () => {
+  const sidebar = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.scss');
+  assert.match(sidebar, /width:\s*280px/);
+  assert.match(sidebar, /width:\s*76px/);
+  assert.match(sidebar, /max-width:\s*991\.98px/);
+  assert.match(sidebar, /prefers-reduced-motion/);
+  const shell = read('src/Web/WebUI/src/app/app.scss');
+  assert.match(shell, /height:\s*100dvh/);
+  assert.match(shell, /\.layout-shell\s*\{[^}]*overflow-y:\s*auto/s);
+  assert.match(shell, /min-height:\s*0/);
+  assert.match(shell, /overflow-y:\s*auto/);
+});
+
 test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () => {
   const packageJson = json('src/Web/WebUI/package.json');
   assert.equal(packageJson.name, 'sadinformes');

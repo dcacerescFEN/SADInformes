@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   NgbCollapseModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem, NgbTooltip,
@@ -13,6 +13,18 @@ import { ThemeStore } from './theme-store';
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm nav-header" aria-label="Navegación principal">
       <div class="container-fluid">
+        @if (showSidebarToggle()) {
+          <button class="header-toggle-btn d-none d-lg-inline-flex me-2" type="button"
+            data-sidebar-mode="desktop" aria-label="Alternar menú de informes" aria-controls="reports-sidebar"
+            [attr.aria-expanded]="!sidebarCollapsed()" (click)="sidebarToggle.emit(false)">
+            <i class="bi bi-list fs-4" aria-hidden="true"></i>
+          </button>
+          <button class="header-toggle-btn d-lg-none" type="button" data-sidebar-mode="mobile"
+            aria-label="Abrir menú de informes" aria-haspopup="dialog" [attr.aria-expanded]="sidebarMobileOpen()"
+            (click)="sidebarToggle.emit(true)">
+            <i class="bi bi-list fs-4" aria-hidden="true"></i>
+          </button>
+        }
         <a class="navbar-brand" routerLink="/" aria-label="Inicio de SADInformes">
           <img src="/logo-fen-white-letters.svg" height="28" alt="FEN Universidad de Chile" class="mx-auto">
         </a>
@@ -77,6 +89,10 @@ import { ThemeStore } from './theme-store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header implements OnInit {
+  readonly showSidebarToggle = input(false);
+  readonly sidebarCollapsed = input(false);
+  readonly sidebarMobileOpen = input(false);
+  readonly sidebarToggle = output<boolean>();
   readonly auth = inject(AuthService);
   readonly navigation = inject(NavigationService);
   readonly theme = inject(ThemeStore);

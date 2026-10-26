@@ -1,7 +1,7 @@
 # SADInformes
 
 Base independiente del sistema de informes, basada en SADAlumnos sin copiar
-sus funcionalidades ni configuración sensible. Etapa 3: navbar con AppConfig.
+sus funcionalidades ni configuración sensible. Etapa 4: sidebar y shell responsive.
 
 ## Alcance
 
@@ -10,7 +10,8 @@ sus funcionalidades ni configuración sensible. Etapa 3: navbar con AppConfig.
 - Angular 22 standalone, rutas lazy y detección OnPush.
 - Página inicial y diagnóstico `GET /api/health`.
 - Autenticación JWT con Keycloak y navbar basada en SADAlumnos.
-- AppConfig SQL de solo lectura. Sin base funcional, sidebar ni informes.
+- AppConfig SQL de solo lectura y sidebar adaptada de SADAdministracion.
+- Sin base funcional ni catálogo nuevo de informes.
 - No se modifican SADAlumnos ni SADAdministracion.
 
 Esta etapa no está preparada para exposición pública ni uso con datos reales.
@@ -53,7 +54,7 @@ antes de llamar a `/api/`. Los tokens permanecen en memoria del adaptador, no
 en localStorage/sessionStorage. El interceptor no adjunta tokens a terceros.
 Si falla la renovación, se limpia la sesión y no se envía la solicitud.
 La navbar ofrece cierre de sesión, selector de tema y navegación entre sistemas.
-No se incorpora sidebar en esta etapa.
+La sidebar se incorpora en la etapa 4, sin cambiar el inicio de sesión.
 
 Las pruebas automatizadas usan adaptadores simulados; el login real requiere
 un usuario del realm y que el administrador haya registrado estas URLs.
@@ -161,7 +162,7 @@ La barra conserva el logo FEN sin texto añadido a la marca, enlaces con iconos,
 menú móvil colapsable y breakpoint `lg` (992 px), espaciados y controles de
 SADAlumnos. Informes aparece antes de Administración y se marca como sitio
 actual. Se conservan correo FEN, cambio de contraseña y cierre de sesión;
-no se incluye el control de sidebar ni suplantación.
+el layout puede habilitar los controles de sidebar; no se incluye suplantación.
 
 Los temas Claro/Oscuro/Auto usan la clave local
 `sadinformes-theme-preference`, sin modificar la preferencia de SADAlumnos.
@@ -183,6 +184,30 @@ sesión y configuración del sitio siguen requiriendo autenticación.
 La infraestructura se registra con `AddInfrastructureServices`; no se copian
 inicializadores de datos académicos, tareas periódicas, correos ni credenciales
 de SADAlumnos.
+
+## Sidebar de informes
+
+Se adapta el componente de SADAdministracion: panel de 280 px expandido y 76 px
+colapsado, con perfil del usuario y temas de la aplicación. Muestra únicamente
+**Inicio**, la ruta que ya existe; no copia períodos académicos, gestión de
+usuarios ni permisos administrativos.
+
+El botón de la navbar colapsa/expande en escritorio. Antes de 992 px abre un
+panel lateral con backdrop, cierre por Escape, enlace, botón o navegación, y
+restauración del foco. Al pasar a escritorio o destruir la vista se retira el
+panel y su backdrop. No se guarda el estado colapsado ni datos de perfil en
+almacenamiento persistente.
+
+La sesión determina el montaje de navbar/sidebar; al perderla se elimina
+también cualquier panel abierto. El nombre proviene de la claim pública
+`name`, con fallback al username. No se cambian tokens, guards, REPORT_ACCESS
+ni autorización backend.
+
+El shell mantiene un único `RouterOutlet`, header con altura automática y
+scroll independiente de contenido/sidebar, evitando superposición cuando
+crece el menú móvil o un aviso de navegación. La sidebar respeta
+`prefers-reduced-motion`. Los controles de sidebar del Header son opcionales
+para conservar sus usos anteriores.
 
 ## Requisitos
 
@@ -300,8 +325,8 @@ quedan fuera de esta etapa.
 
 ## Siguientes etapas
 
-1. Sidebar de SADAdministracion adaptada a informes.
-2. Permisos funcionales, catálogo de informes y fuentes de datos aprobados.
+1. Definir catálogo de informes y fuentes de datos aprobados.
+2. Incorporar informes y permisos funcionales correspondientes.
 
 No copiar connection strings, secretos, entidades, procedimientos ni servicios
 funcionales de los sistemas de referencia.

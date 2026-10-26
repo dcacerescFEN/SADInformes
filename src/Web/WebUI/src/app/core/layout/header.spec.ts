@@ -45,6 +45,28 @@ describe('Navbar basada en SADAlumnos', () => {
     expect(root.querySelector('a[aria-label="Correo FEN"]')?.hasAttribute('title')).toBe(false);
   });
 
+  it('no agrega controles de sidebar si el layout no los habilita', () => {
+    expect(fixture.nativeElement.querySelector('[data-sidebar-mode]')).toBeNull();
+  });
+
+  it('expone controles separados de escritorio y móvil con su estado ARIA', () => {
+    const events: boolean[] = [];
+    fixture.componentInstance.sidebarToggle.subscribe((mobile) => events.push(mobile));
+    fixture.componentRef.setInput('showSidebarToggle', true);
+    fixture.componentRef.setInput('sidebarCollapsed', true);
+    fixture.componentRef.setInput('sidebarMobileOpen', true);
+    fixture.detectChanges();
+    const desktop = fixture.nativeElement.querySelector('[data-sidebar-mode="desktop"]');
+    const mobile = fixture.nativeElement.querySelector('[data-sidebar-mode="mobile"]');
+    expect(desktop.getAttribute('aria-controls')).toBe('reports-sidebar');
+    expect(desktop.getAttribute('aria-expanded')).toBe('false');
+    expect(mobile.getAttribute('aria-haspopup')).toBe('dialog');
+    expect(mobile.getAttribute('aria-expanded')).toBe('true');
+    desktop.click();
+    mobile.click();
+    expect(events).toEqual([false, true]);
+  });
+
   it('muestra Informes antes de Administración y lo marca como sitio actual', () => {
     links.set([
       { key: 'student', label: 'Alumnos', icon: 'bi-person-badge', url: 'https://alumnos.example.test' },

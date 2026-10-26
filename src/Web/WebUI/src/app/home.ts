@@ -4,8 +4,8 @@ import { AuthService } from './core/auth/auth-service';
 @Component({
   selector: 'app-home',
   template: `
-    <main>
-      <h1>SADInformes</h1>
+    <section class="home-page" aria-labelledby="home-title">
+      <h1 id="home-title">SADInformes</h1>
       <p>Base del sistema de informes.</p>
       @if (auth.isAuthenticated()) {
         <p>Sesión iniciada: {{ auth.username() }}</p>
@@ -14,9 +14,10 @@ import { AuthService } from './core/auth/auth-service';
         <button type="button" (click)="login()">Iniciar sesión</button>
       }
       @if (error()) { <p role="alert">{{ error() }}</p> }
-      <p>La sidebar y los informes se incorporarán en etapas posteriores.</p>
-    </main>
+      <p>Los informes se incorporarán en etapas posteriores.</p>
+    </section>
   `,
+  styles: ':host { display: block; } .home-page { max-width: 64rem; margin: 0 auto; }',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
