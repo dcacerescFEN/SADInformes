@@ -8,8 +8,8 @@ S2. "Continua Etapa 4"
 
 ## Tasks
 T1 | S1-S2 | inline | completado | commit: d048f27 | Adaptar sidebar, perfil y controles del panel móvil con pruebas.
-T2 | S1-S2 | inline | completado | commit: por registrar | Integrar shell y toggles de navbar sin alterar sesión ni enlaces.
-T3 | S1-S2 | verificación independiente + revisión nativa | en progreso | commit: pendiente | Verificar layout, regresiones y documentación.
+T2 | S1-S2 | inline | bloqueado: falta prueba de layout en navegador | commit: 628244a | Integrar shell y toggles de navbar sin alterar sesión ni enlaces.
+T3 | S1-S2 | verificación independiente + revisión nativa | bloqueado: objeción de layout sin medición real | commit: 628244a | Verificar layout, regresiones y documentación.
 
 ## Log
 L1. "necesito que crees un nuevo sistema el SADInformes, utiliza la base de SADAlumnos como la integracion con keycloack, la barra de navegación y utiliza la sidebar que tiene SADAdministracion, genera un plan"
@@ -26,3 +26,6 @@ L11. GREEN T1: 53 pruebas enfocadas aprobadas con ng-bootstrap real: perfil, Ini
 L12. RED T2: 3 fallos de integración en App/Header y prueba de shell inexistente. App/Header/Home integrados manteniendo outlet único y sidebar condicionada por sesión; estructurales Node aprobados. Suite completa/build en curso, sin marcar T2 completada todavía.
 L13. GREEN T2: suite Angular completa y build aprobados (bundle681kB, aviso500kB/límite1MB). Se preserva outlet al perder/reabrir sesión, se elimina panel/perfil y controles anteriores funcionan. Ajuste de overflow del shell con RED/GREEN estructural: si la navbar supera el viewport, sigue siendo desplazable en vez de recortar controles; sin cambios de lógica TS.
 L14. Compilación final CSS aprobada (bundle681,02kB, advertencia sin alterar presupuesto). T2 listo con fuentes/tests/documentación; falta outside view y smoke. Revisión nativa de unidadT1 no disponible por package-local-binary-missing.
+L15. Smoke final, build solución y 10 Node aprobaron. La revisión independiente objetó el fallback de overflow del shell en un viewport menor que el header; no aprueba S1/S2 por ese punto, aunque confirma sidebar/perfil/sesión y demás comportamiento.
+L16. La objeción es estática: no hubo medición de scrollHeight/layout. Se planteó un único contraste acotado de la premisa CSS; subagente falló sin informe final. No se reintenta ni se inventa evidencia de navegador. Cambiar height por min-height sin medición puede afectar scrolls independientes; queda pendiente comprobar y resolver, no se acepta ni rechaza la objeción sin prueba.
+L17. T2 se reabre y T3 queda bloqueada. Se requiere autorización para usar Edge local con perfil/fixture dentro del proyecto, o comprobación manual del operador, antes de cerrar. Revisión nativa no disponible por package-local-binary-missing; no se afirma aprobación. Archivos operativos humanos siguen fuera de commits.

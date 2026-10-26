@@ -204,8 +204,9 @@ también cualquier panel abierto. El nombre proviene de la claim pública
 ni autorización backend.
 
 El shell mantiene un único `RouterOutlet`, header con altura automática y
-scroll independiente de contenido/sidebar, evitando superposición cuando
-crece el menú móvil o un aviso de navegación. La sidebar respeta
+scroll independiente de contenido/sidebar. La comprobación visual y del overflow
+en ventanas más bajas que el menú expandido sigue pendiente; no se considera
+cerrada esta integración hasta resolverla. La sidebar respeta
 `prefers-reduced-motion`. Los controles de sidebar del Header son opcionales
 para conservar sus usos anteriores.
 
