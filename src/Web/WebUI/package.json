@@ -7,7 +7,8 @@
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },
   "scripts": {
-    "start": "ng serve --host 127.0.0.1 --port 4206",
+    "prestart": "node aspnetcore-https.js",
+    "start": "node start-dev.js",
     "build": "ng build",
     "test": "ng test --watch=false"
   },

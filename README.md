@@ -43,8 +43,8 @@ no crea ni modifica clientes ni usuarios. Para `SADInformes`:
 - Cliente OpenID Connect público, `Client authentication` desactivado.
 - Standard flow habilitado y PKCE S256.
 - Redirect URIs y post logout redirect URIs:
-  `http://127.0.0.1:4206/*` en desarrollo.
-- Web origins: `http://127.0.0.1:4206`, no `*`.
+  `https://localhost:4200/*` en desarrollo.
+- Web origins: `https://localhost:4200`, no `*`.
 - El access token debe incluir `SADInformes` en `aud`; configurar un audience
   mapper si el realm no lo incluye. Tener `azp=SADInformes` no sustituye `aud`.
 
@@ -63,6 +63,28 @@ SDK .NET 10, Node.js compatible con Angular 22
 (`^22.22.3 || ^24.15.0 || >=26.0.0`) y pnpm 12.6.0.
 `global.json` permite cualquier feature band instalada del SDK 10.0.
 
+## HTTPS de desarrollo
+
+Si el navegador no confía en el certificado, ejecutar manualmente:
+
+```sh
+dotnet dev-certs https --trust
+```
+
+Este comando modifica la confianza local y puede requerir confirmación del
+sistema operativo. La aplicación no lo ejecuta automáticamente.
+
+`pnpm start` exporta el certificado de desarrollo a
+`src/Web/WebUI/.certs/localhost.pem` y su clave a `localhost.key`, antes de
+iniciar Angular con HTTPS en localhost:4200. La carpeta está ignorada por Git:
+no compartir ni versionar la clave. No se escriben archivos en APPDATA.
+Si se renueva el certificado ASP.NET Core, retirar las copias de `.certs` y
+volver a iniciar para exportarlo de nuevo.
+
+Angular confía en ese certificado mediante `NODE_EXTRA_CA_CERTS` únicamente
+en su proceso hijo, y el proxy mantiene `secure: true`. La prueba TLS también
+valida el certificado y hostname, sin desactivar validación global.
+
 ## Ejecución local
 
 Instalar las dependencias frontend una vez, desde la raíz de SADInformes:
@@ -72,25 +94,33 @@ cd src/Web/WebUI
 pnpm install --frozen-lockfile
 cd ../../..
 dotnet build SADInformes.slnx
-dotnet run --project src/Web/WebApi --launch-profile http
+dotnet run --project src/Web/WebApi --launch-profile https
 ```
 
-Abrir http://localhost:5086. El perfil `http` activa ASP.NET Core SPA proxy:
+Abrir https://localhost:7070. El perfil `https` activa ASP.NET Core SPA proxy:
 WebApi inicia `pnpm start` en WebUI y, cuando Angular está listo, redirige
-al frontend en http://127.0.0.1:4206. No es necesario iniciar ambos proyectos
+al frontend en https://localhost:4200. No es necesario iniciar ambos proyectos
 por separado. El servidor Angular reenvía `/api` a la API; no requiere CORS
-ni certificados locales.
+y utiliza el certificado de desarrollo ASP.NET Core.
 
 En Visual Studio, abrir `SADInformes.slnx`: WebUI aparece como proyecto JavaScript
 junto a WebApi. Establecer WebApi como proyecto de inicio y utilizar el perfil
-`http`. La referencia a WebUI tiene `ReferenceOutputAssembly=false`, porque
+`https`. La referencia a WebUI tiene `ReferenceOutputAssembly=false`, porque
 no es un ensamblado .NET.
 
 Opcionalmente se puede ejecutar `pnpm start` manualmente en WebUI; el SPA proxy
 reutiliza ese servidor si ya está activo.
-Se utilizan puertos distintos de los de SADAlumnos y SADAdministracion.
+Se comparten los puertos 7070 y 4200 con SADAlumnos y SADAdministracion:
+no pueden ejecutarse simultáneamente en esos mismos puertos.
 
-`GET http://localhost:5086/api/health` devuelve:
+El perfil `http` anterior permanece disponible: conserva el listener
+`http://localhost:5086` y levanta también HTTPS en 7070 para no romper el
+proxy Angular. Para uso normal se recomienda `--launch-profile https`.
+
+En Keycloak, actualizar las redirect URIs, post logout redirect URIs y Web origins
+a las URLs HTTPS indicadas arriba; no se modifican automáticamente en el servidor.
+
+`GET https://localhost:7070/api/health` devuelve:
 
 ```json
 {"status":"ok","application":"SADInformes"}
@@ -115,14 +145,15 @@ Las pruebas Node comprueban estructura, dependencias y arranque HTTP real de la 
 Las pruebas Angular comprueban contenedor, página inicial y redirección de rutas.
 
 Para verificar el arranque integrado después de compilar, sin servidores previos
-en los puertos 5086 y 4206:
+en los puertos 7070 y 4200 (y 5086 para el listener HTTP compatible):
 
 ```sh
 node --test tests/dev-smoke.mjs
 ```
 
-Esta prueba inicia WebApi con el perfil `http`, espera la redirección a Angular,
-comprueba la página y su JavaScript, consulta `/api/health` a través del frontend
+Esta prueba inicia WebApi con el perfil `https`, espera la redirección a Angular,
+valida TLS con el certificado exportado, comprueba la página y su JavaScript,
+consulta `/api/health` a través del frontend
 y cierra el árbol de procesos que inició. Si los puertos están ocupados, falla
 sin detener los procesos existentes.
 

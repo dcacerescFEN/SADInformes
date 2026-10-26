@@ -57,14 +57,22 @@ test('El perfil de WebApi activa el SPA proxy hacia el frontend configurado', ()
   const api = read('src/Web/WebApi/WebApi.csproj');
   assert.match(api, /<SpaRoot>\.\.\/WebUI\/<\/SpaRoot>/);
   assert.match(api, /<SpaProxyLaunchCommand>pnpm start<\/SpaProxyLaunchCommand>/);
-  assert.match(api, /<SpaProxyServerUrl>http:\/\/127\.0\.0\.1:4206<\/SpaProxyServerUrl>/);
-  const profile = json('src/Web/WebApi/Properties/launchSettings.json').profiles.http;
+  assert.match(api, /<SpaProxyServerUrl>https:\/\/localhost:4200<\/SpaProxyServerUrl>/);
+  const profile = json('src/Web/WebApi/Properties/launchSettings.json').profiles.https;
   assert.equal(profile.environmentVariables.ASPNETCORE_HOSTINGSTARTUPASSEMBLIES,
     'Microsoft.AspNetCore.SpaProxy');
-  assert.equal(profile.applicationUrl, 'http://localhost:5086');
+  assert.ok(profile.applicationUrl.split(';').includes('https://localhost:7070'));
   const proxy = json('src/Web/WebUI/src/proxy.conf.json');
-  assert.equal(proxy['/api'].target, profile.applicationUrl);
-  assert.match(json('src/Web/WebUI/package.json').scripts.start, /--port 4206/);
+  assert.equal(proxy['/api'].target, 'https://localhost:7070');
+  const scripts = json('src/Web/WebUI/package.json').scripts;
+  assert.equal(scripts.prestart, 'node aspnetcore-https.js');
+  assert.equal(scripts.start, 'node start-dev.js');
+  const launcher = read('src/Web/WebUI/start-dev.js');
+  assert.match(launcher, /'--ssl'/);
+  assert.match(launcher, /'--port', '4200'/);
+  assert.match(launcher, /'--host', 'localhost'/);
+  const ignore = read('.gitignore');
+  assert.match(ignore, /\*\*\/\.certs\//);
 });
 
 test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () => {

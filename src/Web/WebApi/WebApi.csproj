@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <SpaRoot>../WebUI/</SpaRoot>
     <SpaProxyLaunchCommand>pnpm start</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>http://127.0.0.1:4206</SpaProxyServerUrl>
+    <SpaProxyServerUrl>https://localhost:4200</SpaProxyServerUrl>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../Application/Application.csproj" />
