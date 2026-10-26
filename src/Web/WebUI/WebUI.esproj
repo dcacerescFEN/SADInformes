@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.127-alpha">
+  <PropertyGroup>
+    <StartupCommand>pnpm start</StartupCommand>
+    <BuildCommand>pnpm build</BuildCommand>
+    <JavaScriptTestFramework>Vitest</JavaScriptTestFramework>
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <PublishAssetsDirectory>$(MSBuildProjectDirectory)/dist/webui/browser</PublishAssetsDirectory>
+  </PropertyGroup>
+</Project>
