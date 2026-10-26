@@ -4,7 +4,10 @@
     <Project Path="src/Application/Application.csproj" />
     <Project Path="src/Infrastructure/Infrastructure.csproj" />
     <Project Path="src/Web/WebApi/WebApi.csproj" />
-    <Project Path="src/Web/WebUI/WebUI.esproj" />
+    <Project Path="src/Web/WebUI/WebUI.esproj">
+      <Build />
+      <Deploy />
+    </Project>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/WebApi.Tests/WebApi.Tests.csproj" />
