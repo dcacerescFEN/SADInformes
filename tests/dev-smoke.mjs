@@ -84,4 +84,12 @@ test('WebApi inicia Angular y el frontend puede consultar la API', { timeout: 12
   assert.equal(health.status, 200);
   assert.match(health.headers.get('content-type'), /application\/json/);
   assert.deepEqual(await health.json(), { status: 'ok', application: 'SADInformes' });
+  const configuration = await fetch(frontend + '/api/config/keycloak');
+  assert.equal(configuration.status, 200);
+  assert.deepEqual(await configuration.json(), {
+    url: 'https://sso-dev.fen.uchile.cl', realm: 'FenUChile', clientId: 'SADInformes',
+  });
+  const anonymousSession = await fetch(frontend + '/api/auth/me');
+  assert.equal(anonymousSession.status, 401);
+  assert.equal(await anonymousSession.text(), '');
 });

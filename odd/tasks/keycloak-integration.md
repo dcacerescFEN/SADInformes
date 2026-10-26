@@ -9,9 +9,9 @@ S3. "el mismo servidor y real el cliendId es SADInformes"
 
 ## Tasks
 T0 | S2 | inline | completado | commit: ce7785c | Registrar base existente de etapa 1.
-T1 | S1-S3 | inline + verificación independiente | completado | commit: por registrar | Configuración pública y validación JWT de la API.
-T2 | S1-S3 | inline + verificación independiente | pendiente | commit: pendiente | Sesión Angular, guard, interceptor y cierre de sesión.
-T3 | S1-S3 | verificación independiente + revisión nativa | pendiente | commit: pendiente | Comprobar integración, actualizar documentación y cerrar.
+T1 | S1-S3 | inline + verificación independiente | completado | commit: 46d928a | Configuración pública y validación JWT de la API.
+T2 | S1-S3 | inline + verificación independiente | completado | commit: por registrar | Sesión Angular, guard, interceptor y cierre de sesión.
+T3 | S1-S3 | verificación independiente + revisión nativa | en progreso | commit: pendiente | Comprobar integración, actualizar documentación y cerrar.
 
 ## Log
 L1. "necesito que crees un nuevo sistema el SADInformes, utiliza la base de SADAlumnos como la integracion con keycloack, la barra de navegación y utiliza la sidebar que tiene SADAdministracion, genera un plan"
@@ -21,3 +21,6 @@ L4. Servidor público de referencia: https://sso-dev.fen.uchile.cl; realm: FenUC
 L5. Diseño: conservar /api/health anónimo; exponer solo url/realm/clientId; /api/auth/me requiere JWT válido. Sin permisos funcionales, suplantación ni clientes administrativos.
 L6. Git estaba inicializado en master, sin commits; se crea una rama de funcionalidad y un checkpoint de la etapa 1 como base de comparación. No push ni publicación.
 L7. API: RED HTTP observado (404 en configuración); primer intento .NET no compiló por dependencia aún ausente. GREEN: 11 pruebas .NET y 7 Node; RSA efímero, audiencia/issuer/firma/vigencia y sesión anónima comprobados.
+L8. Verificador independiente T1: aceptado S1-S3 sin bloqueadores. Revisión nativa no disponible: package-local-binary-missing; no se reintentará esta unidad.
+L9. Angular: RED (9 fallos de comportamiento) seguido de GREEN de suite completa y build. Adaptador keycloak-js 26.2.4, como SADAlumnos; sesión solo en memoria, redirecciones del mismo origen y renovación fallida bloquea la solicitud.
+L10. La consulta OIDC real fue bloqueada al resolver a dirección interna; no se eludió el bloqueo. Login real requiere conectividad institucional y cliente configurado; no se modificó Keycloak remotamente.

@@ -35,6 +35,28 @@ Solo se guardan valores públicos en `appsettings.json`. Se pueden sobrescribir
 mediante `Keycloak__Url`, `Keycloak__Realm` y `Keycloak__ClientId`;
 no se necesita ni debe añadirse un client secret a la SPA.
 
+### Configuración del cliente en Keycloak
+
+La configuración del servidor se realiza por el administrador; esta aplicación
+no crea ni modifica clientes ni usuarios. Para `SADInformes`:
+
+- Cliente OpenID Connect público, `Client authentication` desactivado.
+- Standard flow habilitado y PKCE S256.
+- Redirect URIs y post logout redirect URIs:
+  `http://127.0.0.1:4206/*` en desarrollo.
+- Web origins: `http://127.0.0.1:4206`, no `*`.
+- El access token debe incluir `SADInformes` en `aud`; configurar un audience
+  mapper si el realm no lo incluye. Tener `azp=SADInformes` no sustituye `aud`.
+
+La SPA comprueba SSO antes del router, exige sesión al entrar y renueva el token
+antes de llamar a `/api/`. Los tokens permanecen en memoria del adaptador, no
+en localStorage/sessionStorage. El interceptor no adjunta tokens a terceros.
+Si falla la renovación, se limpia la sesión y no se envía la solicitud.
+La página inicial ofrece cierre de sesión, sin incorporar navbar ni sidebar.
+
+Las pruebas automatizadas usan adaptadores simulados; el login real requiere
+un usuario del realm y que el administrador haya registrado estas URLs.
+
 ## Requisitos
 
 SDK .NET 10, Node.js compatible con Angular 22
@@ -120,10 +142,9 @@ quedan fuera de esta etapa.
 
 ## Siguientes etapas
 
-1. Integración Keycloak basada en SADAlumnos, con cliente y permisos propios.
-2. Navbar de SADAlumnos.
-3. Sidebar de SADAdministracion adaptada a informes.
-4. Catálogo de informes y fuentes de datos aprobados.
+1. Navbar de SADAlumnos.
+2. Sidebar de SADAdministracion adaptada a informes.
+3. Permisos funcionales, catálogo de informes y fuentes de datos aprobados.
 
 No copiar connection strings, secretos, entidades, procedimientos ni servicios
 funcionales de los sistemas de referencia.

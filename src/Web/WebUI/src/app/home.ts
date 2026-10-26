@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AuthService } from './core/auth/auth-service';
 
 @Component({
   selector: 'app-home',
@@ -6,9 +7,30 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     <main>
       <h1>SADInformes</h1>
       <p>Base del sistema de informes.</p>
-      <p>Autenticación, navegación e informes se incorporarán en etapas posteriores.</p>
+      @if (auth.isAuthenticated()) {
+        <p>Sesión iniciada: {{ auth.username() }}</p>
+        <button type="button" (click)="logout()">Cerrar sesión</button>
+      } @else {
+        <p>Tu sesión ha finalizado.</p>
+        <button type="button" (click)="login()">Iniciar sesión</button>
+      }
+      @if (error()) { <p role="alert">{{ error() }}</p> }
+      <p>La navegación y los informes se incorporarán en etapas posteriores.</p>
     </main>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Home {}
+export class Home {
+  readonly auth = inject(AuthService);
+  readonly error = signal('');
+
+  async login(): Promise<void> {
+    try { await this.auth.login(); }
+    catch { this.error.set('No se pudo iniciar sesión. Intenta nuevamente.'); }
+  }
+
+  async logout(): Promise<void> {
+    try { await this.auth.logout(); }
+    catch { this.error.set('No se pudo cerrar sesión. Intenta nuevamente.'); }
+  }
+}
