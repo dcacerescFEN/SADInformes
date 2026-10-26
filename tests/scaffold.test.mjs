@@ -35,6 +35,8 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
         [...project.matchAll(/<PackageReference Include="([^"]+)"/g)].map((match) => match[1]),
         ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer'],
       );
+    } else if (layer === 'Infrastructure') {
+      assert.match(project, /PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12"/);
     } else {
       assert.doesNotMatch(project, /<PackageReference/);
     }
@@ -88,7 +90,8 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
 
 test('La configuración usa el servidor y realm de referencia con cliente propio, sin base de datos', () => {
   const settings = json('src/Web/WebApi/appsettings.json');
-  assert.deepEqual(Object.keys(settings).sort(), ['AllowedHosts', 'Keycloak', 'Logging']);
+  assert.deepEqual(Object.keys(settings).sort(), ['AllowedHosts', 'ConfigureSite', 'Keycloak', 'Logging']);
+  assert.deepEqual(settings.ConfigureSite, { ApplicationName: 'SADInformes', EnvironmentName: 'DEV' });
   assert.deepEqual(settings.Keycloak, {
     Url: 'https://sso-dev.fen.uchile.cl', Realm: 'FenUChile', ClientId: 'SADInformes',
   });

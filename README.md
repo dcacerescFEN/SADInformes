@@ -57,6 +57,41 @@ La página inicial ofrece cierre de sesión, sin incorporar navbar ni sidebar.
 Las pruebas automatizadas usan adaptadores simulados; el login real requiere
 un usuario del realm y que el administrador haya registrado estas URLs.
 
+## Menú central de AppConfig
+
+`GET /api/config/site` requiere un Bearer de SADInformes y devuelve únicamente
+`{ menu: { ... } }`. Lee registros activos de aplicación **SADInformes** y
+ambiente **DEV**; también exige aplicación y ambiente activos.
+
+Configurar `ConnectionStrings__AppConfig` en el entorno del proceso WebApi, fuera
+del repositorio. Usar una cuenta con permiso de lectura sobre
+`Applications`, `Environments` y `Configurations`. No registrar conexiones
+ni contraseñas en commits o capturas. Los selectores públicos están en
+`ConfigureSite:ApplicationName` y `ConfigureSite:EnvironmentName`.
+
+Claves centrales admitidas, en pares URL/clientId:
+
+| Destino | URL | Cliente físico |
+| --- | --- | --- |
+| Alumnos | StudentUrl | StudentClientId |
+| Profesores | TeacherUrl | TeacherClientId |
+| Cursos | CoursesMenuUrl | CoursesMenuClientId |
+| Exámenes | ExamsMenuUrl | ExamsMenuClientId |
+| Actividades | ActivitiesMenuUrl | ActivitiesMenuClientId |
+| Ayudantes | AssistantsMenuUrl | AssistantsMenuClientId |
+| Procesos | ProcessesMenuUrl | ProcessesMenuClientId |
+| Administración | AdministrationMenuUrl | AdministrationMenuClientId |
+
+No se crean tablas, migraciones, registros ni valores predeterminados. El modelo
+EF conserva nombres y relaciones de AppConfig en SADAlumnos. Las claves se
+interpretan sin distinguir mayúsculas; duplicados activos de una misma clave
+rechazan el menú. Otras claves, incluidas credenciales, nunca se publican.
+
+Sin conexión o ante errores de AppConfig, el endpoint devuelve 503 con un mensaje
+genérico, sin detalles SQL. Health y Keycloak no dependen de AppConfig. Las pruebas
+del lector usan una base EF InMemory aislada y el endpoint HTTP real, no el SQL
+institucional.
+
 ## Requisitos
 
 SDK .NET 10, Node.js compatible con Angular 22

@@ -12,6 +12,11 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
+using Application.Navigation;
+using Infrastructure.Data;
+using Infrastructure.Navigation;
+using Microsoft.EntityFrameworkCore;
+using Configuration = Domain.Entities.AppConfig.Configuration;
 
 namespace WebApi.Tests;
 
@@ -97,6 +102,100 @@ public sealed class AuthenticationTests : IDisposable
             await response.Content.ReadAsStringAsync());
         Assert.Equal(HttpStatusCode.NotFound, (await _client.GetAsync("/api/reports")).StatusCode);
     }
+
+    [Fact]
+    public async Task The_menu_requires_authentication()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, (await _client.GetAsync("/api/config/site")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("application")]
+    [InlineData("environment")]
+    [InlineData("inactive-config")]
+    [InlineData("inactive-application")]
+    [InlineData("inactive-environment")]
+    public async Task Menu_reads_only_active_SADInformes_DEV_rows_and_known_keys(string excluded)
+    {
+        var rows = new[]
+        {
+            MenuRow("StudentUrl", "https://alumnos.example.test"),
+            MenuRow("studentclientid", "SADAlumnos"),
+            MenuRow("ConnectionString", "never-publish-this"),
+            MenuRow("TeacherUrl", "https://excluded.example.test", excluded),
+        };
+        using var factory = MenuFactory(rows);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var menu = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("menu");
+        Assert.Equal(16, menu.EnumerateObject().Count());
+        Assert.Equal("https://alumnos.example.test", menu.GetProperty("studentUrl").GetString());
+        Assert.Equal("SADAlumnos", menu.GetProperty("studentClientId").GetString());
+        Assert.Equal(JsonValueKind.Null, menu.GetProperty("teacherUrl").ValueKind);
+        Assert.DoesNotContain("never-publish-this", menu.GetRawText());
+    }
+
+    [Fact]
+    public async Task Duplicate_active_keys_fail_closed_without_exposing_values()
+    {
+        using var factory = MenuFactory([
+            MenuRow("StudentUrl", "https://first.example.test"),
+            MenuRow("studenturl", "https://second.example.test"),
+        ]);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.DoesNotContain("example.test", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Database_errors_return_only_a_sanitized_unavailable_response()
+    {
+        using var factory = _factory.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            services.AddSingleton<ISiteMenuProvider>(new AppConfigSiteMenuProvider(
+                () => throw new InvalidOperationException("private-database-detail"), "SADInformes", "DEV"))));
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("private-database-detail", body);
+        Assert.Equal("La navegación no está disponible.",
+            JsonDocument.Parse(body).RootElement.GetProperty("title").GetString());
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/health")).StatusCode);
+    }
+
+    private WebApplicationFactory<Program> MenuFactory(Configuration[] rows)
+    {
+        var options = new DbContextOptionsBuilder<AppConfigContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using (var seed = new AppConfigContext(options))
+        {
+            seed.Configurations.AddRange(rows);
+            seed.SaveChanges();
+        }
+        return _factory.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            services.AddSingleton<ISiteMenuProvider>(new AppConfigSiteMenuProvider(
+                () => new AppConfigContext(options), "SADInformes", "DEV"))));
+    }
+
+    private static Configuration MenuRow(string key, string value, string? excluded = null) => new()
+    {
+        ConfigurationName = key, ConfigurationValue = value, IsActive = excluded != "inactive-config",
+        Application = new()
+        {
+            ApplicationName = excluded == "application" ? "SADAlumnos" : "SADInformes",
+            IsActive = excluded != "inactive-application",
+        },
+        Environment = new()
+        {
+            EnvironmentName = excluded == "environment" ? "PROD" : "DEV",
+            IsActive = excluded != "inactive-environment",
+        },
+    };
 
     private string CreateToken(string? defect = null)
     {

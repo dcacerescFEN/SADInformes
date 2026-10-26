@@ -50,5 +50,8 @@ test('La API mantiene health y publica configuración, sin permitir una sesión 
   const session = await fetch(url + '/api/auth/me');
   assert.equal(session.status, 401);
   assert.equal(await session.text(), '');
+  const menu = await fetch(url + '/api/config/site');
+  assert.equal(menu.status, 401);
+  assert.equal(await menu.text(), '');
   assert.equal(errors, '');
 });
