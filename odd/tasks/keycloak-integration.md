@@ -13,7 +13,7 @@ S4. "agrega el  https y ocupa los mismo puertos que ocupan sadalumnos y sadadmin
 T0 | S2 | inline | completado | commit: ce7785c | Registrar base existente de etapa 1.
 T1 | S1-S3 | inline + verificación independiente | completado | commit: 46d928a | Configuración pública y validación JWT de la API.
 T2 | S1-S3 | inline + verificación independiente | completado | commit: b0d41f4 | Sesión Angular, guard, interceptor y cierre de sesión.
-T3 | S1-S3 | verificación independiente + revisión nativa | bloqueado: decisión humana sobre prueba real y revisión no disponible | commit: b0d41f4 | Comprobar integración, actualizar documentación y cerrar.
+T3 | S1-S3 | verificación independiente + revisión nativa | completado: login real confirmado por usuario; revisión nativa no disponible | commit: b0d41f4 | Comprobar integración, actualizar documentación y cerrar.
 
 T4 | S4 | inline | completado | commit: 0b0d4bf | Fijar pruebas de HTTPS y puertos.
 T5 | S4 | inline | completado | commit: 0b0d4bf | Configurar certificados locales, HTTPS 7070/4200 y proxy.
@@ -40,3 +40,5 @@ L17. RED observado: la prueba de configuración exige https://localhost:7070 y h
 L18. HTTPS principal: localhost:7070 y localhost:4200. Se preserva el perfil http y su listener 5086, añadiendo 7070 para mantener funcional el proxy. Certificado solo en .certs ignorado; NODE_EXTRA_CA_CERTS solo en el proceso Angular y proxy secure:true. La confianza global se deja como comando manual.
 L19. GREEN: build solución y Angular, 11 pruebas .NET, suite Angular, 7 Node y smoke HTTPS aprobados. El smoke validó certificado/hostname, redirección 7070→4200 y health/config/me401 por el proxy. Verificador independiente aceptó S4 sin bloqueadores.
 L20. Unidad HTTPS registrada en 0b0d4bf. Native assess de este commit no disponible (package-local-binary-missing); se conserva verificación independiente aprobada. La modificación humana de la solución permanece sin stage ni commit. T3 sigue esperando la decisión anterior, sin nuevas solicitudes de login real.
+L21. "funciona el login"
+L22. El usuario confirma login real después del cambio HTTPS. Se cierra T3 con evidencia manual del usuario, pruebas locales y verificación independiente; la revisión nativa sigue no disponible y no se afirma aprobación nativa. La confirmación no acredita por separado refresh/logout reales ni autoriza las etapas siguientes.
