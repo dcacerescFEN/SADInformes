@@ -15,8 +15,8 @@ S7. "sadinformes-dev.fen.uchile.cl, para verlo debe seguir el mismo comportamien
 
 ## Tasks
 T1 | S1-S7 | inline | completado | commit: 096a0ef; 6909ab0; 567f686 (destino Informes) | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
-T2 | S1-S7 | inline | en progreso | commit: 25226f0 (núcleo), 63981f6 (UI); paridad pendiente | Incorporar navbar, acceso por cliente, tema y sesión.
-T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
+T2 | S1-S7 | inline | completado | commit: 25226f0 (núcleo), 63981f6 (UI), fee473a (Informes/paridad) | Incorporar navbar, acceso por cliente, tema y sesión.
+T3 | S1-S7 | verificación independiente + revisión nativa | bloqueado: prueba SQL real y validación visual del operador | commit: 63981f6; fee473a | Verificar API, navbar responsive, regresiones y documentación.
 
 ## Log
 L1. "necesito que crees un nuevo sistema el SADInformes, utiliza la base de SADAlumnos como la integracion con keycloack, la barra de navegación y utiliza la sidebar que tiene SADAdministracion, genera un plan"
@@ -57,3 +57,5 @@ L35. RED frontend observado: 8 de 64 casos fallaron por Report no autorizado/no 
 L36. GREEN inicial UI y build aprobados; bundle652,96kB (aviso500kB, límite1MB). Ajustado correo para conservar solo tooltip ng-bootstrap, sin título nativo duplicado, con aserción DOM; suite/build final en curso.
 L37. Diferencial del helper de acceso contra base: 150 casos de clientes previos conservan resultados, incluidos permisos REPORT colocados en clientes incorrectos y variantes -iis. Snapshot temporal de fuente dentro del proyecto eliminado. Node emitió aviso de detección de módulo TypeScript solo en este probe; no se altera package.type ni scripts productivos.
 L38. GREEN final frontend: suite Angular completa y build aprobados; bundle652,94kB (mismo aviso500kB, bajo1MB). Lista Informes antes de Administración, active/aria-current en Informes, logo sin caption, breakpointlg, estilos y controles de referencia; se conserva accesibilidad y no se agrega sidebar.
+L39. Verificador independiente aceptó S6-S7 y ambas unidades567f686/fee473a sin bloqueadores. Smoke HTTPS y build solución aprobaron; 9 Node finales. Revisión nativa de ambas unidades no disponible por package-local-binary-missing, sin autoridad creada. No se aplican probes adicionales redundantes.
+L40. T1/T2 completos; T3 solo espera prueba SQL real y visual institucional. Se preservan sin stage/commit cambios humanos en SADInformes.slnx, appsettings.json y appsettings.Development.json. No se consultó SQL/Keycloak real ni se modificaron filas. Reiniciar WebApi para recargar snapshot; en IIS configurar cliente físico destino explícito.
