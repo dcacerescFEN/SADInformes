@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,7 @@ using Application.Configuration;
 using Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Configuration = Domain.Entities.AppConfig.Configuration;
+using WebApi.Authentication;
 
 namespace WebApi.Tests;
 
@@ -27,6 +29,7 @@ public sealed class AuthenticationTests : IDisposable
     private readonly RSA _rsa = RSA.Create(2048);
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
+    private readonly string _clientId;
 
     public AuthenticationTests()
     {
@@ -34,16 +37,27 @@ public sealed class AuthenticationTests : IDisposable
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Testing");
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConfigureSite:ApplicationName"] = "SADInformes",
+                ["ConfigureSite:EnvironmentName"] = "DEV",
+                ["ConnectionStrings:AppConfig"] = "",
+            }));
             builder.ConfigureServices(services =>
+            {
+                services.AddSingleton<IAppConfigurationReader>(new AppConfigConfigurationReader(
+                    () => throw new InvalidOperationException("AppConfig no configurado en la prueba.")));
                 services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     var config = new OpenIdConnectConfiguration { Issuer = Issuer };
                     config.SigningKeys.Add(key);
                     options.ConfigurationManager =
                         new StaticConfigurationManager<OpenIdConnectConfiguration>(config);
-                }));
+                });
+            });
         });
         _client = _factory.CreateClient();
+        _clientId = _factory.Services.GetRequiredService<PublicKeycloakConfiguration>().ClientId;
     }
 
     [Fact]
@@ -56,7 +70,8 @@ public sealed class AuthenticationTests : IDisposable
             body.EnumerateObject().Select(property => property.Name).Order().ToArray());
         Assert.Equal("https://sso-dev.fen.uchile.cl", body.GetProperty("url").GetString());
         Assert.Equal("FenUChile", body.GetProperty("realm").GetString());
-        Assert.Equal("SADInformes", body.GetProperty("clientId").GetString());
+        Assert.Contains(_clientId, new[] { "SADInformes", "SADInformes-iis" });
+        Assert.Equal(_clientId, body.GetProperty("clientId").GetString());
     }
 
     [Fact]
@@ -131,7 +146,7 @@ public sealed class AuthenticationTests : IDisposable
         var response = await client.GetAsync("/api/config/site");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var menu = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("menu");
-        Assert.Equal(16, menu.EnumerateObject().Count());
+        Assert.Equal(18, menu.EnumerateObject().Count());
         Assert.Equal("https://alumnos.example.test", menu.GetProperty("studentUrl").GetString());
         Assert.Equal("SADAlumnos", menu.GetProperty("studentClientId").GetString());
         Assert.Equal("https://sadprofesores-dev.fen.uchile.cl", menu.GetProperty("teacherUrl").GetString());
@@ -170,7 +185,7 @@ public sealed class AuthenticationTests : IDisposable
     }
 
     [Fact]
-    public async Task Missing_menu_values_use_the_same_public_defaults_as_SADAlumnos()
+    public async Task Missing_menu_values_use_reference_defaults_and_the_confirmed_Reports_destination()
     {
         using var factory = MenuFactory([]);
         using var client = factory.CreateClient();
@@ -187,9 +202,10 @@ public sealed class AuthenticationTests : IDisposable
             ("activitiesMenu", "https://sadactividades-dev.fen.uchile.cl", "SADActividades"),
             ("assistantsMenu", "https://sadayudantes-dev.fen.uchile.cl", "SADAyudantes"),
             ("processesMenu", "https://sadprocesos-dev.fen.uchile.cl", "SADProcesos"),
+            ("reportsMenu", "https://sadinformes-dev.fen.uchile.cl", "SADInformes"),
             ("administrationMenu", "https://sadadministracion-dev.fen.uchile.cl", "SADAdministracion"),
         };
-        Assert.Equal(16, menu.EnumerateObject().Count());
+        Assert.Equal(18, menu.EnumerateObject().Count());
         foreach (var (key, url, id) in defaults)
         {
             Assert.Equal(url, menu.GetProperty(key + "Url").GetString());
@@ -222,6 +238,26 @@ public sealed class AuthenticationTests : IDisposable
             Assert.DoesNotContain("custom.example.test", await response.Content.ReadAsStringAsync());
             Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/health")).StatusCode);
         }
+    }
+
+    [Theory]
+    [InlineData("https://custom-reports.example.test", "SADInformes-iis")]
+    [InlineData("  https://custom-reports.example.test  ", "")]
+    public async Task Reports_values_from_AppConfig_override_defaults_without_changing_other_destinations(
+        string url, string clientId)
+    {
+        using var factory = MenuFactory([
+            MenuRow("reportsmenuurl", url), MenuRow("REPORTSMENUCLIENTID", clientId),
+        ]);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var menu = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("menu");
+        Assert.Equal(url.Trim(), menu.GetProperty("reportsMenuUrl").GetString());
+        Assert.Equal(clientId, menu.GetProperty("reportsMenuClientId").GetString());
+        Assert.Equal("SADAdministracion", menu.GetProperty("administrationMenuClientId").GetString());
+        Assert.Equal("https://sadadministracion-dev.fen.uchile.cl", menu.GetProperty("administrationMenuUrl").GetString());
     }
 
     [Fact]
@@ -285,7 +321,7 @@ public sealed class AuthenticationTests : IDisposable
         var now = DateTime.UtcNow;
         var token = new JwtSecurityToken(
             issuer: defect == "issuer" ? "https://other.invalid/realms/other" : Issuer,
-            audience: defect == "audience" ? "SADAlumnos" : "SADInformes",
+            audience: defect == "audience" ? "SADAlumnos" : _clientId,
             claims: [new Claim("sub", "test-user"), new Claim("preferred_username", "usuario-prueba")],
             notBefore: defect == "future" ? now.AddMinutes(5) : now.AddMinutes(-10),
             expires: defect == "expired" ? now.AddMinutes(-5) : now.AddMinutes(10),

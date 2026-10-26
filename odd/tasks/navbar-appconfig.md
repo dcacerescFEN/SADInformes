@@ -10,9 +10,12 @@ S4. "SADInformes /DEV"
 
 S5. "sigue el formato de esta en SADAlumnos, Ocupa los EndpointExtension y IEdnpoint, ademas ConfigurationInitialiser tambien agrega el valor por defecto"
 
+S6. "hay cosas que en la barra de navegación no estan iguales que en los otros sitios, el link de SADInformes agregalo en la configuracion deberia ir antes de Administración"
+S7. "sadinformes-dev.fen.uchile.cl, para verlo debe seguir el mismo comportamiento de los demas debe tener el permiso de REPORT_ACCESS no se si la traduccion es correcta de informe sino cambiala"
+
 ## Tasks
-T1 | S1-S5 | inline | completado | commit: 096a0ef; 6909ab0 | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
-T2 | S1-S4 | inline | completado | commit: 25226f0 (núcleo), 63981f6 (UI) | Incorporar navbar, acceso por cliente, tema y sesión.
+T1 | S1-S7 | inline | completado | commit: 096a0ef; 6909ab0; Informes por registrar | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
+T2 | S1-S7 | inline | en progreso | commit: 25226f0 (núcleo), 63981f6 (UI); paridad pendiente | Incorporar navbar, acceso por cliente, tema y sesión.
 T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
 
 ## Log
@@ -42,3 +45,10 @@ L23. GREEN final backend: 24 pruebas .NET aprobadas, incluido snapshot único po
 L24. Compilación emite NU1902/NU1903 por System.Security.Cryptography.Pkcs 9.0.11 transitivo. No se cambian versiones ni se ocultan avisos como parte de S5; se registra para decisión separada.
 L25. Verificador independiente S5: cumplido, sin bloqueadores; confirma versiones PackageReference sin cambios y singleton por host. Smoke HTTPS aprobado tras el refactor; se mantienen puertos7070/4200 y proxy, assets y autorizaciones previas.
 L26. Corrección S5 registrada en 6909ab0. Assess de la unidad no disponible (package-local-binary-missing); verificación independiente cumplida sin bloqueadores. T1 se cierra con 24 pruebas .NET, 8 Node, diferencial y smoke HTTPS aprobados. T3 conserva bloqueo externo SQL/visual; no se afirma prueba de SQL real ni aprobación nativa.
+L27. "hay cosas que en la barra de navegación no estan iguales que en los otros sitios, el link de SADInformes agregalo en la configuracion deberia ir antes de Administración"
+L28. "sadinformes-dev.fen.uchile.cl, para verlo debe seguir el mismo comportamiento de los demas debe tener el permiso de REPORT_ACCESS no se si la traduccion es correcta de informe sino cambiala"
+L29. ReportsMenuUrl=https://sadinformes-dev.fen.uchile.cl y ReportsMenuClientId=SADInformes, con overrides de AppConfig. Report es traducción correcta; conservar REPORT_ACCESS. Misma política de destinos: roles nuevos REPORT_ADMIN/SUPERADMIN o permiso REPORT_ACCESS en cliente físico exacto, incluyendo separación -iis.
+L30. Preservar cambios humanos en SADInformes.slnx, appsettings.json y appsettings.Development.json. Pruebas deben aislar configuración y lectura AppConfig para no usar conexiones operativas ni asumir que producción y Development tienen el mismo clientId.
+L31. Fixture de pruebas: la captura temprana de Keycloak conserva el clientId público configurado (plain o -iis). Se usa ese valor para tokens de prueba sin modificar validadores; el lector AppConfig se sustituye por fixture aislado y los tests de proceso fijan conexión vacía. La prueba enfocada de configuración pública aprobó tras corregir la suposición anterior del test.
+L32. RED backend Informes: 3 fallos esperados (16 campos en vez de 18 y claves Reports inexistentes); implementadas claves/defaults, GREEN completo en curso.
+L33. GREEN T1: 26 pruebas .NET y 8 Node aprobadas con fixtures aislados. Las dos claves nuevas se publican con default confirmado y overrides case-insensitive, sin cambiar destinos previos ni configurar archivos operativos.

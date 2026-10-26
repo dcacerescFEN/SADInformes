@@ -10,8 +10,8 @@ public static class SiteMenuFields
     public static IReadOnlyList<string> Names { get; } = Array.AsReadOnly(new[]
     {
         "StudentUrl", "TeacherUrl", "CoursesMenuUrl", "ExamsMenuUrl",
-        "ActivitiesMenuUrl", "AssistantsMenuUrl", "ProcessesMenuUrl", "AdministrationMenuUrl",
+        "ActivitiesMenuUrl", "AssistantsMenuUrl", "ProcessesMenuUrl", "ReportsMenuUrl", "AdministrationMenuUrl",
         "StudentClientId", "TeacherClientId", "CoursesMenuClientId", "ExamsMenuClientId",
-        "ActivitiesMenuClientId", "AssistantsMenuClientId", "ProcessesMenuClientId", "AdministrationMenuClientId",
+        "ActivitiesMenuClientId", "AssistantsMenuClientId", "ProcessesMenuClientId", "ReportsMenuClientId", "AdministrationMenuClientId",
     });
 }

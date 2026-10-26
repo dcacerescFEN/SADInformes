@@ -56,6 +56,12 @@ test('WebApi inicia Angular y el frontend puede consultar la API', { timeout: 12
   const child = spawn('dotnet', ['run', '--no-build', '--launch-profile', 'https'], {
     cwd: fileURLToPath(new URL('../src/Web/WebApi/', import.meta.url)),
     detached: process.platform !== 'win32',
+    env: {
+      ...process.env, ConnectionStrings__AppConfig: '',
+      Keycloak__Url: 'https://sso-dev.fen.uchile.cl',
+      Keycloak__Realm: 'FenUChile', Keycloak__ClientId: 'SADInformes',
+      ConfigureSite__ApplicationName: 'SADInformes', ConfigureSite__EnvironmentName: 'DEV',
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';

@@ -37,6 +37,7 @@ public sealed class ConfigurationInitialiser(
         ["ActivitiesMenuUrl"] = "https://sadactividades-dev.fen.uchile.cl",
         ["AssistantsMenuUrl"] = "https://sadayudantes-dev.fen.uchile.cl",
         ["ProcessesMenuUrl"] = "https://sadprocesos-dev.fen.uchile.cl",
+        ["ReportsMenuUrl"] = "https://sadinformes-dev.fen.uchile.cl",
         ["AdministrationMenuUrl"] = "https://sadadministracion-dev.fen.uchile.cl",
         ["StudentClientId"] = "SADAlumnos",
         ["TeacherClientId"] = "SADProfesores",
@@ -45,6 +46,7 @@ public sealed class ConfigurationInitialiser(
         ["ActivitiesMenuClientId"] = "SADActividades",
         ["AssistantsMenuClientId"] = "SADAyudantes",
         ["ProcessesMenuClientId"] = "SADProcesos",
+        ["ReportsMenuClientId"] = "SADInformes",
         ["AdministrationMenuClientId"] = "SADAdministracion",
     };
 

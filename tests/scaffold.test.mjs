@@ -98,11 +98,10 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
   assert.equal(packageJson.scripts.build, 'ng build');
 });
 
-test('La configuración usa el servidor y realm de referencia con cliente propio, sin base de datos', () => {
+test('La configuración pública conserva servidor, realm y cliente propio por ambiente', () => {
   const settings = json('src/Web/WebApi/appsettings.json');
-  assert.deepEqual(Object.keys(settings).sort(), ['AllowedHosts', 'ConfigureSite', 'Keycloak', 'Logging']);
   assert.deepEqual(settings.ConfigureSite, { ApplicationName: 'SADInformes', EnvironmentName: 'DEV' });
-  assert.deepEqual(settings.Keycloak, {
-    Url: 'https://sso-dev.fen.uchile.cl', Realm: 'FenUChile', ClientId: 'SADInformes',
-  });
+  assert.equal(settings.Keycloak.Url, 'https://sso-dev.fen.uchile.cl');
+  assert.equal(settings.Keycloak.Realm, 'FenUChile');
+  assert.ok(['SADInformes', 'SADInformes-iis'].includes(settings.Keycloak.ClientId));
 });

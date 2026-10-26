@@ -8,7 +8,13 @@ test('La API mantiene health y publica configuración, sin permitir una sesión 
   const dll = fileURLToPath(new URL('../src/Web/WebApi/bin/Debug/net10.0/WebApi.dll', import.meta.url));
   const child = spawn('dotnet', [dll, '--urls', 'http://127.0.0.1:0'], {
     cwd: fileURLToPath(new URL('../src/Web/WebApi/', import.meta.url)),
-    env: { ...process.env, ASPNETCORE_ENVIRONMENT: 'Development' },
+    env: {
+      ...process.env, ASPNETCORE_ENVIRONMENT: 'Development',
+      ConnectionStrings__AppConfig: '',
+      Keycloak__Url: 'https://sso-dev.fen.uchile.cl',
+      Keycloak__Realm: 'FenUChile', Keycloak__ClientId: 'SADInformes',
+      ConfigureSite__ApplicationName: 'SADInformes', ConfigureSite__EnvironmentName: 'DEV',
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';

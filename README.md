@@ -81,6 +81,7 @@ Claves centrales admitidas, en pares URL/clientId:
 | Actividades | ActivitiesMenuUrl | ActivitiesMenuClientId |
 | Ayudantes | AssistantsMenuUrl | AssistantsMenuClientId |
 | Procesos | ProcessesMenuUrl | ProcessesMenuClientId |
+| Informes | ReportsMenuUrl | ReportsMenuClientId |
 | Administración | AdministrationMenuUrl | AdministrationMenuClientId |
 
 `ConfigurationInitialiser` carga AppConfig una vez durante el arranque mediante
@@ -100,6 +101,7 @@ Las claves ausentes o nulas usan los mismos defaults públicos de SADAlumnos:
 | Actividades | https://sadactividades-dev.fen.uchile.cl | SADActividades |
 | Ayudantes | https://sadayudantes-dev.fen.uchile.cl | SADAyudantes |
 | Procesos | https://sadprocesos-dev.fen.uchile.cl | SADProcesos |
+| Informes | https://sadinformes-dev.fen.uchile.cl | SADInformes |
 | Administración | https://sadadministracion-dev.fen.uchile.cl | SADAdministracion |
 
 `StatusSite` usa `1` como default operativo, sin añadirlo al contrato público
@@ -136,10 +138,17 @@ mezclan con los del cliente sin sufijo. Se admiten los roles nuevos
 | SADActividades | ACTIVITY | — |
 | SADAyudantes | ASSISTANT | — |
 | SADProcesos | PROCESS | — |
+| SADInformes | REPORT | PERMISSION_REPORT_ACCESS |
 
 Un destino sin clientId, desconocido, sin cliente en el token o con roles antiguos
-se oculta. No se infiere una política de informes: el acceso a SADInformes sigue
-siendo la sesión ya integrada. La marca lleva al inicio del sistema actual.
+se oculta. Informes aparece antes de Administración y requiere en su cliente
+físico `ROLE_REPORT_ADMIN`, `ROLE_REPORT_SUPERADMIN` o `PERMISSION_REPORT_ACCESS`,
+con el mismo criterio de los demás destinos. `REPORT_ACCESS` es el nombre lógico
+confirmado; no se renombra. La marca lleva al inicio del sistema actual.
+
+En despliegues IIS, configurar `ReportsMenuClientId` con el cliente físico destino
+(por ejemplo `SADInformes-iis`); no se mezclan permisos entre variantes.
+Estos cambios no crean ni modifican filas de AppConfig automáticamente.
 
 Las URLs deben ser HTTP(S) absolutas, sin credenciales, espacios ni caracteres
 de control. Si existe acceso pero falta una URL válida, el enlace queda sin
