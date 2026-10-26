@@ -11,7 +11,7 @@ S4. "SADInformes /DEV"
 S5. "sigue el formato de esta en SADAlumnos, Ocupa los EndpointExtension y IEdnpoint, ademas ConfigurationInitialiser tambien agrega el valor por defecto"
 
 ## Tasks
-T1 | S1-S5 | inline | en progreso | commit: 096a0ef; corrección pendiente | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
+T1 | S1-S5 | inline | completado | commit: 096a0ef; 6909ab0 | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
 T2 | S1-S4 | inline | completado | commit: 25226f0 (núcleo), 63981f6 (UI) | Incorporar navbar, acceso por cliente, tema y sesión.
 T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
 
@@ -41,3 +41,4 @@ L22. GREEN inicial: 23 pruebas .NET y 8 Node aprobadas, incluidas todas las ruta
 L23. GREEN final backend: 24 pruebas .NET aprobadas, incluido snapshot único por host. Diferencial HTTP contra b4d94c3 aprobado para seis rutas: status, Content-Type, challenge y cuerpo idénticos, stderr y terminación iguales. La copia temporal dentro del proyecto se eliminó al terminar.
 L24. Compilación emite NU1902/NU1903 por System.Security.Cryptography.Pkcs 9.0.11 transitivo. No se cambian versiones ni se ocultan avisos como parte de S5; se registra para decisión separada.
 L25. Verificador independiente S5: cumplido, sin bloqueadores; confirma versiones PackageReference sin cambios y singleton por host. Smoke HTTPS aprobado tras el refactor; se mantienen puertos7070/4200 y proxy, assets y autorizaciones previas.
+L26. Corrección S5 registrada en 6909ab0. Assess de la unidad no disponible (package-local-binary-missing); verificación independiente cumplida sin bloqueadores. T1 se cierra con 24 pruebas .NET, 8 Node, diferencial y smoke HTTPS aprobados. T3 conserva bloqueo externo SQL/visual; no se afirma prueba de SQL real ni aprobación nativa.
