@@ -14,7 +14,7 @@ test('La solución contiene las cuatro capas del backend y el proyecto WebUI', (
   assert.deepEqual(projects, [
     'src/Application/Application.csproj', 'src/Domain/Domain.csproj',
     'src/Infrastructure/Infrastructure.csproj', 'src/Web/WebApi/WebApi.csproj',
-    'src/Web/WebUI/WebUI.esproj',
+    'src/Web/WebUI/WebUI.esproj', 'tests/WebApi.Tests/WebApi.Tests.csproj',
   ]);
 });
 
@@ -33,7 +33,7 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
     if (layer === 'Web/WebApi') {
       assert.deepEqual(
         [...project.matchAll(/<PackageReference Include="([^"]+)"/g)].map((match) => match[1]),
-        ['Microsoft.AspNetCore.SpaProxy'],
+        ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer'],
       );
     } else {
       assert.doesNotMatch(project, /<PackageReference/);
@@ -78,7 +78,10 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
   assert.equal(packageJson.scripts.build, 'ng build');
 });
 
-test('La configuración inicial no requiere base de datos ni autenticación', () => {
-  assert.deepEqual(Object.keys(json('src/Web/WebApi/appsettings.json')).sort(),
-    ['AllowedHosts', 'Logging']);
+test('La configuración usa el servidor y realm de referencia con cliente propio, sin base de datos', () => {
+  const settings = json('src/Web/WebApi/appsettings.json');
+  assert.deepEqual(Object.keys(settings).sort(), ['AllowedHosts', 'Keycloak', 'Logging']);
+  assert.deepEqual(settings.Keycloak, {
+    Url: 'https://sso-dev.fen.uchile.cl', Realm: 'FenUChile', ClientId: 'SADInformes',
+  });
 });

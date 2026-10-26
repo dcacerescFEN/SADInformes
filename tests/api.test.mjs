@@ -4,7 +4,7 @@ import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-test('La API arranca sin SQL ni Keycloak y expone solo el diagnóstico inicial', { timeout: 15000 }, async (t) => {
+test('La API mantiene health y publica configuración, sin permitir una sesión anónima', { timeout: 15000 }, async (t) => {
   const dll = fileURLToPath(new URL('../src/Web/WebApi/bin/Debug/net10.0/WebApi.dll', import.meta.url));
   const child = spawn('dotnet', [dll, '--urls', 'http://127.0.0.1:0'], {
     cwd: fileURLToPath(new URL('../src/Web/WebApi/', import.meta.url)),
@@ -42,5 +42,13 @@ test('La API arranca sin SQL ni Keycloak y expone solo el diagnóstico inicial',
   for (const path of ['/api/Students', '/api/auth', '/api/reports']) {
     assert.equal((await fetch(url + path)).status, 404, path);
   }
+  const config = await fetch(url + '/api/config/keycloak');
+  assert.equal(config.status, 200);
+  assert.deepEqual(await config.json(), {
+    url: 'https://sso-dev.fen.uchile.cl', realm: 'FenUChile', clientId: 'SADInformes',
+  });
+  const session = await fetch(url + '/api/auth/me');
+  assert.equal(session.status, 401);
+  assert.equal(await session.text(), '');
   assert.equal(errors, '');
 });

@@ -1,7 +1,7 @@
 # SADInformes
 
-Base independiente del sistema de informes. Etapa 1: estructura de SADAlumnos,
-sin copiar sus funcionalidades ni configuración sensible.
+Base independiente del sistema de informes, basada en SADAlumnos sin copiar
+sus funcionalidades ni configuración sensible. Etapa 2: integración Keycloak.
 
 ## Alcance
 
@@ -9,12 +9,31 @@ sin copiar sus funcionalidades ni configuración sensible.
   Application e Infrastructure y enlaza el proyecto Angular `WebUI.esproj`.
 - Angular 22 standalone, rutas lazy y detección OnPush.
 - Página inicial y diagnóstico `GET /api/health`.
-- Sin base de datos, autenticación, navbar, sidebar ni informes. Las capas interiores
+- Autenticación JWT de la API con Keycloak. Sin base de datos, navbar, sidebar ni informes. Las capas interiores
   permanecen vacías hasta que exista una funcionalidad que las necesite.
 - No se modifican SADAlumnos ni SADAdministracion.
 
 Esta etapa no está preparada para exposición pública ni uso con datos reales.
-Keycloak y los permisos se incorporarán antes de implementar informes.
+Los permisos funcionales se definirán antes de implementar informes.
+
+## Keycloak
+
+Servidor: `https://sso-dev.fen.uchile.cl`; realm: `FenUChile`;
+cliente público: `SADInformes` (sensible a mayúsculas).
+
+La API valida firma, issuer, audiencia y vigencia del token; no acepta audiencia
+`SADAlumnos`. No se copia administración de usuarios, suplantación ni permisos
+`STUDENT_*`.
+
+- `GET /api/health`: público, conserva el diagnóstico.
+- `GET /api/config/keycloak`: público, solo `url`, `realm` y `clientId`.
+- `GET /api/auth/me`: exige Bearer válido y devuelve `username`;
+  sin token o con token inválido responde 401, sin identidad.
+- Los endpoints de negocio futuros deben declarar su autorización explícitamente.
+
+Solo se guardan valores públicos en `appsettings.json`. Se pueden sobrescribir
+mediante `Keycloak__Url`, `Keycloak__Realm` y `Keycloak__ClientId`;
+no se necesita ni debe añadirse un client secret a la SPA.
 
 ## Requisitos
 
@@ -61,12 +80,15 @@ Desde la raíz de SADInformes:
 
 ```sh
 dotnet build SADInformes.slnx
+dotnet test tests/WebApi.Tests/WebApi.Tests.csproj
 node --test tests/*.test.mjs
 cd src/Web/WebUI
 pnpm build
 pnpm test
 ```
 
+Las pruebas .NET usan claves RSA efímeras y metadatos OIDC locales al proceso:
+validan tokens por HTTP sin usuarios ni acceso al servidor Keycloak real.
 Las pruebas Node comprueban estructura, dependencias y arranque HTTP real de la API.
 Las pruebas Angular comprueban contenedor, página inicial y redirección de rutas.
 

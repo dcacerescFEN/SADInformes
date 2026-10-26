@@ -6,4 +6,7 @@
     <Project Path="src/Web/WebApi/WebApi.csproj" />
     <Project Path="src/Web/WebUI/WebUI.esproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WebApi.Tests/WebApi.Tests.csproj" />
+  </Folder>
 </Solution>
