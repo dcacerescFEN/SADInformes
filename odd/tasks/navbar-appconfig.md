@@ -10,8 +10,8 @@ S4. "SADInformes /DEV"
 
 ## Tasks
 T1 | S1-S4 | inline | completado | commit: 096a0ef | Leer menú propio de AppConfig mediante endpoint autenticado.
-T2 | S1-S4 | inline | completado | commit: 25226f0 (núcleo); UI por registrar | Incorporar navbar, acceso por cliente, tema y sesión.
-T3 | S1-S4 | verificación independiente + revisión nativa | en progreso | commit: pendiente | Verificar API, navbar responsive, regresiones y documentación.
+T2 | S1-S4 | inline | completado | commit: 25226f0 (núcleo), 63981f6 (UI) | Incorporar navbar, acceso por cliente, tema y sesión.
+T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
 
 ## Log
 L1. "necesito que crees un nuevo sistema el SADInformes, utiliza la base de SADAlumnos como la integracion con keycloack, la barra de navegación y utiliza la sidebar que tiene SADAdministracion, genera un plan"
@@ -29,3 +29,6 @@ L12. T2 (núcleo de navegación): RED con 23 fallos; GREEN 47 pruebas de sesión
 L13. Revisión nativa de 25226f0 no disponible por binario local ausente. UI: RED observado en 8 pruebas de navbar/tema; implementación integrada con Bootstrap/ng-bootstrap de mismas versiones que SADAlumnos, logo original y temas propios. GREEN y build en curso.
 L14. No hay herramientas de navegador disponibles en la sesión (búsqueda de capacidades sin resultados). Se ejecutan pruebas DOM de interacción y smoke HTTPS de assets/API; no se afirmará inspección visual real.
 L15. UI GREEN: suite Angular completa y build aprobados tras RED de 8 pruebas. Advertencia de bundle inicial: 642,59 kB frente al umbral de aviso 500 kB, bajo el límite de error 1 MB; no se cambió el presupuesto para ocultarla.
+L16. Smoke final y build solución aprobados: 7 Node y 1 smoke HTTPS; sirve logo original y JavaScript, mantiene health/config Keycloak y rechaza menú anónimo con 401 por el proxy.
+L17. Verificador independiente aceptó T2-T3 frontend (25226f0 y 63981f6), S1-S4, sin bloqueadores. Revisión nativa de 63981f6 no disponible por package-local-binary-missing; no autoridad creada ni aprobación nativa afirmada.
+L18. Pendiente externo para cerrar T3: definir ConnectionStrings__AppConfig en el proceso WebApi con acceso de lectura y confirmar registros SADInformes/DEV; validar navbar real en navegador institucional. No se copiaron credenciales ni se modificaron filas. La modificación humana de SADInformes.slnx se conserva fuera de commits. No push.
