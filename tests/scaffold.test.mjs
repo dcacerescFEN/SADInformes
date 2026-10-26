@@ -82,8 +82,9 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
   assert.equal(packageJson.name, 'sadinformes');
   assert.match(packageJson.dependencies['@angular/core'], /^22\./);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    '@angular/common', '@angular/compiler', '@angular/core',
-    '@angular/platform-browser', '@angular/router', 'keycloak-js', 'rxjs', 'tslib',
+    '@angular/common', '@angular/compiler', '@angular/core', '@angular/forms', '@angular/localize',
+    '@angular/platform-browser', '@angular/router', '@ng-bootstrap/ng-bootstrap', '@popperjs/core',
+    'bootstrap', 'bootstrap-icons', 'keycloak-js', 'rxjs', 'tslib',
   ]);
   assert.equal(packageJson.scripts.build, 'ng build');
 });

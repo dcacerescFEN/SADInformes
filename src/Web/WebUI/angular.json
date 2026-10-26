@@ -26,7 +26,18 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "src/styles.scss"
+            ],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           },
           "configurations": {

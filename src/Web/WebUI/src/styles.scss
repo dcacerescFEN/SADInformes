@@ -1,15 +1,19 @@
 :root {
-  font-family: system-ui, sans-serif;
-  color: #182338;
-  background: #f5f7fa;
+  --primary-blue: #003b7a;
+  --primary-blue-deep: #06245a;
+  --layout-background: #f4f7fb;
+  --layout-text: #1e2b3c;
 }
-
+:root[data-theme='dark'] {
+  --primary-blue: #295ea4;
+  --primary-blue-deep: #0d1b3d;
+  --layout-background: #0e1525;
+  --layout-text: #e5edf8;
+}
 body {
   margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--layout-text);
+  background: var(--layout-background);
 }
-
-main {
-  max-width: 64rem;
-  margin: 4rem auto;
-  padding: 0 1.5rem;
-}
+main { max-width: 64rem; margin: 2rem auto; padding: 0 1.5rem; }

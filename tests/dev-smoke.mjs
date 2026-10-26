@@ -114,6 +114,13 @@ test('WebApi inicia Angular y el frontend puede consultar la API', { timeout: 12
   assert.deepEqual(await configuration.json(), {
     url: 'https://sso-dev.fen.uchile.cl', realm: 'FenUChile', clientId: 'SADInformes',
   });
+  const logo = await fetchLocal(frontend + '/logo-fen-white-letters.svg');
+  assert.equal(logo.status, 200);
+  assert.match(logo.headers.get('content-type'), /image\/svg\+xml/);
+  assert.match(await logo.text(), /<svg/);
+  const menu = await fetchLocal(frontend + '/api/config/site');
+  assert.equal(menu.status, 401);
+  assert.equal(await menu.text(), '');
   const anonymousSession = await fetchLocal(frontend + '/api/auth/me');
   assert.equal(anonymousSession.status, 401);
   assert.equal(await anonymousSession.text(), '');

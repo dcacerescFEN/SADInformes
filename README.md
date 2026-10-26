@@ -1,7 +1,7 @@
 # SADInformes
 
 Base independiente del sistema de informes, basada en SADAlumnos sin copiar
-sus funcionalidades ni configuración sensible. Etapa 2: integración Keycloak.
+sus funcionalidades ni configuración sensible. Etapa 3: navbar con AppConfig.
 
 ## Alcance
 
@@ -9,8 +9,8 @@ sus funcionalidades ni configuración sensible. Etapa 2: integración Keycloak.
   Application e Infrastructure y enlaza el proyecto Angular `WebUI.esproj`.
 - Angular 22 standalone, rutas lazy y detección OnPush.
 - Página inicial y diagnóstico `GET /api/health`.
-- Autenticación JWT de la API con Keycloak. Sin base de datos, navbar, sidebar ni informes. Las capas interiores
-  permanecen vacías hasta que exista una funcionalidad que las necesite.
+- Autenticación JWT con Keycloak y navbar basada en SADAlumnos.
+- AppConfig SQL de solo lectura. Sin base funcional, sidebar ni informes.
 - No se modifican SADAlumnos ni SADAdministracion.
 
 Esta etapa no está preparada para exposición pública ni uso con datos reales.
@@ -52,7 +52,8 @@ La SPA comprueba SSO antes del router, exige sesión al entrar y renueva el toke
 antes de llamar a `/api/`. Los tokens permanecen en memoria del adaptador, no
 en localStorage/sessionStorage. El interceptor no adjunta tokens a terceros.
 Si falla la renovación, se limpia la sesión y no se envía la solicitud.
-La página inicial ofrece cierre de sesión, sin incorporar navbar ni sidebar.
+La navbar ofrece cierre de sesión, selector de tema y navegación entre sistemas.
+No se incorpora sidebar en esta etapa.
 
 Las pruebas automatizadas usan adaptadores simulados; el login real requiere
 un usuario del realm y que el administrador haya registrado estas URLs.
@@ -119,6 +120,21 @@ Las URLs deben ser HTTP(S) absolutas, sin credenciales, espacios ni caracteres
 de control. Si existe acceso pero falta una URL válida, el enlace queda sin
 `href`, deshabilitado y fuera del recorrido de tabulación. El filtro de la navbar
 no sustituye la autorización de cada API destino.
+
+### Presentación y sesión
+
+La barra conserva marca FEN, enlaces con iconos, menú móvil colapsable,
+correo FEN, cambio de contraseña y cierre de sesión. El inicio se identifica como
+SADInformes; no se incluye el control de sidebar ni suplantación.
+
+Los temas Claro/Oscuro/Auto usan la clave local
+`sadinformes-theme-preference`, sin modificar la preferencia de SADAlumnos.
+Auto sigue los cambios de tema del sistema. Si el navegador bloquea el
+almacenamiento, el tema funciona durante la sesión sin persistirlo.
+
+Ante fallo de AppConfig, se muestra `No se pudo cargar la navegación.`;
+los controles de usuario y tema siguen disponibles y no se conservan enlaces
+obsoletos. Un fallo al cerrar sesión muestra un aviso sin ocultarlo.
 
 ## Requisitos
 
@@ -236,9 +252,8 @@ quedan fuera de esta etapa.
 
 ## Siguientes etapas
 
-1. Navbar de SADAlumnos.
-2. Sidebar de SADAdministracion adaptada a informes.
-3. Permisos funcionales, catálogo de informes y fuentes de datos aprobados.
+1. Sidebar de SADAdministracion adaptada a informes.
+2. Permisos funcionales, catálogo de informes y fuentes de datos aprobados.
 
 No copiar connection strings, secretos, entidades, procedimientos ni servicios
 funcionales de los sistemas de referencia.
