@@ -12,6 +12,7 @@ const DESTINATIONS = [
   ['activities', 'Actividades', 'bi-calendar-event', 'activitiesMenuUrl', 'activitiesMenuClientId'],
   ['assistants', 'Ayudantes', 'bi-people', 'assistantsMenuUrl', 'assistantsMenuClientId'],
   ['processes', 'Procesos', 'bi-gear', 'processesMenuUrl', 'processesMenuClientId'],
+  ['reports', 'Informes', 'bi-file-earmark-bar-graph', 'reportsMenuUrl', 'reportsMenuClientId'],
   ['administration', 'Administración', 'bi-shield-lock', 'administrationMenuUrl', 'administrationMenuClientId'],
 ] as const;
 

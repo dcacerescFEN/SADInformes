@@ -86,6 +86,14 @@ test('WebApi descubre IEndpoint e inicializa configuración antes de servir', ()
   assert.match(read('src/Web/WebApi/Extension/IEndpoint.cs'), /interface IEndpoint/);
 });
 
+test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
+  const styles = read('src/Web/WebUI/src/app/core/layout/header.scss');
+  assert.match(styles, /max-width:\s*991\.98px/);
+  assert.match(styles, /max-width:\s*575\.98px/);
+  assert.doesNotMatch(styles, /1199\.98px/);
+  assert.match(styles, /padding:\s*0\.375rem 0\.75rem/);
+});
+
 test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () => {
   const packageJson = json('src/Web/WebUI/package.json');
   assert.equal(packageJson.name, 'sadinformes');

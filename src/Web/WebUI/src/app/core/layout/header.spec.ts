@@ -36,10 +36,28 @@ describe('Navbar basada en SADAlumnos', () => {
     expect(load).toHaveBeenCalledOnce();
     expect(root.querySelector('nav[aria-label="Navegación principal"]')).not.toBeNull();
     expect(root.querySelector('.navbar-brand img')?.getAttribute('src')).toBe('/logo-fen-white-letters.svg');
-    expect(root.querySelector('.navbar-brand')?.textContent).toContain('SADInformes');
+    expect(root.querySelector('.navbar-brand')?.textContent?.trim()).toBe('');
+    expect(root.querySelector('nav')?.classList.contains('navbar-expand-lg')).toBe(true);
+    expect(root.querySelector('nav')?.classList.contains('navbar-expand-xl')).toBe(false);
     expect(root.querySelector('a[aria-label="Alumnos"]')?.getAttribute('href')).toBe('https://alumnos.example.test');
     expect(root.textContent).not.toContain('Profesores');
     expect(root.querySelector('aside')).toBeNull();
+    expect(root.querySelector('a[aria-label="Correo FEN"]')?.hasAttribute('title')).toBe(false);
+  });
+
+  it('muestra Informes antes de Administración y lo marca como sitio actual', () => {
+    links.set([
+      { key: 'student', label: 'Alumnos', icon: 'bi-person-badge', url: 'https://alumnos.example.test' },
+      { key: 'reports', label: 'Informes', icon: 'bi-file-earmark-bar-graph', url: 'https://sadinformes-dev.fen.uchile.cl' },
+      { key: 'administration', label: 'Administración', icon: 'bi-shield-lock', url: 'https://admin.example.test' },
+    ]);
+    fixture.detectChanges();
+    const anchors = [...fixture.nativeElement.querySelectorAll('a.header-nav-link')] as HTMLAnchorElement[];
+    expect(anchors.map((link) => link.getAttribute('aria-label'))).toEqual(['Alumnos', 'Informes', 'Administración']);
+    expect(anchors[1].classList.contains('active')).toBe(true);
+    expect(anchors[1].getAttribute('aria-current')).toBe('page');
+    expect(anchors[2].classList.contains('active')).toBe(false);
+    expect(fixture.nativeElement.querySelector('.navbar-brand').hasAttribute('aria-current')).toBe(false);
   });
 
   it('alterna el menú móvil y lo cierra al elegir destino', () => {

@@ -1,6 +1,7 @@
 const POLICIES = new Map<string, { module: string; permission?: string }>([
   ['NewSAD', { module: 'SAD', permission: 'SAD_ACCESS' }],
   ['SADAlumnos', { module: 'STUDENT', permission: 'STUDENT_ACCESS_STUDENT_MODULE' }],
+  ['SADInformes', { module: 'REPORT', permission: 'REPORT_ACCESS' }],
   ['SADAdministracion', { module: 'ADMINISTRATION', permission: 'ADMINISTRATION_ACCESS' }],
   ['SADProfesores', { module: 'TEACHER' }],
   ['SADCursos', { module: 'COURSE' }],

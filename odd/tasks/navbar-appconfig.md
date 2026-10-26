@@ -14,7 +14,7 @@ S6. "hay cosas que en la barra de navegación no estan iguales que en los otros 
 S7. "sadinformes-dev.fen.uchile.cl, para verlo debe seguir el mismo comportamiento de los demas debe tener el permiso de REPORT_ACCESS no se si la traduccion es correcta de informe sino cambiala"
 
 ## Tasks
-T1 | S1-S7 | inline | completado | commit: 096a0ef; 6909ab0; Informes por registrar | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
+T1 | S1-S7 | inline | completado | commit: 096a0ef; 6909ab0; 567f686 (destino Informes) | Adaptar endpoints descubiertos e inicialización del menú con defaults de referencia.
 T2 | S1-S7 | inline | en progreso | commit: 25226f0 (núcleo), 63981f6 (UI); paridad pendiente | Incorporar navbar, acceso por cliente, tema y sesión.
 T3 | S1-S4 | verificación independiente + revisión nativa | bloqueado: conexión SQL y validación visual del operador | commit: 63981f6 | Verificar API, navbar responsive, regresiones y documentación.
 
@@ -52,3 +52,8 @@ L30. Preservar cambios humanos en SADInformes.slnx, appsettings.json y appsettin
 L31. Fixture de pruebas: la captura temprana de Keycloak conserva el clientId público configurado (plain o -iis). Se usa ese valor para tokens de prueba sin modificar validadores; el lector AppConfig se sustituye por fixture aislado y los tests de proceso fijan conexión vacía. La prueba enfocada de configuración pública aprobó tras corregir la suposición anterior del test.
 L32. RED backend Informes: 3 fallos esperados (16 campos en vez de 18 y claves Reports inexistentes); implementadas claves/defaults, GREEN completo en curso.
 L33. GREEN T1: 26 pruebas .NET y 8 Node aprobadas con fixtures aislados. Las dos claves nuevas se publican con default confirmado y overrides case-insensitive, sin cambiar destinos previos ni configurar archivos operativos.
+L34. Unidad backend 567f686 evaluada: revisión nativa no disponible por package-local-binary-missing. Frontend: pruebas RED de nuevos permisos, orden de enlaces, marca sin texto añadido y breakpoints/espaciados de referencia en curso.
+L35. RED frontend observado: 8 de 64 casos fallaron por Report no autorizado/no incluido, orden y marca/breakpoint distintos; prueba CSS también falló. Implementados política REPORT confirmada, destino antes de Administración y paridad de marca/clases/espaciado. Estructurales Node GREEN; suite Angular completa y build en curso.
+L36. GREEN inicial UI y build aprobados; bundle652,96kB (aviso500kB, límite1MB). Ajustado correo para conservar solo tooltip ng-bootstrap, sin título nativo duplicado, con aserción DOM; suite/build final en curso.
+L37. Diferencial del helper de acceso contra base: 150 casos de clientes previos conservan resultados, incluidos permisos REPORT colocados en clientes incorrectos y variantes -iis. Snapshot temporal de fuente dentro del proyecto eliminado. Node emitió aviso de detección de módulo TypeScript solo en este probe; no se altera package.type ni scripts productivos.
+L38. GREEN final frontend: suite Angular completa y build aprobados; bundle652,94kB (mismo aviso500kB, bajo1MB). Lista Informes antes de Administración, active/aria-current en Informes, logo sin caption, breakpointlg, estilos y controles de referencia; se conserva accesibilidad y no se agrega sidebar.

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
-  NgbCollapseModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem,
+  NgbCollapseModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem, NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { NavigationService } from '../navigation/navigation-service';
@@ -9,24 +9,24 @@ import { ThemeStore } from './theme-store';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, NgbCollapseModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem],
+  imports: [RouterLink, NgbCollapseModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem, NgbTooltip],
   template: `
-    <nav class="navbar navbar-expand-xl navbar-dark nav-header" aria-label="Navegación principal">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm nav-header" aria-label="Navegación principal">
       <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/" aria-current="page">
-          <img src="/logo-fen-white-letters.svg" height="28" alt="FEN Universidad de Chile">
-          <span>SADInformes</span>
+        <a class="navbar-brand" routerLink="/" aria-label="Inicio de SADInformes">
+          <img src="/logo-fen-white-letters.svg" height="28" alt="FEN Universidad de Chile" class="mx-auto">
         </a>
         <button class="navbar-toggler" type="button" aria-label="Alternar navegación"
           aria-controls="main-navigation" [attr.aria-expanded]="!isMenuCollapsed"
           (click)="isMenuCollapsed = !isMenuCollapsed">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div id="main-navigation" class="navbar-collapse" [ngbCollapse]="isMenuCollapsed">
+        <div id="main-navigation" class="collapse navbar-collapse" [ngbCollapse]="isMenuCollapsed">
           <ul class="navbar-nav me-auto">
             @for (item of navigation.links(); track item.key) {
               <li class="nav-item">
-                <a class="header-nav-link" [attr.aria-label]="item.label" [attr.href]="item.url"
+                <a class="nav-link header-nav-link" [attr.aria-label]="item.label" [attr.href]="item.url"
+                  [class.active]="item.key === 'reports'" [attr.aria-current]="item.key === 'reports' ? 'page' : null"
                   [attr.aria-disabled]="item.url ? null : 'true'" [attr.tabindex]="item.url ? null : -1"
                   (click)="isMenuCollapsed = true">
                   <i [class]="'bi ' + item.icon" aria-hidden="true"></i><span>{{ item.label }}</span>
@@ -35,35 +35,34 @@ import { ThemeStore } from './theme-store';
             }
           </ul>
           <div class="header-actions d-flex align-items-center">
-            <div ngbDropdown>
-              <button id="themeMenu" class="header-icon-btn" type="button" ngbDropdownToggle aria-label="Cambiar tema">
-                <i [class]="'bi ' + themeIcon()" aria-hidden="true"></i>
+            <div ngbDropdown class="me-3">
+              <button id="themeMenu" class="header-icon-btn dropdown-toggle" type="button" ngbDropdownToggle aria-label="Cambiar tema">
+                <i [class]="'bi fs-5 ' + themeIcon()" aria-hidden="true"></i>
               </button>
-              <div class="dropdown-menu-end" ngbDropdownMenu aria-labelledby="themeMenu">
+              <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="themeMenu">
                 @for (choice of themes; track choice[0]) {
                   <button ngbDropdownItem type="button" [attr.data-theme-choice]="choice[0]"
                     [attr.aria-pressed]="theme.preference() === choice[0]" (click)="theme.setPreference(choice[0])">
                     <i [class]="'bi me-2 ' + choice[2]" aria-hidden="true"></i>{{ choice[1] }}
-                    @if (theme.preference() === choice[0]) { <i class="bi bi-check2 ms-2" aria-hidden="true"></i> }
+                    @if (theme.preference() === choice[0]) { <i class="bi bi-check2 ms-auto" aria-hidden="true"></i> }
                   </button>
                 }
               </div>
             </div>
-            <a class="header-icon-btn" href="http://g.fen.uchile.cl" target="_blank"
-              rel="noopener noreferrer" aria-label="Correo FEN" title="Correo FEN">
-              <i class="bi bi-envelope" aria-hidden="true"></i>
+            <a class="text-white me-3" href="http://g.fen.uchile.cl" target="_blank" ngbTooltip="Correo FEN"
+              rel="noopener noreferrer" aria-label="Correo FEN">
+              <i class="bi bi-envelope fs-5" aria-hidden="true"></i>
             </a>
-            <div ngbDropdown>
-              <button id="userMenu" class="header-icon-btn" type="button" ngbDropdownToggle aria-label="Menú de usuario">
-                <i class="bi bi-person-circle" aria-hidden="true"></i>
+            <div ngbDropdown class="me-3">
+              <button id="userMenu" class="header-icon-btn dropdown-toggle" type="button" ngbDropdownToggle aria-label="Menú de usuario">
+                <i class="bi bi-person-circle fs-5" aria-hidden="true"></i>
               </button>
-              <div class="dropdown-menu-end" ngbDropdownMenu aria-labelledby="userMenu">
-                <span class="dropdown-header">{{ auth.username() }}</span>
+              <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="userMenu">
                 <a ngbDropdownItem href="https://cuenta.fen.uchile.cl" target="_blank" rel="noopener noreferrer">
-                  <i class="bi bi-key-fill me-2" aria-hidden="true"></i>Cambiar contraseña
+                  <i class="bi bi-key-fill me-2" aria-hidden="true"></i>Cambiar Contraseña
                 </a>
                 <button ngbDropdownItem type="button" data-action="logout" (click)="logout()">
-                  <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Cerrar sesión
+                  <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Cerrar Sesión
                 </button>
               </div>
             </div>

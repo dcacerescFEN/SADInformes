@@ -157,9 +157,11 @@ no sustituye la autorización de cada API destino.
 
 ### Presentación y sesión
 
-La barra conserva marca FEN, enlaces con iconos, menú móvil colapsable,
-correo FEN, cambio de contraseña y cierre de sesión. El inicio se identifica como
-SADInformes; no se incluye el control de sidebar ni suplantación.
+La barra conserva el logo FEN sin texto añadido a la marca, enlaces con iconos,
+menú móvil colapsable y breakpoint `lg` (992 px), espaciados y controles de
+SADAlumnos. Informes aparece antes de Administración y se marca como sitio
+actual. Se conservan correo FEN, cambio de contraseña y cierre de sesión;
+no se incluye el control de sidebar ni suplantación.
 
 Los temas Claro/Oscuro/Auto usan la clave local
 `sadinformes-theme-preference`, sin modificar la preferencia de SADAlumnos.
