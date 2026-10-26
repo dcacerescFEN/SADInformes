@@ -15,9 +15,9 @@ T1 | S1-S3 | inline + verificación independiente | completado | commit: 46d928a
 T2 | S1-S3 | inline + verificación independiente | completado | commit: b0d41f4 | Sesión Angular, guard, interceptor y cierre de sesión.
 T3 | S1-S3 | verificación independiente + revisión nativa | bloqueado: decisión humana sobre prueba real y revisión no disponible | commit: b0d41f4 | Comprobar integración, actualizar documentación y cerrar.
 
-T4 | S4 | inline | completado | commit: pendiente | Fijar pruebas de HTTPS y puertos.
-T5 | S4 | inline | completado | commit: pendiente | Configurar certificados locales, HTTPS 7070/4200 y proxy.
-T6 | S4 | verificación independiente + revisión nativa | en progreso | commit: pendiente | Verificar arranque TLS, regresiones y documentación.
+T4 | S4 | inline | completado | commit: 0b0d4bf | Fijar pruebas de HTTPS y puertos.
+T5 | S4 | inline | completado | commit: 0b0d4bf | Configurar certificados locales, HTTPS 7070/4200 y proxy.
+T6 | S4 | verificación independiente + revisión nativa | completado con revisión nativa no disponible | commit: 0b0d4bf | Verificar arranque TLS, regresiones y documentación.
 
 ## Log
 L1. "necesito que crees un nuevo sistema el SADInformes, utiliza la base de SADAlumnos como la integracion con keycloack, la barra de navegación y utiliza la sidebar que tiene SADAdministracion, genera un plan"
@@ -39,3 +39,4 @@ L16. Se conserva la modificación humana de SADInformes.slnx (Build/Deploy de We
 L17. RED observado: la prueba de configuración exige https://localhost:7070 y https://localhost:4200 y falla contra los puertos anteriores.
 L18. HTTPS principal: localhost:7070 y localhost:4200. Se preserva el perfil http y su listener 5086, añadiendo 7070 para mantener funcional el proxy. Certificado solo en .certs ignorado; NODE_EXTRA_CA_CERTS solo en el proceso Angular y proxy secure:true. La confianza global se deja como comando manual.
 L19. GREEN: build solución y Angular, 11 pruebas .NET, suite Angular, 7 Node y smoke HTTPS aprobados. El smoke validó certificado/hostname, redirección 7070→4200 y health/config/me401 por el proxy. Verificador independiente aceptó S4 sin bloqueadores.
+L20. Unidad HTTPS registrada en 0b0d4bf. Native assess de este commit no disponible (package-local-binary-missing); se conserva verificación independiente aprobada. La modificación humana de la solución permanece sin stage ni commit. T3 sigue esperando la decisión anterior, sin nuevas solicitudes de login real.
