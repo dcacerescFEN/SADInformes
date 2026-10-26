@@ -19,9 +19,11 @@ export class AuthService {
   private keycloak?: Keycloak;
   private readonly authenticated = signal(false);
   private readonly user = signal('');
+  private readonly displayName = signal('');
   private readonly resourceAccess = signal<unknown>(undefined);
   readonly isAuthenticated = this.authenticated.asReadonly();
   readonly username = this.user.asReadonly();
+  readonly name = this.displayName.asReadonly();
 
   async initialize(): Promise<void> {
     const response = await fetch('/api/config/keycloak');
@@ -52,6 +54,7 @@ export class AuthService {
     await this.requireKeycloak().logout({ redirectUri: window.location.origin + '/' });
     this.authenticated.set(false);
     this.user.set('');
+    this.displayName.set('');
     this.resourceAccess.set(undefined);
   }
 
@@ -85,5 +88,8 @@ export class AuthService {
     this.authenticated.set(this.keycloak?.authenticated === true);
     this.resourceAccess.set(this.authenticated() ? this.keycloak?.tokenParsed?.['resource_access'] : undefined);
     this.user.set(this.authenticated() ? this.keycloak?.tokenParsed?.['preferred_username'] ?? '' : '');
+    const name: unknown = this.keycloak?.tokenParsed?.['name'];
+    this.displayName.set(this.authenticated() && typeof name === 'string' && name.trim()
+      ? name.trim() : this.user());
   }
 }

@@ -13,7 +13,7 @@ describe('Sesión Keycloak', () => {
   let auth: AuthService;
   let adapter: {
     authenticated: boolean; token: string | undefined;
-    tokenParsed: { preferred_username: string; resource_access?: unknown };
+    tokenParsed: { preferred_username: string; resource_access?: unknown; name?: unknown };
     init: ReturnType<typeof vi.fn>; updateToken: ReturnType<typeof vi.fn>;
     login: ReturnType<typeof vi.fn>; logout: ReturnType<typeof vi.fn>;
     clearToken: ReturnType<typeof vi.fn>;
@@ -80,6 +80,7 @@ describe('Sesión Keycloak', () => {
     expect(adapter.clearToken).toHaveBeenCalledOnce();
     expect(auth.isAuthenticated()).toBe(false);
     expect(auth.username()).toBe('');
+    expect(auth.name()).toBe('');
   });
 
   it('mantiene el destino de login dentro del origen y cierra sesión en Keycloak', async () => {
@@ -139,6 +140,16 @@ describe('Sesión Keycloak', () => {
     adapter.authenticated = false;
     adapter.onAuthLogout?.();
     expect(auth.hasSiteAccess('SADAlumnos')).toBe(false);
+  });
+
+  it.each([
+    [' Usuario Prueba ', 'Usuario Prueba'], [undefined, 'usuario'], [{ invalid: true }, 'usuario'],
+  ])('expone nombre público o username como fallback sin almacenarlo: %s', async (name, expected) => {
+    adapter.tokenParsed.name = name;
+    await auth.initialize();
+    expect(auth.name()).toBe(expected);
+    await auth.logout();
+    expect(auth.name()).toBe('');
   });
 
   it('refleja el cierre de sesión del adaptador', async () => {

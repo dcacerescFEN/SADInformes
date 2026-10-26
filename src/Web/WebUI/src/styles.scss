@@ -3,12 +3,24 @@
   --primary-blue-deep: #06245a;
   --layout-background: #f4f7fb;
   --layout-text: #1e2b3c;
+  --secondary-blue: #2c4a8c;
+  --layout-surface-strong: #ffffff;
+  --layout-muted-text: #607086;
+  --layout-border-color: rgba(214, 223, 235, 0.9);
+  --table-row-hover-background: #f3f6fb;
+  --dropdown-option-selected-background: #dbe8f8;
 }
 :root[data-theme='dark'] {
   --primary-blue: #295ea4;
   --primary-blue-deep: #0d1b3d;
   --layout-background: #0e1525;
   --layout-text: #e5edf8;
+  --secondary-blue: #5b84c4;
+  --layout-surface-strong: #111827;
+  --layout-muted-text: #b5c3d6;
+  --layout-border-color: rgba(76, 95, 126, 0.7);
+  --table-row-hover-background: #1b2537;
+  --dropdown-option-selected-background: #2b3b57;
 }
 body {
   margin: 0;
