@@ -23,14 +23,14 @@ describe('Menú central', () => {
 
   async function load(menu: unknown) {
     const pending = navigation.load();
-    http.expectOne('/api/config/site').flush({ menu });
+    http.expectOne('/api/config/site').flush({ success: true, message: null, data: menu });
     await pending;
   }
 
-  it('usa la configuración y oculta destinos sin cliente o acceso', async () => {
+  it('usa el contrato común con claves canónicas y oculta destinos sin acceso', async () => {
     await load({
-      studentUrl: 'https://alumnos.example.test', studentClientId: ' SADAlumnos ',
-      teacherUrl: 'https://profesores.example.test', teacherClientId: 'SADProfesores',
+      studentsMenuUrl: 'https://alumnos.example.test', studentsMenuClientId: ' SADAlumnos ',
+      teachersMenuUrl: 'https://profesores.example.test', teachersMenuClientId: 'SADProfesores',
       coursesMenuUrl: 'https://cursos.example.test',
     });
     expect(navigation.links()).toEqual([{
@@ -42,7 +42,7 @@ describe('Menú central', () => {
   it('inserta Informes configurado inmediatamente antes de Administración', async () => {
     hasSiteAccess.mockImplementation((id: string) => ['SADAlumnos', 'SADInformes-iis', 'SADAdministracion'].includes(id));
     await load({
-      studentUrl: 'https://alumnos.example.test', studentClientId: 'SADAlumnos',
+      studentsMenuUrl: 'https://alumnos.example.test', studentsMenuClientId: 'SADAlumnos',
       reportsMenuUrl: 'https://sadinformes-dev.fen.uchile.cl', reportsMenuClientId: 'SADInformes-iis',
       administrationMenuUrl: 'https://admin.example.test', administrationMenuClientId: 'SADAdministracion',
     });
@@ -65,7 +65,7 @@ describe('Menú central', () => {
     null, '/relativa', 'javascript:alert(1)', 'data:text/html,x',
     'https://usuario:clave@example.test', 'https://example .test', 'https:///example.test',
   ])('deja deshabilitado un destino autorizado con URL inválida: %s', async (url) => {
-    await load({ studentClientId: 'SADAlumnos', studentUrl: url });
+    await load({ studentsMenuClientId: 'SADAlumnos', studentsMenuUrl: url });
     expect(navigation.links()).toHaveLength(1);
     expect(navigation.links()[0].url).toBeNull();
   });
@@ -75,8 +75,18 @@ describe('Menú central', () => {
     expect(navigation.links()).toEqual([]);
   });
 
+  it('rechaza un envelope fallido aunque contenga destinos', async () => {
+    const pending = navigation.load();
+    http.expectOne('/api/config/site').flush({
+      success: false, data: { studentsMenuClientId: 'SADAlumnos', studentsMenuUrl: 'https://example.test' },
+    });
+    await pending;
+    expect(navigation.links()).toEqual([]);
+    expect(navigation.error()).toBe('No se pudo cargar la navegación.');
+  });
+
   it('retira enlaces anteriores y muestra aviso si AppConfig falla', async () => {
-    await load({ studentClientId: 'SADAlumnos', studentUrl: 'https://alumnos.example.test' });
+    await load({ studentsMenuClientId: 'SADAlumnos', studentsMenuUrl: 'https://alumnos.example.test' });
     const pending = navigation.load();
     http.expectOne('/api/config/site').flush({}, { status: 503, statusText: 'Unavailable' });
     await pending;

@@ -9,6 +9,20 @@
   --layout-border-color: rgba(214, 223, 235, 0.9);
   --table-row-hover-background: #f3f6fb;
   --dropdown-option-selected-background: #dbe8f8;
+  --layout-surface: rgba(255, 255, 255, 0.9);
+  --light-blue: #dbe8f8;
+  --border-gray: #cfd8e3;
+  --input-background: #ffffff;
+  --input-text: #1e2b3c;
+  --input-placeholder: #6c757d;
+  --input-border-color: rgba(206, 212, 218, 0.95);
+  --input-disabled-background: #eef2f7;
+  --input-disabled-text: #6c757d;
+  --table-header-background: #f8fafc;
+  --table-row-background: #ffffff;
+  --dropdown-option-hover-background: #eef4fb;
+  --card-radius: 0.75rem;
+  --card-shadow: 0 2px 10px rgba(15, 35, 70, 0.06);
 }
 :root[data-theme='dark'] {
   --primary-blue: #295ea4;
@@ -21,10 +35,279 @@
   --layout-border-color: rgba(76, 95, 126, 0.7);
   --table-row-hover-background: #1b2537;
   --dropdown-option-selected-background: #2b3b57;
+  --layout-surface: rgba(17, 24, 39, 0.84);
+  --light-blue: #17253d;
+  --border-gray: #31405c;
+  --input-background: #202938;
+  --input-text: #e5edf8;
+  --input-placeholder: #9fb0c9;
+  --input-border-color: rgba(76, 95, 126, 0.9);
+  --input-disabled-background: #1a2333;
+  --input-disabled-text: #d6e1f0;
+  --table-header-background: #182235;
+  --table-row-background: #111827;
+  --dropdown-option-hover-background: #243146;
+  --card-radius: 0.75rem;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
   color: var(--layout-text);
   background: var(--layout-background);
+}
+
+.page-header,
+.form-section {
+  background: var(--layout-surface-strong);
+  border: 1px solid var(--layout-border-color);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.page-header {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.page-title {
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--layout-muted-text);
+  font-size: 0.875rem;
+}
+
+.form-section {
+  padding: 1.5rem;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: var(--input-background);
+  border-color: var(--input-border-color);
+  color: var(--input-text);
+}
+
+.form-control::placeholder {
+  color: var(--input-placeholder);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--input-background);
+  border-color: var(--primary-blue);
+  color: var(--input-text);
+}
+
+// Botones compartidos con SADAlumnos y SADAdministracion.
+.btn-create,
+.btn-search,
+.btn-clear,
+.btn-back {
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-create,
+.btn-search {
+  border: none;
+  color: #fff;
+}
+
+.btn-create {
+  background: #198754;
+  font-weight: 600;
+}
+
+.btn-create:hover {
+  background: #16a34a;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  text-decoration: none;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-search {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  box-shadow: 0 2px 6px rgba(0, 59, 122, 0.25);
+}
+
+.btn-search:hover {
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.btn-clear,
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--layout-border-color);
+  color: var(--layout-text);
+}
+
+.btn-clear:hover,
+.btn-back:hover {
+  background: var(--table-row-hover-background);
+  border-color: var(--secondary-blue);
+  color: var(--layout-text);
+}
+
+.btn-search:disabled,
+.btn-clear:disabled,
+.btn-back:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+// Tabla reutilizable de shared.
+.app-table {
+  margin-bottom: 0;
+  color: var(--layout-text);
+  font-size: 0.82rem;
+  --bs-table-bg: var(--table-row-background);
+  --bs-table-color: var(--layout-text);
+  --bs-table-border-color: var(--layout-border-color);
+  --bs-table-hover-bg: var(--table-row-hover-background);
+  --bs-table-hover-color: var(--layout-text);
+}
+
+.app-table thead th {
+  background-color: var(--table-header-background);
+  color: var(--layout-text);
+  border-bottom-color: var(--layout-border-color);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+// Sin esto, Bootstrap aplica 1rem a los botones de orden y los encabezados
+// ordenables se ven más grandes que los que no ordenan.
+.app-table thead th .btn {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.app-table tbody td {
+  background-color: var(--table-row-background);
+  color: var(--layout-text);
+  border-color: var(--layout-border-color);
+}
+
+// Selectores ng-select con etiqueta flotante, igual que las referencias.
+.ng-select-container-custom {
+  position: relative;
+}
+
+.floating-label {
+  position: absolute;
+  top: 0.1rem;
+  left: 0.75rem;
+  background-color: var(--layout-surface-strong);
+  font-size: 0.9rem;
+  color: var(--layout-muted-text);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ng-select-custom .ng-select-container {
+  background-color: var(--input-background);
+  color: var(--input-text);
+  border: 1px solid var(--input-border-color);
+  box-shadow: none;
+  height: calc(2.5rem + 2px);
+  padding-top: 0.3rem;
+  margin-top: 1.2rem;
+}
+
+.ng-select-custom {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.ng-select-custom .ng-select-container:focus,
+.ng-select-custom .ng-select-container.ng-select-focused,
+.ng-select-custom.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+  border-color: var(--primary-blue);
+  box-shadow: none;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: var(--input-placeholder);
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder,
+.ng-select .ng-select-container .ng-value-container .ng-input > input,
+.ng-select .ng-select-container .ng-value-container {
+  color: var(--input-text);
+}
+
+.ng-select .ng-arrow-wrapper .ng-arrow,
+.ng-select .ng-clear-wrapper {
+  color: var(--layout-muted-text);
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  background-color: var(--input-disabled-background);
+}
+
+// Desplegable de ng-select con los colores del tema, incluido modo oscuro.
+.ng-select.ng-select-opened > .ng-select-container {
+  background-color: var(--input-background);
+  border-color: var(--primary-blue);
+}
+
+.ng-dropdown-panel {
+  background-color: var(--layout-surface-strong);
+  border-color: var(--layout-border-color);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background-color: var(--layout-surface-strong);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: var(--dropdown-option-hover-background);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+  background-color: var(--dropdown-option-selected-background);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-header,
+.ng-dropdown-panel .ng-dropdown-footer {
+  background-color: var(--layout-surface-strong);
+  color: var(--layout-text);
+  border-color: var(--layout-border-color);
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  background-color: var(--input-disabled-background);
+  color: var(--input-disabled-text);
+  opacity: 1;
+}
+
+.ng-select.ng-select-disabled > .ng-select-container .ng-value-container,
+.ng-select.ng-select-disabled > .ng-select-container .ng-value-container .ng-placeholder,
+.ng-select.ng-select-disabled > .ng-select-container .ng-arrow-wrapper,
+.ng-select.ng-select-disabled > .ng-select-container .ng-clear-wrapper {
+  color: var(--input-disabled-text);
+  opacity: 1;
 }

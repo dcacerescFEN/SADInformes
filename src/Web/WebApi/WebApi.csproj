@@ -17,5 +17,18 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.18.2" />
   </ItemGroup>
+  <Target Name="PublishAngular" BeforeTargets="ComputeFilesToPublish" Condition="'$(SpaBuildOnPublish)' != 'false'">
+    <Exec Command="pnpm install --frozen-lockfile" WorkingDirectory="$(SpaRoot)" />
+    <Exec Command="pnpm build" WorkingDirectory="$(SpaRoot)" />
+    <ItemGroup>
+      <AngularDist Include="$(SpaRoot)dist/webui/browser/**/*" />
+      <ResolvedFileToPublish Include="@(AngularDist->'%(FullPath)')"
+        Exclude="@(ResolvedFileToPublish)"
+        RelativePath="wwwroot/%(RecursiveDir)%(Filename)%(Extension)"
+        CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 </Project>

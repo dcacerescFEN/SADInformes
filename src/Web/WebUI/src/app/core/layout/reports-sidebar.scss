@@ -25,7 +25,21 @@
   border-bottom: 1px solid var(--layout-border-color);
   i { color: var(--secondary-blue); font-size: 1.5rem; }
 }
-.sidebar-navigation { flex: 1; padding-top: 1rem; }
+.sidebar-navigation { flex: 1; min-height: 0; overflow-y: auto; padding-top: 1rem; }
+.sidebar-group { margin-block: 0.25rem; }
+.sidebar-section-toggle {
+  width: 100%; border: 0; background: transparent; text-align: left;
+  span { min-width: 0; overflow-wrap: anywhere; }
+}
+.sidebar-chevron { margin-left: auto; font-size: 0.75rem !important; }
+.sidebar-submenu { margin-left: 1rem; border-left: 1px solid var(--layout-border-color); padding-left: 0.25rem; }
+.sidebar-report { white-space: normal; overflow-wrap: anywhere; }
+.sidebar-pending { font-size: 0.85rem; }
+.reports-flyout {
+  width: min(320px, calc(100vw - 92px)); max-height: 70dvh; overflow-y: auto;
+  background: var(--layout-surface-strong); color: var(--layout-text);
+  border-color: var(--layout-border-color);
+}
 .sidebar-link {
   color: var(--layout-text);
   padding: 0.75rem;
@@ -65,7 +79,102 @@
   .sidebar-label { display: none; }
   .sidebar-brand, .sidebar-profile { justify-content: center; }
   .sidebar-link { justify-content: center; padding-inline: 0; }
+  .sidebar-section-toggle::after { display: none; }
 }
 .sidebar--drawer { position: static; height: auto; flex: 1; border: none; }
 @media (max-width: 991.98px) { :host { display: none; } }
 @media (prefers-reduced-motion: reduce) { :host { transition: none; } }
+
+// Búsqueda y favoritos, con el patrón de la sidebar de SADAlumnos.
+.sidebar-search {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--layout-border-color);
+  margin-bottom: 0.5rem;
+
+  i {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-blue);
+    font-size: 0.9rem;
+  }
+
+  input {
+    width: 100%;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    background: var(--input-background);
+    color: var(--input-text);
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem 0.45rem 2.1rem;
+
+    &::placeholder { color: var(--input-placeholder); }
+    &:focus { outline: none; border-color: var(--primary-blue); }
+  }
+}
+
+.sidebar-favorites { margin-bottom: 0.5rem; }
+
+.sidebar-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--layout-muted-text);
+  padding: 0.5rem 0.75rem 0.25rem;
+}
+
+.sidebar-report-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .sidebar-report { flex: 1; min-width: 0; }
+}
+
+.sidebar-favorite-toggle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--layout-muted-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    background: var(--table-row-hover-background);
+    color: var(--primary-blue);
+  }
+
+  &.is-active {
+    opacity: 1;
+    color: #f0ad4e;
+  }
+}
+
+.sidebar-report-row:hover .sidebar-favorite-toggle,
+.sidebar-report-row:focus-within .sidebar-favorite-toggle { opacity: 1; }
+
+.sidebar-no-results {
+  padding: 1.25rem 0.75rem;
+  text-align: center;
+  color: var(--layout-muted-text);
+  font-size: 0.85rem;
+
+  i { display: block; margin-bottom: 0.5rem; font-size: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-favorite-toggle { transition: none; }
+}

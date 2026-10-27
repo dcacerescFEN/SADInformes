@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -33,8 +33,11 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
     if (layer === 'Web/WebApi') {
       assert.deepEqual(
         [...project.matchAll(/<PackageReference Include="([^"]+)"/g)].map((match) => match[1]),
-        ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer'],
+        ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer',
+          'Microsoft.AspNetCore.OpenApi', 'Scalar.AspNetCore'],
       );
+    } else if (layer === 'Application') {
+      assert.match(project, /PackageReference Include="Scrutor" Version="7.0.0"/);
     } else if (layer === 'Infrastructure') {
       assert.match(project, /PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12"/);
     } else {
@@ -77,6 +80,24 @@ test('El perfil de WebApi activa el SPA proxy hacia el frontend configurado', ()
   assert.match(ignore, /\*\*\/\.certs\//);
 });
 
+test('Los perfiles de desarrollo abren Scalar como los proyectos de referencia', () => {
+  const profiles = json('src/Web/WebApi/Properties/launchSettings.json').profiles;
+  for (const name of ['https', 'http']) {
+    assert.equal(profiles[name].launchBrowser, true, name);
+    assert.equal(profiles[name].launchUrl, 'scalar', name);
+    assert.equal(profiles[name].environmentVariables.ASPNETCORE_ENVIRONMENT, 'Development');
+  }
+});
+
+test('AppConfig se carga directamente sin lector ni interfaz redundantes', () => {
+  assert.equal(existsSync(resolve(root, 'src/Infrastructure/Configuration/AppConfigConfigurationReader.cs')), false);
+  assert.equal(existsSync(resolve(root, 'src/Application/Configuration/IAppConfigurationReader.cs')), false);
+  const initialiser = read('src/Infrastructure/Configuration/ConfigurationInitialiser.cs');
+  assert.match(initialiser, /AppConfigContext configContext/);
+  assert.match(initialiser, /configContext\.Configurations\.AsNoTracking\(\)/);
+  assert.match(read('src/Infrastructure/ConfigureServices.cs'), /AddDbContext<AppConfigContext>/);
+});
+
 test('WebApi descubre IEndpoint e inicializa configuración antes de servir', () => {
   const program = read('src/Web/WebApi/Program.cs');
   assert.match(program, /\.AddEndpoints\(/);
@@ -84,6 +105,114 @@ test('WebApi descubre IEndpoint e inicializa configuración antes de servir', ()
   assert.match(program, /await app\.InitialiseConfigurationAsync\(/);
   assert.doesNotMatch(program, /app\.MapGet\(|MapSiteConfiguration/);
   assert.match(read('src/Web/WebApi/Extension/IEndpoint.cs'), /interface IEndpoint/);
+});
+
+test('Application registra handlers por scan y Config conserva el patrón de NewSAD', () => {
+  const registration = read('src/Application/ConfigureServices.cs');
+  assert.match(registration, /AddApplicationServices/);
+  assert.match(registration, /services\.Scan\(/);
+  assert.doesNotMatch(read('src/Web/WebApi/ConfigureServices.cs'), /AddApplicationServices/);
+  const site = read('src/Web/WebApi/Endpoints/Config/ConfigEndpoints.cs');
+  assert.match(site, /IRequestDispatcher sender/);
+  assert.match(site, /sender\.Send\(/);
+  const keycloak = read('src/Web/WebApi/Endpoints/Config/PublicKeycloakConfigEndpoints.cs');
+  assert.match(keycloak, /IConfiguration configuration/);
+  assert.doesNotMatch(keycloak, /IRequestDispatcher/);
+});
+
+test('Publicar WebApi compila Angular y copia sus assets a wwwroot', () => {
+  const project = read('src/Web/WebApi/WebApi.csproj');
+  assert.match(project, /Target Name="PublishAngular"/);
+  assert.match(project, /pnpm install --frozen-lockfile/);
+  assert.match(project, /pnpm build/);
+  assert.match(project, /dist\/webui\/browser/);
+  assert.match(project, /ResolvedFileToPublish/);
+  assert.match(project, /wwwroot/);
+});
+
+test('El SAD se consume con SadContext y procedimientos al estilo de las referencias', () => {
+  const infrastructure = read('src/Infrastructure/ConfigureServices.cs');
+  assert.match(infrastructure, /AddDbContext<SadContext>/);
+  assert.ok(infrastructure.includes('GetConnectionString("Sad")'));
+  assert.ok(infrastructure.includes('AddScoped<ISadContextProcedures, SadContextProcedures>()'));
+  const context = read('src/Infrastructure/Data/SadContext.cs');
+  assert.match(context, /DbContextOptions<SadContext>/);
+  assert.match(context, /ISadContext/);
+  const procedures = read('src/Infrastructure/Data/SadContextProcedures.cs');
+  for (const sp of ['spRec_Encuesta_DocenteXCurso', 'spRec_PeriodosAcademicosProgramacion',
+    'spRec_TiposAlumno', 'spRec_TiposAlumnosModalidades']) {
+    assert.ok(procedures.includes('[dbo].[' + sp + ']'), sp);
+  }
+  assert.match(procedures, /SqlQueryAsync<SpRecEncuestaDocenteXCursoResult>/);
+  assert.equal(existsSync(resolve(root, 'src/Infrastructure/Reports/Postgraduate/SqlTeacherSurveyReader.cs')), false);
+  const spDirectory = resolve(root, 'src/Domain/Entities/Sad/Sp');
+  const spFiles = readdirSync(spDirectory).filter(file => file.endsWith('.cs'));
+  for (const sp of ['SpRecEncuestaDocenteXCursoResult', 'SpRecPeriodosAcademicosProgramacionResult',
+    'SpRecTiposAlumnoResult', 'SpRecTiposAlumnosModalidadesResult']) {
+    assert.ok(spFiles.includes(sp + '.cs'), sp + ' debe tener su propio archivo');
+    assert.equal((read('src/Domain/Entities/Sad/Sp/' + sp + '.cs').match(/public sealed class/g) ?? []).length, 1);
+  }
+});
+
+test('Las pantallas de informes usan el page-header de las referencias', () => {
+  for (const page of ['postgraduate/teacher-survey/teacher-survey.ts', 'postgraduate/postgraduate-placeholder.ts']) {
+    const source = read('src/Web/WebUI/src/app/' + page);
+    assert.ok(source.includes('container-fluid px-0 py-4'), page);
+    assert.ok(source.includes('class=\"page-header\"'), page);
+    assert.ok(source.includes('class=\"page-title\"'), page);
+    assert.ok(source.includes('page-subtitle'), page);
+  }
+  const styles = read('src/Web/WebUI/src/styles.scss');
+  assert.match(styles, /^.page-header,/m);
+  assert.match(styles, /--card-radius/);
+});
+
+test('La tabla y los filtros reutilizan shared y ng-select de las referencias', () => {
+  const table = read('src/Web/WebUI/src/app/shared/components/table.ts');
+  assert.ok(table.includes("selector: 'app-table'"));
+  assert.ok(!table.includes('NgbTooltip'), 'la tabla debe ser la de SADAlumnos');
+  const angular = json('src/Web/WebUI/angular.json');
+  assert.ok(angular.projects.webui.architect.build.options.styles
+    .includes('node_modules/@ng-select/ng-select/themes/default.theme.css'));
+  assert.ok(table.includes('export interface TableColumn'));
+  const page = read('src/Web/WebUI/src/app/postgraduate/teacher-survey/teacher-survey.ts');
+  assert.ok(page.includes("import { Table, TableColumn } from '../../shared/components/table';"));
+  assert.ok(page.includes('<app-table'));
+  assert.ok(page.includes('btn btn-create'), 'exportar debe usar el botón verde de SADAlumnos');
+  assert.ok(page.includes('NgSelectModule'));
+  assert.ok(page.includes('class="floating-label"'));
+  assert.ok(page.includes('btn btn-search'));
+  assert.ok(!page.includes('data-action="clear"'), 'el botón limpiar fue retirado');
+  const styles = read('src/Web/WebUI/src/styles.scss');
+  for (const token of ['.btn-search', '.btn-clear', '.app-table', '.ng-select-custom', '.floating-label']) {
+    assert.ok(styles.includes(token), token);
+  }
+  assert.match(styles, /.btn-create {[^}]*background: #198754/s, 'btn-create debe ser verde');
+  assert.match(styles, /--input-disabled-text/, 'faltan variables de entrada para modo oscuro');
+  assert.match(styles, /--input-background: #202938/, 'el modo oscuro debe usar el azulado de SADAlumnos');
+  assert.match(styles, /--input-placeholder/);
+  assert.match(styles, /--light-blue: #17253d/);
+  assert.match(styles, /--dropdown-option-hover-background/);
+  assert.match(styles, /.ng-dropdown-panel {[^}]*layout-surface-strong/s, 'el panel de ng-select debe seguir el tema');
+  assert.match(styles, /.app-table thead th .btn {[^}]*font-size: inherit/s, 'los encabezados deben conservar su tamaño');
+});
+
+test('La sidebar no incluye un acceso redundante a Inicio', () => {
+  const sidebar = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.ts');
+  assert.ok(!sidebar.includes('bi-house-door'), 'no debe quedar el icono de Inicio');
+  assert.ok(!sidebar.includes('routerLink="/"'), 'la marca y la navbar conservan el acceso al inicio');
+});
+
+test('La sidebar ofrece búsqueda y favoritos con clave propia', () => {
+  const sidebar = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.ts');
+  assert.ok(sidebar.includes('class="sidebar-search"'));
+  assert.ok(sidebar.includes("sadinformes.sidebar.favorite-routes"));
+  assert.ok(!sidebar.includes("students.detail.favorite-routes"));
+  assert.ok(sidebar.includes('No se encontraron opciones'));
+  const styles = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.scss');
+  for (const token of ['.sidebar-search', '.sidebar-favorite-toggle', '.sidebar-no-results']) {
+    assert.ok(styles.includes(token), token);
+  }
 });
 
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
@@ -113,7 +242,7 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
   assert.match(packageJson.dependencies['@angular/core'], /^22\./);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
     '@angular/common', '@angular/compiler', '@angular/core', '@angular/forms', '@angular/localize',
-    '@angular/platform-browser', '@angular/router', '@ng-bootstrap/ng-bootstrap', '@popperjs/core',
+    '@angular/platform-browser', '@angular/router', '@ng-bootstrap/ng-bootstrap', '@ng-select/ng-select', '@popperjs/core',
     'bootstrap', 'bootstrap-icons', 'keycloak-js', 'rxjs', 'tslib',
   ]);
   assert.equal(packageJson.scripts.build, 'ng build');

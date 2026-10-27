@@ -5,8 +5,8 @@ import { AuthService } from '../auth/auth-service';
 
 export interface NavigationLink { key: string; label: string; icon: string; url: string | null; }
 const DESTINATIONS = [
-  ['student', 'Alumnos', 'bi-person-badge', 'studentUrl', 'studentClientId'],
-  ['teacher', 'Profesores', 'bi-person-lines-fill', 'teacherUrl', 'teacherClientId'],
+  ['student', 'Alumnos', 'bi-person-badge', 'studentsMenuUrl', 'studentsMenuClientId'],
+  ['teacher', 'Profesores', 'bi-person-lines-fill', 'teachersMenuUrl', 'teachersMenuClientId'],
   ['courses', 'Cursos', 'bi-book', 'coursesMenuUrl', 'coursesMenuClientId'],
   ['exams', 'Exámenes', 'bi-clipboard-check', 'examsMenuUrl', 'examsMenuClientId'],
   ['activities', 'Actividades', 'bi-calendar-event', 'activitiesMenuUrl', 'activitiesMenuClientId'],
@@ -46,10 +46,11 @@ export class NavigationService {
     this.menu.set({});
     this.error.set('');
     try {
-      const config = await firstValueFrom(this.http.get<{ menu?: unknown }>('/api/config/site'));
-      const menu = config?.menu;
-      if (typeof menu === 'object' && menu !== null && !Array.isArray(menu))
-        this.menu.set(menu as Record<string, unknown>);
+      const config = await firstValueFrom(this.http.get<{ success: boolean; data?: unknown }>('/api/config/site'));
+      const menu = config?.data;
+      if (config.success !== true || typeof menu !== 'object' || menu === null || Array.isArray(menu))
+        throw new Error('Contrato de configuración inválido.');
+      this.menu.set(menu as Record<string, unknown>);
     } catch {
       this.menu.set({});
       this.error.set('No se pudo cargar la navegación.');
