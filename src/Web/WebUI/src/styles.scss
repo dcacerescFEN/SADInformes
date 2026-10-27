@@ -73,9 +73,26 @@ body {
     border-color 0.2s ease, color 0.2s ease;
 }
 
+.btn-create,
 .btn-search {
   border: none;
   color: #fff;
+}
+
+.btn-create {
+  background: #198754;
+  font-weight: 600;
+}
+
+.btn-create:hover {
+  background: #16a34a;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  text-decoration: none;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-search {
   background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
   box-shadow: 0 2px 6px rgba(0, 59, 122, 0.25);
 }
@@ -124,6 +141,14 @@ body {
   border-bottom-color: var(--layout-border-color);
   font-size: 0.78rem;
   white-space: nowrap;
+}
+
+// Sin esto, Bootstrap aplica 1rem a los botones de orden y los encabezados
+// ordenables se ven más grandes que los que no ordenan.
+.app-table thead th .btn {
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
 }
 
 .app-table tbody td {
@@ -185,4 +210,53 @@ body {
 
 .ng-select.ng-select-disabled > .ng-select-container {
   background-color: var(--input-disabled-background);
+}
+
+// Desplegable de ng-select con los colores del tema, incluido modo oscuro.
+.ng-select.ng-select-opened > .ng-select-container {
+  background-color: var(--input-background);
+  border-color: var(--primary-blue);
+}
+
+.ng-dropdown-panel {
+  background-color: var(--layout-surface-strong);
+  border-color: var(--layout-border-color);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background-color: var(--layout-surface-strong);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: var(--dropdown-option-hover-background);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+  background-color: var(--dropdown-option-selected-background);
+  color: var(--layout-text);
+}
+
+.ng-dropdown-panel .ng-dropdown-header,
+.ng-dropdown-panel .ng-dropdown-footer {
+  background-color: var(--layout-surface-strong);
+  color: var(--layout-text);
+  border-color: var(--layout-border-color);
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  background-color: var(--input-disabled-background);
+  color: var(--input-disabled-text);
+  opacity: 1;
+}
+
+.ng-select.ng-select-disabled > .ng-select-container .ng-value-container,
+.ng-select.ng-select-disabled > .ng-select-container .ng-value-container .ng-placeholder,
+.ng-select.ng-select-disabled > .ng-select-container .ng-arrow-wrapper,
+.ng-select.ng-select-disabled > .ng-select-container .ng-clear-wrapper {
+  color: var(--input-disabled-text);
+  opacity: 1;
 }

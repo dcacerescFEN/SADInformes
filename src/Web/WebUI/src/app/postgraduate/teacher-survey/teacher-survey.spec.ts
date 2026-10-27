@@ -102,7 +102,18 @@ describe('Informe Encuesta docente por curso', () => {
     expect(itemsOf(selects()[2])).toEqual(['PT', 'FT']);
   });
 
+  it('preselecciona los primeros valores como el SAD', async () => {
+    expect(fixture.componentInstance.form.getRawValue()).toEqual({
+      period: '2024A', studentType: 'MBA', modality: 'PT',
+    });
+  });
+
   it('no consulta sin filtros completos y explica qué falta', async () => {
+    element('[data-action="clear"]').click();
+    await settle();
+    expect(fixture.componentInstance.form.getRawValue()).toEqual({
+      period: '', studentType: '', modality: '',
+    });
     await submit();
     expect(root.querySelector('[role="alert"]')?.textContent)
       .toContain('Seleccione período, tipo de alumno y modalidad');

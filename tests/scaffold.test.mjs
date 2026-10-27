@@ -187,6 +187,11 @@ test('La tabla y los filtros reutilizan shared y ng-select de las referencias', 
   for (const token of ['.btn-search', '.btn-clear', '.app-table', '.ng-select-custom', '.floating-label']) {
     assert.ok(styles.includes(token), token);
   }
+  assert.match(styles, /.btn-create {[^}]*background: #198754/s, 'btn-create debe ser verde');
+  assert.match(styles, /--input-disabled-text/, 'faltan variables de entrada para modo oscuro');
+  assert.match(styles, /--dropdown-option-hover-background/);
+  assert.match(styles, /.ng-dropdown-panel {[^}]*layout-surface-strong/s, 'el panel de ng-select debe seguir el tema');
+  assert.match(styles, /.app-table thead th .btn {[^}]*font-size: inherit/s, 'los encabezados deben conservar su tamaño');
 });
 
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {

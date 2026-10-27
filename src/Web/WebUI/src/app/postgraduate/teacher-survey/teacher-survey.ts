@@ -157,8 +157,15 @@ export class TeacherSurvey {
       const response = await firstValueFrom(this.http.get<Envelope<Filters>>(BASE + '/filters' + query));
       if (response.success !== true) throw new Error('contrato');
       this.filters.set(response.data);
-      if (!response.data.modalities.includes(this.form.controls.modality.value))
-        this.form.controls.modality.setValue('');
+      // El SAD llega con valores preseleccionados: primer período, primer tipo y
+      // la primera modalidad disponible para el tipo elegido.
+      const { period, modality } = this.form.getRawValue();
+      if (!period && response.data.periods.length > 0)
+        this.form.controls.period.setValue(response.data.periods[0].value);
+      if (!this.form.controls.studentType.value && response.data.studentTypes.length > 0)
+        this.form.controls.studentType.setValue(response.data.studentTypes[0].value, { emitEvent: false });
+      if (!response.data.modalities.includes(modality))
+        this.form.controls.modality.setValue(response.data.modalities[0] ?? '');
     } catch {
       this.filters.set({ periods: [], studentTypes: [], modalities: [] });
       this.error.set('No se pudieron cargar los filtros del informe.');
@@ -166,7 +173,8 @@ export class TeacherSurvey {
   }
 
   protected clear(): void {
-    this.form.reset({ period: '', studentType: '', modality: '' });
+    // Sin emitEvent: limpiar no debe disparar otra carga de catálogos.
+    this.form.reset({ period: '', studentType: '', modality: '' }, { emitEvent: false });
     this.rows.set([]);
     this.error.set('');
     this.notice.set('');
