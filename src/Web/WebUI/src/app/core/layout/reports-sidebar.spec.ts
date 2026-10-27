@@ -121,6 +121,61 @@ describe('Sidebar de Informes', () => {
     expect(document.querySelector('.dropdown-menu.show')).toBeNull();
   });
 
+  it('busca secciones y opciones y avisa cuando no hay coincidencias', async () => {
+    const root: HTMLElement = fixture.nativeElement;
+    const search = root.querySelector<HTMLInputElement>('.sidebar-search input')!;
+    search.value = 'tesis';
+    search.dispatchEvent(new Event('input'));
+    await settle();
+    const sections = [...root.querySelectorAll<HTMLElement>('[data-section]')]
+      .map(button => button.getAttribute('aria-label'));
+    expect(sections).toEqual(['Postgrado']);
+    root.querySelector<HTMLButtonElement>('[data-section="postgrado"]')!.click();
+    await settle();
+    const titles = [...root.querySelectorAll('.sidebar-submenu .sidebar-report')]
+      .map(link => link.textContent?.trim());
+    expect(titles).toEqual(['Defensas de tesis Postgrado', 'Registro de tesis']);
+
+    search.value = 'zzzz';
+    search.dispatchEvent(new Event('input'));
+    await settle();
+    expect(root.textContent).toContain('No se encontraron opciones');
+  });
+
+  it('marca favoritos, los muestra arriba y los persiste con clave propia', async () => {
+    const root: HTMLElement = fixture.nativeElement;
+    root.querySelector<HTMLButtonElement>('[data-section="postgrado"]')!.click();
+    await settle();
+    const star = root.querySelector<HTMLButtonElement>(
+      '.sidebar-submenu .sidebar-report-row .sidebar-favorite-toggle')!;
+    expect(star.getAttribute('aria-label')).toBe('Agregar a favoritos');
+    star.click();
+    await settle();
+    expect(star.getAttribute('aria-label')).toBe('Quitar de favoritos');
+    const favorites = root.querySelector<HTMLElement>('[data-favorites]')!;
+    expect(favorites.textContent).toContain('Favoritos');
+    expect(favorites.textContent).toContain('Encuesta docente por curso');
+    expect(JSON.parse(localStorage.getItem('sadinformes.sidebar.favorite-routes')!))
+      .toEqual(['encuesta-docente-por-curso']);
+    expect(localStorage.getItem('students.detail.favorite-routes')).toBeNull();
+
+    favorites.querySelector<HTMLButtonElement>('.sidebar-favorite-toggle')!.click();
+    await settle();
+    expect(root.querySelector('[data-favorites]')).toBeNull();
+    expect(JSON.parse(localStorage.getItem('sadinformes.sidebar.favorite-routes')!)).toEqual([]);
+  });
+
+  it('recupera favoritos guardados al iniciar', async () => {
+    localStorage.setItem('sadinformes.sidebar.favorite-routes', JSON.stringify(['registro-tesis']));
+    fixture.destroy();
+    fixture = TestBed.createComponent(ReportsSidebar);
+    fixture.detectChanges();
+    await settle();
+    const favorites = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLElement>('[data-favorites]');
+    expect(favorites?.textContent).toContain('Registro de tesis');
+  });
+
   it('abre un solo panel, enfoca cierre y Escape lo cierra', async () => {
     const trigger = document.createElement('button');
     document.body.append(trigger);

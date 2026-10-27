@@ -203,6 +203,18 @@ test('La sidebar no incluye un acceso redundante a Inicio', () => {
   assert.ok(!sidebar.includes('routerLink="/"'), 'la marca y la navbar conservan el acceso al inicio');
 });
 
+test('La sidebar ofrece búsqueda y favoritos con clave propia', () => {
+  const sidebar = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.ts');
+  assert.ok(sidebar.includes('class="sidebar-search"'));
+  assert.ok(sidebar.includes("sadinformes.sidebar.favorite-routes"));
+  assert.ok(!sidebar.includes("students.detail.favorite-routes"));
+  assert.ok(sidebar.includes('No se encontraron opciones'));
+  const styles = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.scss');
+  for (const token of ['.sidebar-search', '.sidebar-favorite-toggle', '.sidebar-no-results']) {
+    assert.ok(styles.includes(token), token);
+  }
+});
+
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
   const styles = read('src/Web/WebUI/src/app/core/layout/header.scss');
   assert.match(styles, /max-width:\s*991\.98px/);
