@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { firstValueFrom } from 'rxjs';
+import { Table, TableColumn } from '../../shared/components/table';
 
 interface Option { value: string; text: string; }
-interface Filters {
-  periods: Option[];
-  studentTypes: Option[];
-  modalities: string[];
-}
+interface Filters { periods: Option[]; studentTypes: Option[]; modalities: string[]; }
 interface Envelope<T> { success: boolean; message: string | null; data: T; }
 interface Row {
   period: string; course: string; name: string; teacherId: string; teacherName: string; assistants: string;
@@ -18,20 +17,25 @@ interface Row {
 }
 
 const BASE = '/api/reports/postgraduate/teacher-survey';
-const COLUMNS: readonly { key: keyof Row; label: string }[] = [
-  { key: 'course', label: 'Curso' }, { key: 'name', label: 'Cátedra' }, { key: 'period', label: 'Período' },
-  { key: 'teacherId', label: 'Rut Profesor' }, { key: 'teacherName', label: 'Nombre Profesor' },
-  { key: 'assistants', label: 'Ayudantes' },
-  { key: 'a1', label: 'A1' }, { key: 'a2', label: 'A2' }, { key: 'a3', label: 'A3' }, { key: 'a4', label: 'A4' },
-  { key: 'aComments', label: 'A_Comentarios' },
-  { key: 'b1', label: 'B1' }, { key: 'b2', label: 'B2' }, { key: 'b3', label: 'B3' }, { key: 'b4', label: 'B4' },
-  { key: 'b5', label: 'B5' }, { key: 'b6', label: 'B6' }, { key: 'b7', label: 'B7' }, { key: 'b8', label: 'B8' },
-  { key: 'b9', label: 'B9' }, { key: 'b10', label: 'B10' }, { key: 'b11', label: 'B11' }, { key: 'b12', label: 'B12' },
-  { key: 'b13', label: 'B13' }, { key: 'bGrade', label: 'B_Nota' }, { key: 'bComments', label: 'B_Comentarios' },
+const COLUMNS: readonly TableColumn[] = [
+  { key: 'course', name: 'Curso', sortable: true },
+  { key: 'name', name: 'Cátedra', sortable: true },
+  { key: 'period', name: 'Período', sortable: true },
+  { key: 'teacherId', name: 'Rut Profesor' },
+  { key: 'teacherName', name: 'Nombre Profesor', sortable: true },
+  { key: 'assistants', name: 'Ayudantes' },
+  { key: 'a1', name: 'A1' }, { key: 'a2', name: 'A2' }, { key: 'a3', name: 'A3' }, { key: 'a4', name: 'A4' },
+  { key: 'aComments', name: 'A_Comentarios', multiline: true },
+  { key: 'b1', name: 'B1' }, { key: 'b2', name: 'B2' }, { key: 'b3', name: 'B3' }, { key: 'b4', name: 'B4' },
+  { key: 'b5', name: 'B5' }, { key: 'b6', name: 'B6' }, { key: 'b7', name: 'B7' }, { key: 'b8', name: 'B8' },
+  { key: 'b9', name: 'B9' }, { key: 'b10', name: 'B10' }, { key: 'b11', name: 'B11' }, { key: 'b12', name: 'B12' },
+  { key: 'b13', name: 'B13' }, { key: 'bGrade', name: 'B_Nota' },
+  { key: 'bComments', name: 'B_Comentarios', multiline: true },
 ];
 
 @Component({
   selector: 'app-teacher-survey',
+  imports: [ReactiveFormsModule, NgSelectModule, Table],
   template: `
     <div class="container-fluid px-0 py-4">
       <div class="page-header">
@@ -45,52 +49,59 @@ const COLUMNS: readonly { key: keyof Row; label: string }[] = [
               Evaluación general del curso (A) y del profesor (B) según período, tipo de alumno y modalidad.
             </p>
           </div>
-          <button class="btn btn-outline-secondary" type="button" data-action="export"
+          <button class="btn btn-clear" type="button" data-action="export"
             [disabled]="rows().length === 0" (click)="exportCsv()">
             <i class="bi bi-filetype-csv me-2" aria-hidden="true"></i>Exportar CSV
           </button>
         </div>
       </div>
 
-      <form class="form-section mb-3" (submit)="$event.preventDefault(); show()">
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-md-4 col-xl-3">
-            <label class="form-label" for="survey-period">Período</label>
-            <select id="survey-period" class="form-select" data-filter="periodo" [value]="period()"
-              (change)="period.set(value($event))">
-              <option value="">Seleccione período</option>
-              @for (option of filters().periods; track option.value) {
-                <option [value]="option.value">{{ option.text }}</option>
-              }
-            </select>
+      <div class="page-header">
+        <form [formGroup]="form" (ngSubmit)="show()">
+          <div class="row g-3 align-items-end">
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              <div class="ng-select-container-custom">
+                <label class="floating-label" for="surveyPeriod">
+                  <i class="bi bi-calendar3 me-1"></i>Período
+                </label>
+                <ng-select inputId="surveyPeriod" formControlName="period" data-filter="periodo"
+                  [items]="filters().periods" bindLabel="text" bindValue="value"
+                  placeholder="Seleccione período" class="form-select ng-select-custom" />
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              <div class="ng-select-container-custom">
+                <label class="floating-label" for="surveyStudentType">
+                  <i class="bi bi-people-fill me-1"></i>Tipo alumno
+                </label>
+                <ng-select inputId="surveyStudentType" formControlName="studentType" data-filter="tipoAlumno"
+                  [items]="filters().studentTypes" bindLabel="text" bindValue="value"
+                  placeholder="Seleccione tipo" class="form-select ng-select-custom" />
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              <div class="ng-select-container-custom">
+                <label class="floating-label" for="surveyModality">
+                  <i class="bi bi-grid-3x3-gap-fill me-1"></i>Modalidad
+                </label>
+                <ng-select inputId="surveyModality" formControlName="modality" data-filter="modalidad"
+                  [items]="filters().modalities" bindLabel="item" bindValue="item" [clearable]="false"
+                  placeholder="Seleccione modalidad" class="form-select ng-select-custom" />
+              </div>
+            </div>
+            <div class="col-xl-auto col-lg-12">
+              <div class="d-flex gap-2">
+                <button class="btn btn-search" type="submit" data-action="show" [disabled]="loading()">
+                  <i class="bi bi-search me-1" aria-hidden="true"></i>Mostrar
+                </button>
+                <button class="btn btn-clear" type="button" data-action="clear" (click)="clear()">
+                  <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Limpiar
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="col-12 col-md-4 col-xl-3">
-            <label class="form-label" for="survey-type">Tipo alumno</label>
-            <select id="survey-type" class="form-select" data-filter="tipoAlumno" [value]="studentType()"
-              (change)="changeStudentType(value($event))">
-              <option value="">Seleccione tipo</option>
-              @for (option of filters().studentTypes; track option.value) {
-                <option [value]="option.value">{{ option.text }}</option>
-              }
-            </select>
-          </div>
-          <div class="col-12 col-md-4 col-xl-3">
-            <label class="form-label" for="survey-modality">Modalidad</label>
-            <select id="survey-modality" class="form-select" data-filter="modalidad" [value]="modality()"
-              (change)="modality.set(value($event))">
-              <option value="">Seleccione modalidad</option>
-              @for (option of filters().modalities; track option) {
-                <option [value]="option">{{ option }}</option>
-              }
-            </select>
-          </div>
-          <div class="col-12 col-xl-auto">
-            <button class="btn btn-primary" type="submit" data-action="show" [disabled]="loading()">
-              <i class="bi bi-search me-2" aria-hidden="true"></i>Mostrar
-            </button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
 
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
@@ -98,74 +109,58 @@ const COLUMNS: readonly { key: keyof Row; label: string }[] = [
 
       @if (rows().length > 0) {
         <div class="form-section">
-          <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle mb-0">
-              <caption class="visually-hidden">Encuesta docente por curso</caption>
-              <thead>
-                <tr>@for (column of columns; track column.key) { <th scope="col">{{ column.label }}</th> }</tr>
-              </thead>
-              <tbody>
-                @for (item of rows(); track item.course + item.teacherId) {
-                  <tr>@for (column of columns; track column.key) {
-                    <td>{{ item[column.key] ?? '' }}</td>
-                  }</tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          <app-table aria-label="Encuesta docente por curso" [data]="rows()" [columns]="columns"
+            [showSummary]="false" [showRowNumber]="false" rowId="course" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>
         </div>
       }
     </div>
   `,
-  styles: `
-    :host { display: block; }
-    table { font-size: 0.8rem; }
-    th, td { white-space: nowrap; }
-  `,
+  styles: ':host { display: block; }',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherSurvey {
   private readonly http = inject(HttpClient);
+  private readonly formBuilder = inject(FormBuilder);
   protected readonly columns = COLUMNS;
+  readonly form = this.formBuilder.nonNullable.group({ period: '', studentType: '', modality: '' });
   protected readonly filters = signal<Filters>({ periods: [], studentTypes: [], modalities: [] });
-  protected readonly period = signal('');
-  protected readonly studentType = signal('');
-  protected readonly modality = signal('');
   protected readonly rows = signal<Row[]>([]);
   protected readonly error = signal('');
   protected readonly notice = signal('');
   protected readonly loading = signal(false);
-  protected readonly selected = computed(() => ({
-    period: this.period(), studentType: this.studentType(), modality: this.modality(),
-  }));
 
-  constructor() { void this.loadFilters(); }
-
-  protected value(event: Event): string { return (event.target as HTMLSelectElement).value; }
-
-  protected async changeStudentType(value: string): Promise<void> {
-    this.studentType.set(value);
-    await this.loadFilters();
+  constructor() {
+    void this.loadFilters();
+    this.form.controls.studentType.valueChanges.subscribe(() => void this.loadFilters());
   }
 
   private async loadFilters(): Promise<void> {
-    const query = this.studentType() ? '?tipoAlumno=' + encodeURIComponent(this.studentType()) : '';
+    const studentType = this.form.controls.studentType.value;
+    const query = studentType ? '?tipoAlumno=' + encodeURIComponent(studentType) : '';
     try {
       const response = await firstValueFrom(this.http.get<Envelope<Filters>>(BASE + '/filters' + query));
       if (response.success !== true) throw new Error('contrato');
       this.filters.set(response.data);
-      if (!response.data.modalities.includes(this.modality())) this.modality.set('');
+      if (!response.data.modalities.includes(this.form.controls.modality.value))
+        this.form.controls.modality.setValue('');
     } catch {
       this.filters.set({ periods: [], studentTypes: [], modalities: [] });
       this.error.set('No se pudieron cargar los filtros del informe.');
     }
   }
 
+  protected clear(): void {
+    this.form.reset({ period: '', studentType: '', modality: '' });
+    this.rows.set([]);
+    this.error.set('');
+    this.notice.set('');
+  }
+
   protected async show(): Promise<void> {
     this.error.set('');
     this.notice.set('');
-    const { period, studentType, modality } = this.selected();
+    const { period, studentType, modality } = this.form.getRawValue();
     if (!period || !studentType || !modality) {
       this.rows.set([]);
       this.error.set('Seleccione período, tipo de alumno y modalidad para consultar.');
@@ -195,8 +190,8 @@ export class TeacherSurvey {
       return /[";\r\n]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
     };
     const lines = [
-      COLUMNS.map(column => column.label).join(';'),
-      ...rows.map(row => COLUMNS.map(column => cell(row[column.key])).join(';')),
+      COLUMNS.map(column => column.name).join(';'),
+      ...rows.map(row => COLUMNS.map(column => cell(row[column.key as keyof Row])).join(';')),
     ];
     const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);

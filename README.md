@@ -320,10 +320,15 @@ los mismos SP, por lo que los valores coinciden para los mismos filtros.
 El acceso al SAD sigue la forma de las aplicaciones de referencia: `SadContext`
 registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
 `ISadContextProcedures` con un método por procedimiento (`EXEC` tipado, parámetros
-`SqlParameter` y `OutputParameter<int>`). No hay conexiones propias del informe ni
-SQL de negocio duplicado. Las pantallas usan el `page-header` compartido de
-SADAlumnos y SADAdministracion, con `container-fluid`, título con icono, subtítulo
-y secciones `form-section`.
+`SqlParameter` y `OutputParameter<int>`). Cada resultado de SP vive en su propio
+archivo bajo `Domain/Entities/Sad/Sp`. No hay conexiones propias del informe ni
+SQL de negocio duplicado.
+
+La interfaz reutiliza los componentes de las referencias: `page-header`,
+`form-floating` con etiqueta flotante sobre `ng-select`
+(`@ng-select/ng-select`), botones `btn-search`, `btn-clear` y `btn-back`, y la
+tabla compartida `app-table` de `src/app/shared/components/table.ts` con
+paginación, orden y estado vacío.
 
 Con `dotnet run` el frontend de desarrollo está en 4200; la API y Scalar, en 7070.
 Una consulta real requiere la conexión de solo lectura y los roles de Keycloak;

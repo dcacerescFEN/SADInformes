@@ -65,7 +65,7 @@ describe('Navegación visual de Postgrado', () => {
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Encuesta docente por curso');
     expect(root.textContent).not.toContain('Pendiente de migración');
-    expect(root.querySelectorAll('select[data-filter]')).toHaveLength(3);
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
     http.verify();
   });
 

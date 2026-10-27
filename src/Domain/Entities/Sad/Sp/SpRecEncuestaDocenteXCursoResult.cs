@@ -33,26 +33,3 @@ public sealed class SpRecEncuestaDocenteXCursoResult
     public double? BNota { get; set; }
     public string? BObservaciones { get; set; }
 }
-
-/// <summary>Resultado de <c>dbo.spRec_PeriodosAcademicosProgramacion</c>.</summary>
-public sealed class SpRecPeriodosAcademicosProgramacionResult
-{
-    public string Periodo { get; set; } = null!;
-    public string? PeriodoLargo { get; set; }
-    public string? Inscripcion { get; set; }
-}
-
-/// <summary>Resultado de <c>dbo.spRec_TiposAlumno</c>.</summary>
-public sealed class SpRecTiposAlumnoResult
-{
-    public string Tipo { get; set; } = null!;
-    public string? Nombre { get; set; }
-    public int? Orden { get; set; }
-}
-
-/// <summary>Resultado de <c>dbo.spRec_TiposAlumnosModalidades</c>.</summary>
-public sealed class SpRecTiposAlumnosModalidadesResult
-{
-    public string Tipo { get; set; } = null!;
-    public string Modalidad { get; set; } = null!;
-}

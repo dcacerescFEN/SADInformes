@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -145,6 +145,13 @@ test('El SAD se consume con SadContext y procedimientos al estilo de las referen
   }
   assert.match(procedures, /SqlQueryAsync<SpRecEncuestaDocenteXCursoResult>/);
   assert.equal(existsSync(resolve(root, 'src/Infrastructure/Reports/Postgraduate/SqlTeacherSurveyReader.cs')), false);
+  const spDirectory = resolve(root, 'src/Domain/Entities/Sad/Sp');
+  const spFiles = readdirSync(spDirectory).filter(file => file.endsWith('.cs'));
+  for (const sp of ['SpRecEncuestaDocenteXCursoResult', 'SpRecPeriodosAcademicosProgramacionResult',
+    'SpRecTiposAlumnoResult', 'SpRecTiposAlumnosModalidadesResult']) {
+    assert.ok(spFiles.includes(sp + '.cs'), sp + ' debe tener su propio archivo');
+    assert.equal((read('src/Domain/Entities/Sad/Sp/' + sp + '.cs').match(/public sealed class/g) ?? []).length, 1);
+  }
 });
 
 test('Las pantallas de informes usan el page-header de las referencias', () => {
@@ -158,6 +165,23 @@ test('Las pantallas de informes usan el page-header de las referencias', () => {
   const styles = read('src/Web/WebUI/src/styles.scss');
   assert.match(styles, /^.page-header,/m);
   assert.match(styles, /--card-radius/);
+});
+
+test('La tabla y los filtros reutilizan shared y ng-select de las referencias', () => {
+  const table = read('src/Web/WebUI/src/app/shared/components/table.ts');
+  assert.ok(table.includes("selector: 'app-table'"));
+  assert.ok(table.includes('export interface TableColumn'));
+  const page = read('src/Web/WebUI/src/app/postgraduate/teacher-survey/teacher-survey.ts');
+  assert.ok(page.includes("import { Table, TableColumn } from '../../shared/components/table';"));
+  assert.ok(page.includes('<app-table'));
+  assert.ok(page.includes('NgSelectModule'));
+  assert.ok(page.includes('class="floating-label"'));
+  assert.ok(page.includes('btn btn-search'));
+  assert.ok(page.includes('btn btn-clear'));
+  const styles = read('src/Web/WebUI/src/styles.scss');
+  for (const token of ['.btn-search', '.btn-clear', '.app-table', '.ng-select-custom', '.floating-label']) {
+    assert.ok(styles.includes(token), token);
+  }
 });
 
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
@@ -187,7 +211,7 @@ test('El frontend usa Angular 22 sin dependencias funcionales de alumnos', () =>
   assert.match(packageJson.dependencies['@angular/core'], /^22\./);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
     '@angular/common', '@angular/compiler', '@angular/core', '@angular/forms', '@angular/localize',
-    '@angular/platform-browser', '@angular/router', '@ng-bootstrap/ng-bootstrap', '@popperjs/core',
+    '@angular/platform-browser', '@angular/router', '@ng-bootstrap/ng-bootstrap', '@ng-select/ng-select', '@popperjs/core',
     'bootstrap', 'bootstrap-icons', 'keycloak-js', 'rxjs', 'tslib',
   ]);
   assert.equal(packageJson.scripts.build, 'ng build');

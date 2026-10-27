@@ -60,3 +60,129 @@ body {
 .form-section {
   padding: 1.5rem;
 }
+
+// Botones compartidos con SADAlumnos y SADAdministracion.
+.btn-create,
+.btn-search,
+.btn-clear,
+.btn-back {
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-search {
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  box-shadow: 0 2px 6px rgba(0, 59, 122, 0.25);
+}
+
+.btn-search:hover {
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.btn-clear,
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--layout-border-color);
+  color: var(--layout-text);
+}
+
+.btn-clear:hover,
+.btn-back:hover {
+  background: var(--table-row-hover-background);
+  border-color: var(--secondary-blue);
+  color: var(--layout-text);
+}
+
+.btn-search:disabled,
+.btn-clear:disabled,
+.btn-back:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+// Tabla reutilizable de shared.
+.app-table {
+  margin-bottom: 0;
+  color: var(--layout-text);
+  font-size: 0.82rem;
+  --bs-table-bg: var(--table-row-background);
+  --bs-table-color: var(--layout-text);
+  --bs-table-border-color: var(--layout-border-color);
+  --bs-table-hover-bg: var(--table-row-hover-background);
+  --bs-table-hover-color: var(--layout-text);
+}
+
+.app-table thead th {
+  background-color: var(--table-header-background);
+  color: var(--layout-text);
+  border-bottom-color: var(--layout-border-color);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.app-table tbody td {
+  background-color: var(--table-row-background);
+  color: var(--layout-text);
+  border-color: var(--layout-border-color);
+}
+
+// Selectores ng-select con etiqueta flotante, igual que las referencias.
+.ng-select-container-custom {
+  position: relative;
+}
+
+.floating-label {
+  position: absolute;
+  top: 0.1rem;
+  left: 0.75rem;
+  background-color: var(--layout-surface-strong);
+  font-size: 0.9rem;
+  color: var(--layout-muted-text);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ng-select-custom .ng-select-container {
+  background-color: var(--input-background);
+  color: var(--input-text);
+  border: 1px solid var(--input-border-color);
+  box-shadow: none;
+  height: calc(2.5rem + 2px);
+  padding-top: 0.3rem;
+  margin-top: 1.2rem;
+}
+
+.ng-select-custom {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.ng-select-custom .ng-select-container:focus,
+.ng-select-custom .ng-select-container.ng-select-focused,
+.ng-select-custom.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+  border-color: var(--primary-blue);
+  box-shadow: none;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder,
+.ng-select .ng-select-container .ng-value-container .ng-input > input,
+.ng-select .ng-select-container .ng-value-container {
+  color: var(--input-text);
+}
+
+.ng-select .ng-arrow-wrapper .ng-arrow,
+.ng-select .ng-clear-wrapper {
+  color: var(--layout-muted-text);
+}
+
+.ng-select.ng-select-disabled > .ng-select-container {
+  background-color: var(--input-disabled-background);
+}

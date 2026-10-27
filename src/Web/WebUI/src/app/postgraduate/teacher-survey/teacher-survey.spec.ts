@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TeacherSurvey } from './teacher-survey';
@@ -62,35 +64,46 @@ describe('Informe Encuesta docente por curso', () => {
     return found;
   }
 
-  async function selectFilter(control: string, value: string) {
-    const select = element(`select[data-filter="${control}"]`) as HTMLSelectElement;
-    select.value = value;
-    select.dispatchEvent(new Event('change'));
+  async function selectFilter(control: 'period' | 'studentType' | 'modality', value: string) {
+    fixture.componentInstance.form.controls[control].setValue(value);
+    await settle();
+  }
+
+  async function submit() {
+    element('form').dispatchEvent(new Event('submit'));
     await settle();
   }
 
   async function completeFilters() {
-    await selectFilter('periodo', '2024A');
-    await selectFilter('tipoAlumno', 'MBA');
+    await selectFilter('period', '2024A');
+    await selectFilter('studentType', 'MBA');
     http.expectOne(FILTERS + '?tipoAlumno=MBA').flush(filters);
     await settle();
-    await selectFilter('modalidad', 'PT');
+    await selectFilter('modality', 'PT');
   }
 
-  it('carga los catálogos y recarga modalidades al cambiar el tipo de alumno', async () => {
-    expect(root.querySelectorAll('select[data-filter]')).toHaveLength(3);
-    expect(root.textContent).toContain('2024 - Primer Semestre');
-    expect(root.textContent).toContain('Magíster en Gestión Pública');
-    await selectFilter('tipoAlumno', 'MBA');
+  // En esta versión de ng-select `items` es una señal expuesta como función.
+  function itemsOf(select: NgSelectComponent): unknown {
+    return (select.items as unknown as () => unknown)();
+  }
+
+  function selects(): NgSelectComponent[] {
+    return fixture.debugElement.queryAll(By.directive(NgSelectComponent))
+      .map(element => element.componentInstance as NgSelectComponent);
+  }
+
+  it('carga los catálogos en ng-select y recarga modalidades al cambiar el tipo', async () => {
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
+    expect(itemsOf(selects()[0])).toEqual(filters.data.periods);
+    expect(itemsOf(selects()[1])).toEqual(filters.data.studentTypes);
+    await selectFilter('studentType', 'MBA');
     http.expectOne(FILTERS + '?tipoAlumno=MBA').flush(filters);
     await settle();
-    expect(root.textContent).toContain('PT');
-    expect(root.textContent).toContain('FT');
+    expect(itemsOf(selects()[2])).toEqual(['PT', 'FT']);
   });
 
   it('no consulta sin filtros completos y explica qué falta', async () => {
-    element('[data-action="show"]').click();
-    await settle();
+    await submit();
     expect(root.querySelector('[role="alert"]')?.textContent)
       .toContain('Seleccione período, tipo de alumno y modalidad');
     http.expectNone(REPORT);
@@ -98,8 +111,7 @@ describe('Informe Encuesta docente por curso', () => {
 
   it('muestra filas, total y columnas del SAD sin interpretar HTML', async () => {
     await completeFilters();
-    element('[data-action="show"]').click();
-    await settle();
+    await submit();
     http.expectOne(REPORT + COMPLETE).flush({
       success: true, message: null,
       data: { rows: [row({ teacherName: '<img src=x onerror=alert(1)>' })], total: 1 },
@@ -114,8 +126,7 @@ describe('Informe Encuesta docente por curso', () => {
 
   it('informa un resultado vacío sin inventar filas', async () => {
     await completeFilters();
-    element('[data-action="show"]').click();
-    await settle();
+    await submit();
     http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
     expect(root.querySelector('table')).toBeNull();
@@ -124,8 +135,7 @@ describe('Informe Encuesta docente por curso', () => {
 
   it('muestra un aviso sanitizado y descarta datos previos si el informe falla', async () => {
     await completeFilters();
-    element('[data-action="show"]').click();
-    await settle();
+    await submit();
     http.expectOne(REPORT + COMPLETE)
       .flush({ title: 'El informe no está disponible.' }, { status: 503, statusText: 'Unavailable' });
     await settle();
@@ -145,8 +155,7 @@ describe('Informe Encuesta docente por curso', () => {
     const exportButton = () => element('[data-action="export"]') as HTMLButtonElement;
     expect(exportButton().disabled).toBe(true);
     await completeFilters();
-    element('[data-action="show"]').click();
-    await settle();
+    await submit();
     http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [row()], total: 1 } });
     await settle();
     expect(exportButton().disabled).toBe(false);
