@@ -44,6 +44,8 @@ describe('Informe Encuesta docente por curso', () => {
     fixture.detectChanges();
     http.expectOne(FILTERS).flush(filters);
     await settle();
+    http.expectOne(FILTERS + '?tipoAlumno=MBA').flush(filters);
+    await settle();
   });
 
   afterEach(() => {
@@ -106,14 +108,21 @@ describe('Informe Encuesta docente por curso', () => {
     expect(fixture.componentInstance.form.getRawValue()).toEqual({
       period: '2024A', studentType: 'MBA', modality: 'PT',
     });
+    expect(root.querySelector('[data-action="clear"]')).toBeNull();
+  });
+
+  it('deshabilita la modalidad cuando no hay tipo de alumno', async () => {
+    fixture.componentInstance.form.controls.studentType.setValue('');
+    await settle();
+    http.expectOne(FILTERS).flush({ ...filters, data: { ...filters.data, modalities: [] } });
+    await settle();
+    expect(fixture.componentInstance.form.controls.modality.disabled).toBe(true);
+    expect(selects()[2]).toBeDefined();
   });
 
   it('no consulta sin filtros completos y explica qué falta', async () => {
-    element('[data-action="clear"]').click();
+    fixture.componentInstance.form.reset({ period: '', studentType: '', modality: '' }, { emitEvent: false });
     await settle();
-    expect(fixture.componentInstance.form.getRawValue()).toEqual({
-      period: '', studentType: '', modality: '',
-    });
     await submit();
     expect(root.querySelector('[role="alert"]')?.textContent)
       .toContain('Seleccione período, tipo de alumno y modalidad');

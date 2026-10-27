@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -96,9 +96,6 @@ const COLUMNS: readonly TableColumn[] = [
                 <button class="btn btn-search" type="submit" data-action="show" [disabled]="loading()">
                   <i class="bi bi-search me-1" aria-hidden="true"></i>Mostrar
                 </button>
-                <button class="btn btn-clear" type="button" data-action="clear" (click)="clear()">
-                  <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Limpiar
-                </button>
               </div>
             </div>
           </div>
@@ -146,12 +143,18 @@ export class TeacherSurvey {
   protected readonly loading = signal(false);
 
   constructor() {
-    void this.loadFilters();
-    this.form.controls.studentType.valueChanges.subscribe(() => void this.loadFilters());
+    void this.loadFilters(true);
+    this.form.controls.studentType.valueChanges.subscribe(value => {
+      // La modalidad depende del tipo: se refleja en la señal antes de recargar.
+      this.selectedType.set(value ?? '');
+      void this.loadFilters();
+    });
   }
 
-  private async loadFilters(): Promise<void> {
+  /** `applyDefaults` solo en la primera carga: el SAD llega con valores elegidos. */
+  private async loadFilters(applyDefaults = false): Promise<void> {
     const studentType = this.form.controls.studentType.value;
+    this.selectedType.set(studentType ?? '');
     const query = studentType ? '?tipoAlumno=' + encodeURIComponent(studentType) : '';
     try {
       const response = await firstValueFrom(this.http.get<Envelope<Filters>>(BASE + '/filters' + query));
@@ -160,10 +163,16 @@ export class TeacherSurvey {
       // El SAD llega con valores preseleccionados: primer período, primer tipo y
       // la primera modalidad disponible para el tipo elegido.
       const { period, modality } = this.form.getRawValue();
-      if (!period && response.data.periods.length > 0)
+      if (applyDefaults && !period && response.data.periods.length > 0)
         this.form.controls.period.setValue(response.data.periods[0].value);
-      if (!this.form.controls.studentType.value && response.data.studentTypes.length > 0)
+      if (applyDefaults && !this.form.controls.studentType.value && response.data.studentTypes.length > 0) {
         this.form.controls.studentType.setValue(response.data.studentTypes[0].value, { emitEvent: false });
+        this.selectedType.set(response.data.studentTypes[0].value);
+        // La primera carga sin tipo trae todas las modalidades; se recargan acotadas
+        // al tipo por defecto, como en el SAD.
+        await this.loadFilters();
+        return;
+      }
       if (!response.data.modalities.includes(modality))
         this.form.controls.modality.setValue(response.data.modalities[0] ?? '');
     } catch {
@@ -172,13 +181,17 @@ export class TeacherSurvey {
     }
   }
 
-  protected clear(): void {
-    // Sin emitEvent: limpiar no debe disparar otra carga de catálogos.
-    this.form.reset({ period: '', studentType: '', modality: '' }, { emitEvent: false });
-    this.rows.set([]);
-    this.error.set('');
-    this.notice.set('');
-  }
+  private readonly selectedType = signal('');
+  protected readonly modalityDisabled = computed(() =>
+    !this.selectedType() || this.filters().modalities.length === 0);
+
+  // Con Reactive Forms el estado se controla en el propio FormControl.
+  private readonly syncModalityState = effect(() => {
+    const disabled = this.modalityDisabled();
+    const control = this.form.controls.modality;
+    if (disabled && control.enabled) control.disable({ emitEvent: false });
+    if (!disabled && control.disabled) control.enable({ emitEvent: false });
+  });
 
   protected async show(): Promise<void> {
     this.error.set('');

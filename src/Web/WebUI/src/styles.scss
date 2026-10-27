@@ -9,6 +9,20 @@
   --layout-border-color: rgba(214, 223, 235, 0.9);
   --table-row-hover-background: #f3f6fb;
   --dropdown-option-selected-background: #dbe8f8;
+  --layout-surface: rgba(255, 255, 255, 0.9);
+  --light-blue: #dbe8f8;
+  --border-gray: #cfd8e3;
+  --input-background: #ffffff;
+  --input-text: #1e2b3c;
+  --input-placeholder: #6c757d;
+  --input-border-color: rgba(206, 212, 218, 0.95);
+  --input-disabled-background: #eef2f7;
+  --input-disabled-text: #6c757d;
+  --table-header-background: #f8fafc;
+  --table-row-background: #ffffff;
+  --dropdown-option-hover-background: #eef4fb;
+  --card-radius: 0.75rem;
+  --card-shadow: 0 2px 10px rgba(15, 35, 70, 0.06);
 }
 :root[data-theme='dark'] {
   --primary-blue: #295ea4;
@@ -21,6 +35,20 @@
   --layout-border-color: rgba(76, 95, 126, 0.7);
   --table-row-hover-background: #1b2537;
   --dropdown-option-selected-background: #2b3b57;
+  --layout-surface: rgba(17, 24, 39, 0.84);
+  --light-blue: #17253d;
+  --border-gray: #31405c;
+  --input-background: #202938;
+  --input-text: #e5edf8;
+  --input-placeholder: #9fb0c9;
+  --input-border-color: rgba(76, 95, 126, 0.9);
+  --input-disabled-background: #1a2333;
+  --input-disabled-text: #d6e1f0;
+  --table-header-background: #182235;
+  --table-row-background: #111827;
+  --dropdown-option-hover-background: #243146;
+  --card-radius: 0.75rem;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 body {
   margin: 0;
@@ -59,6 +87,25 @@ body {
 
 .form-section {
   padding: 1.5rem;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: var(--input-background);
+  border-color: var(--input-border-color);
+  color: var(--input-text);
+}
+
+.form-control::placeholder {
+  color: var(--input-placeholder);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--input-background);
+  border-color: var(--primary-blue);
+  color: var(--input-text);
 }
 
 // Botones compartidos con SADAlumnos y SADAdministracion.
@@ -195,6 +242,10 @@ body {
 .ng-select-custom.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
   border-color: var(--primary-blue);
   box-shadow: none;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: var(--input-placeholder);
 }
 
 .ng-select .ng-select-container .ng-value-container .ng-placeholder,
