@@ -33,50 +33,62 @@ const COLUMNS: readonly { key: keyof Row; label: string }[] = [
 @Component({
   selector: 'app-teacher-survey',
   template: `
-    <section class="report" aria-labelledby="survey-title">
-      <p class="text-body-secondary mb-2">Postgrado</p>
-      <h1 id="survey-title">Encuesta docente por curso</h1>
-      <p class="text-body-secondary">
-        Evaluación general del curso (A) y del profesor (B) según período, tipo de alumno y modalidad.
-      </p>
-
-      <form class="row g-2 align-items-end mb-3" (submit)="$event.preventDefault(); show()">
-        <div class="col-auto">
-          <label class="form-label" for="survey-period">Período</label>
-          <select id="survey-period" class="form-select" data-filter="periodo" [value]="period()"
-            (change)="period.set(value($event))">
-            <option value="">Seleccione período</option>
-            @for (option of filters().periods; track option.value) {
-              <option [value]="option.value">{{ option.text }}</option>
-            }
-          </select>
-        </div>
-        <div class="col-auto">
-          <label class="form-label" for="survey-type">Tipo alumno</label>
-          <select id="survey-type" class="form-select" data-filter="tipoAlumno" [value]="studentType()"
-            (change)="changeStudentType(value($event))">
-            <option value="">Seleccione tipo</option>
-            @for (option of filters().studentTypes; track option.value) {
-              <option [value]="option.value">{{ option.text }}</option>
-            }
-          </select>
-        </div>
-        <div class="col-auto">
-          <label class="form-label" for="survey-modality">Modalidad</label>
-          <select id="survey-modality" class="form-select" data-filter="modalidad" [value]="modality()"
-            (change)="modality.set(value($event))">
-            <option value="">Seleccione modalidad</option>
-            @for (option of filters().modalities; track option) {
-              <option [value]="option">{{ option }}</option>
-            }
-          </select>
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-primary" type="submit" data-action="show" [disabled]="loading()">Mostrar</button>
-        </div>
-        <div class="col-auto">
+    <div class="container-fluid px-0 py-4">
+      <div class="page-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+          <div>
+            <h1 class="page-title">
+              <i class="bi bi-clipboard-data" aria-hidden="true"></i>
+              Encuesta docente por curso
+            </h1>
+            <p class="page-subtitle mb-0">
+              Evaluación general del curso (A) y del profesor (B) según período, tipo de alumno y modalidad.
+            </p>
+          </div>
           <button class="btn btn-outline-secondary" type="button" data-action="export"
-            [disabled]="rows().length === 0" (click)="exportCsv()">Exportar CSV</button>
+            [disabled]="rows().length === 0" (click)="exportCsv()">
+            <i class="bi bi-filetype-csv me-2" aria-hidden="true"></i>Exportar CSV
+          </button>
+        </div>
+      </div>
+
+      <form class="form-section mb-3" (submit)="$event.preventDefault(); show()">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-4 col-xl-3">
+            <label class="form-label" for="survey-period">Período</label>
+            <select id="survey-period" class="form-select" data-filter="periodo" [value]="period()"
+              (change)="period.set(value($event))">
+              <option value="">Seleccione período</option>
+              @for (option of filters().periods; track option.value) {
+                <option [value]="option.value">{{ option.text }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-12 col-md-4 col-xl-3">
+            <label class="form-label" for="survey-type">Tipo alumno</label>
+            <select id="survey-type" class="form-select" data-filter="tipoAlumno" [value]="studentType()"
+              (change)="changeStudentType(value($event))">
+              <option value="">Seleccione tipo</option>
+              @for (option of filters().studentTypes; track option.value) {
+                <option [value]="option.value">{{ option.text }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-12 col-md-4 col-xl-3">
+            <label class="form-label" for="survey-modality">Modalidad</label>
+            <select id="survey-modality" class="form-select" data-filter="modalidad" [value]="modality()"
+              (change)="modality.set(value($event))">
+              <option value="">Seleccione modalidad</option>
+              @for (option of filters().modalities; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-12 col-xl-auto">
+            <button class="btn btn-primary" type="submit" data-action="show" [disabled]="loading()">
+              <i class="bi bi-search me-2" aria-hidden="true"></i>Mostrar
+            </button>
+          </div>
         </div>
       </form>
 
@@ -85,28 +97,29 @@ const COLUMNS: readonly { key: keyof Row; label: string }[] = [
       @if (loading()) { <p role="status">Cargando…</p> }
 
       @if (rows().length > 0) {
-        <div class="table-responsive">
-          <table class="table table-sm table-striped align-middle">
-            <caption class="visually-hidden">Encuesta docente por curso</caption>
-            <thead>
-              <tr>@for (column of columns; track column.key) { <th scope="col">{{ column.label }}</th> }</tr>
-            </thead>
-            <tbody>
-              @for (item of rows(); track item.course + item.teacherId) {
-                <tr>@for (column of columns; track column.key) {
-                  <td>{{ item[column.key] ?? '' }}</td>
-                }</tr>
-              }
-            </tbody>
-          </table>
+        <div class="form-section">
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-0">
+              <caption class="visually-hidden">Encuesta docente por curso</caption>
+              <thead>
+                <tr>@for (column of columns; track column.key) { <th scope="col">{{ column.label }}</th> }</tr>
+              </thead>
+              <tbody>
+                @for (item of rows(); track item.course + item.teacherId) {
+                  <tr>@for (column of columns; track column.key) {
+                    <td>{{ item[column.key] ?? '' }}</td>
+                  }</tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>
         </div>
-        <p class="fw-semibold">Total:{{ rows().length }}</p>
       }
-    </section>
+    </div>
   `,
   styles: `
     :host { display: block; }
-    .report { max-width: 100%; }
     table { font-size: 0.8rem; }
     th, td { white-space: nowrap; }
   `,

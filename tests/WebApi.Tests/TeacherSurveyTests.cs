@@ -166,7 +166,7 @@ public sealed class TeacherSurveyTests
             return Task.FromResult<IReadOnlyList<TeacherSurveyRow>>(
             [
                 new(period, "MBA101/1", "Gestión (MBA101)", "12345678-9", "Profesora Prueba", "Ayudante Uno",
-                    4.5m, 4m, 4m, 4m, "comentario A", 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m, 4m,
+                    4.5, 4, 4, 4, "comentario A", 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                     null, "comentario B"),
             ]);
         }

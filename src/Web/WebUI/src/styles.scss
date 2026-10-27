@@ -28,3 +28,35 @@ body {
   color: var(--layout-text);
   background: var(--layout-background);
 }
+
+.page-header,
+.form-section {
+  background: var(--layout-surface-strong);
+  border: 1px solid var(--layout-border-color);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.page-header {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.page-title {
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--layout-muted-text);
+  font-size: 0.875rem;
+}
+
+.form-section {
+  padding: 1.5rem;
+}

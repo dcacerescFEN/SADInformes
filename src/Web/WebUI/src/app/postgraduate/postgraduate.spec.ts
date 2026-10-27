@@ -39,7 +39,7 @@ describe('Navegación visual de Postgrado', () => {
     for (const report of POSTGRADUATE_REPORTS.filter(item => item.available !== true)) {
       await harness.navigateByUrl('/postgrado/' + report.slug);
       const root = harness.routeNativeElement!;
-      expect(root.querySelector('h1')?.textContent).toBe(report.title);
+      expect(root.querySelector('h1')?.textContent?.trim()).toBe(report.title);
       expect(root.textContent).toContain(report.description);
       expect(root.textContent).toContain('Pendiente de migración');
       expect(root.textContent).toContain(report.legacyPath);
@@ -63,7 +63,7 @@ describe('Navegación visual de Postgrado', () => {
     });
     await harness.detectChanges();
     const root = harness.routeNativeElement!;
-    expect(root.querySelector('h1')?.textContent).toBe('Encuesta docente por curso');
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Encuesta docente por curso');
     expect(root.textContent).not.toContain('Pendiente de migración');
     expect(root.querySelectorAll('select[data-filter]')).toHaveLength(3);
     http.verify();

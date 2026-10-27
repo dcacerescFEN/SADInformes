@@ -130,6 +130,36 @@ test('Publicar WebApi compila Angular y copia sus assets a wwwroot', () => {
   assert.match(project, /wwwroot/);
 });
 
+test('El SAD se consume con SadContext y procedimientos al estilo de las referencias', () => {
+  const infrastructure = read('src/Infrastructure/ConfigureServices.cs');
+  assert.match(infrastructure, /AddDbContext<SadContext>/);
+  assert.ok(infrastructure.includes('GetConnectionString("Sad")'));
+  assert.ok(infrastructure.includes('AddScoped<ISadContextProcedures, SadContextProcedures>()'));
+  const context = read('src/Infrastructure/Data/SadContext.cs');
+  assert.match(context, /DbContextOptions<SadContext>/);
+  assert.match(context, /ISadContext/);
+  const procedures = read('src/Infrastructure/Data/SadContextProcedures.cs');
+  for (const sp of ['spRec_Encuesta_DocenteXCurso', 'spRec_PeriodosAcademicosProgramacion',
+    'spRec_TiposAlumno', 'spRec_TiposAlumnosModalidades']) {
+    assert.ok(procedures.includes('[dbo].[' + sp + ']'), sp);
+  }
+  assert.match(procedures, /SqlQueryAsync<SpRecEncuestaDocenteXCursoResult>/);
+  assert.equal(existsSync(resolve(root, 'src/Infrastructure/Reports/Postgraduate/SqlTeacherSurveyReader.cs')), false);
+});
+
+test('Las pantallas de informes usan el page-header de las referencias', () => {
+  for (const page of ['postgraduate/teacher-survey/teacher-survey.ts', 'postgraduate/postgraduate-placeholder.ts']) {
+    const source = read('src/Web/WebUI/src/app/' + page);
+    assert.ok(source.includes('container-fluid px-0 py-4'), page);
+    assert.ok(source.includes('class=\"page-header\"'), page);
+    assert.ok(source.includes('class=\"page-title\"'), page);
+    assert.ok(source.includes('page-subtitle'), page);
+  }
+  const styles = read('src/Web/WebUI/src/styles.scss');
+  assert.match(styles, /^.page-header,/m);
+  assert.match(styles, /--card-radius/);
+});
+
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
   const styles = read('src/Web/WebUI/src/app/core/layout/header.scss');
   assert.match(styles, /max-width:\s*991\.98px/);

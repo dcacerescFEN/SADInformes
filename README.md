@@ -301,6 +301,7 @@ SAD, tabla de resultados, total y exportación CSV.
 | Permiso | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` en el cliente físico configurado |
 | Datos | SP existentes `spRec_Encuesta_DocenteXCurso`, `spRec_PeriodosAcademicosProgramacion`, `spRec_TiposAlumno` y `spRec_TiposAlumnosModalidades` |
 | Conexión | `ConnectionStrings:Sad`, definida fuera del repositorio con una cuenta de solo lectura |
+| Acceso a datos | `SadContext` + `ISadContextProcedures`, igual que SADAlumnos y SADAdministracion |
 
 `REPORT_ACCESS` habilita la entrada y la configuración del sitio, pero **no** concede
 este informe: sin el permiso específico la API responde 403. Los roles de otro cliente,
@@ -315,6 +316,14 @@ Diferencias conocidas con la pantalla legada: la exportación es CSV UTF-8 con s
 `;` y nombre `.csv` (el SAD generaba el mismo formato con extensión `.xls` y Windows-1252),
 no se enlaza al curso del SAD legado y no se pagina el resultado. Ambas pantallas usan
 los mismos SP, por lo que los valores coinciden para los mismos filtros.
+
+El acceso al SAD sigue la forma de las aplicaciones de referencia: `SadContext`
+registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
+`ISadContextProcedures` con un método por procedimiento (`EXEC` tipado, parámetros
+`SqlParameter` y `OutputParameter<int>`). No hay conexiones propias del informe ni
+SQL de negocio duplicado. Las pantallas usan el `page-header` compartido de
+SADAlumnos y SADAdministracion, con `container-fluid`, título con icono, subtítulo
+y secciones `form-section`.
 
 Con `dotnet run` el frontend de desarrollo está en 4200; la API y Scalar, en 7070.
 Una consulta real requiere la conexión de solo lectura y los roles de Keycloak;

@@ -6,10 +6,10 @@ public sealed record TeacherSurveyOption(string Value, string Text);
 /// <summary>Fila del informe: evaluación general del curso (A) y del profesor (B).</summary>
 public sealed record TeacherSurveyRow(
     string Period, string Course, string Name, string TeacherId, string TeacherName, string Assistants,
-    decimal? A1, decimal? A2, decimal? A3, decimal? A4, string? AComments,
-    decimal? B1, decimal? B2, decimal? B3, decimal? B4, decimal? B5, decimal? B6, decimal? B7,
-    decimal? B8, decimal? B9, decimal? B10, decimal? B11, decimal? B12, decimal? B13,
-    decimal? BGrade, string? BComments);
+    double? A1, double? A2, double? A3, double? A4, string? AComments,
+    int? B1, int? B2, int? B3, int? B4, int? B5, int? B6, int? B7,
+    int? B8, int? B9, int? B10, int? B11, int? B12, int? B13,
+    double? BGrade, string? BComments);
 
 /// <summary>Catálogos que alimentan los selectores del informe.</summary>
 public sealed record TeacherSurveyFilters(

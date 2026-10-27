@@ -9,25 +9,37 @@ import { PostgraduateReport } from './postgraduate-catalogue';
   imports: [RouterLink],
   template: `
     @if (report(); as report) {
-      <section class="report-preview" aria-labelledby="report-title">
-        <p class="text-body-secondary mb-2">Postgrado</p>
-        <h1 id="report-title">{{ report.title }}</h1>
-        <p><span class="badge text-bg-secondary">Pendiente de migración</span></p>
-        <p>{{ report.description }}</p>
-        <div class="alert alert-info">
-          Esta ficha es únicamente visual. La funcionalidad todavía no está migrada:
-          no consulta datos ni permite realizar operaciones.
+      <div class="container-fluid px-0 py-4">
+        <div class="page-header">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+              <h1 id="report-title" class="page-title">
+                <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                {{ report.title }}
+              </h1>
+              <p class="page-subtitle mb-0">{{ report.description }}</p>
+            </div>
+            <a class="btn btn-outline-secondary" routerLink="/">
+              <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Volver al inicio
+            </a>
+          </div>
         </div>
-        <h2 class="h6">Referencia en SAD</h2>
-        <p><code>{{ report.legacyPath }}</code></p>
-        <a routerLink="/">Volver al inicio</a>
-      </section>
+
+        <div class="form-section">
+          <p><span class="badge text-bg-secondary">Pendiente de migración</span></p>
+          <div class="alert alert-info mb-3">
+            Esta ficha es únicamente visual. La funcionalidad todavía no está migrada:
+            no consulta datos ni permite realizar operaciones.
+          </div>
+          <h2 class="h6">Referencia en SAD</h2>
+          <p class="mb-0"><code>{{ report.legacyPath }}</code></p>
+        </div>
+      </div>
     }
   `,
   styles: `
     :host { display: block; }
-    .report-preview { max-width: 64rem; margin: 0 auto; }
-    h1, code { overflow-wrap: anywhere; }
+    code { overflow-wrap: anywhere; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
