@@ -4,6 +4,8 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { firstValueFrom } from 'rxjs';
 import { Table, TableColumn } from '../../shared/components/table';
+import { ANSWER_SCALE, COURSE_QUESTIONS, TEACHER_QUESTIONS } from './teacher-survey-glossary';
+import { GlossaryTable } from './glossary-table';
 
 interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: string[]; }
@@ -35,7 +37,7 @@ const COLUMNS: readonly TableColumn[] = [
 
 @Component({
   selector: 'app-teacher-survey',
-  imports: [ReactiveFormsModule, NgSelectModule, Table],
+  imports: [ReactiveFormsModule, NgSelectModule, Table, GlossaryTable],
   template: `
     <div class="container-fluid px-0 py-4">
       <div class="page-header">
@@ -49,7 +51,7 @@ const COLUMNS: readonly TableColumn[] = [
               Evaluación general del curso (A) y del profesor (B) según período, tipo de alumno y modalidad.
             </p>
           </div>
-          <button class="btn btn-clear" type="button" data-action="export"
+          <button class="btn btn-create" type="button" data-action="export"
             [disabled]="rows().length === 0" (click)="exportCsv()">
             <i class="bi bi-filetype-csv me-2" aria-hidden="true"></i>Exportar CSV
           </button>
@@ -110,10 +112,20 @@ const COLUMNS: readonly TableColumn[] = [
       @if (rows().length > 0) {
         <div class="form-section">
           <app-table aria-label="Encuesta docente por curso" [data]="rows()" [columns]="columns"
-            [showSummary]="false" [showRowNumber]="false" rowId="course" />
+            [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>
         </div>
       }
+
+      <div class="form-section mt-3">
+        <h2 class="h6">Glosa</h2>
+        <h3 class="h6 text-body-secondary">Evaluación general del curso</h3>
+        <app-glossary-table [entries]="courseQuestions" data-glossary="curso" />
+        <h3 class="h6 text-body-secondary mt-3">Evaluación del profesor</h3>
+        <app-glossary-table [entries]="teacherQuestions" data-glossary="profesor" />
+        <h3 class="h6 text-body-secondary mt-3">Respuestas</h3>
+        <app-glossary-table [entries]="answerScale" firstColumn="Número" data-glossary="respuestas" />
+      </div>
     </div>
   `,
   styles: ':host { display: block; }',
@@ -123,6 +135,9 @@ export class TeacherSurvey {
   private readonly http = inject(HttpClient);
   private readonly formBuilder = inject(FormBuilder);
   protected readonly columns = COLUMNS;
+  protected readonly courseQuestions = COURSE_QUESTIONS;
+  protected readonly teacherQuestions = TEACHER_QUESTIONS;
+  protected readonly answerScale = ANSWER_SCALE;
   readonly form = this.formBuilder.nonNullable.group({ period: '', studentType: '', modality: '' });
   protected readonly filters = signal<Filters>({ periods: [], studentTypes: [], modalities: [] });
   protected readonly rows = signal<Row[]>([]);

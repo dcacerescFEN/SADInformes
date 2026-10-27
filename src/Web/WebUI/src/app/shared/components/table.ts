@@ -1,5 +1,4 @@
 import { NgClass } from '@angular/common';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Component, effect, input, output, signal } from '@angular/core';
 
 export interface TableColumn {
@@ -15,25 +14,20 @@ export interface TableColumn {
   alternateAction?: TableAction;
   alternateActionVisible?: (row: object) => boolean;
   badges?: boolean;
-  badgeClass?: (row: object) => string;
   emphasized?: boolean;
 }
 
 export interface TableAction {
   icon?: string;
-  iconForRow?: (row: object) => string;
   label: string | ((row: object) => string);
   actionKey: string;
   cssClass?: string;
-  cssClassForRow?: (row: object) => string;
   ariaLabel?: (row: object) => string;
-  testId?: (row: object) => string;
-  tooltip?: (row: object) => string;
 }
 
 @Component({
   selector: 'app-table',
-  imports: [NgClass, NgbTooltip],
+  imports: [NgClass],
   template: `
     <div class="table-container">
       <div class="table-responsive">
@@ -88,7 +82,7 @@ export interface TableAction {
                   class="text-center empty-state py-4"
                 >
                   <i class="bi bi-inbox me-2" style="font-size: 1.5rem;"></i>
-                  {{ emptyMessage() }}
+                  No se encontraron registros
                 </td>
               </tr>
             }
@@ -120,10 +114,8 @@ export interface TableAction {
                           <button
                             class="btn"
                             type="button"
-                            [ngClass]="column.alternateAction.cssClassForRow?.(row) ?? column.alternateAction.cssClass"
+                            [ngClass]="column.alternateAction.cssClass"
                             [disabled]="isColumnActionDisabled(row, column)"
-                            [attr.data-testid]="column.alternateAction.testId?.(row)"
-                            [ngbTooltip]="column.alternateAction.tooltip?.(row)" container="body"
                             [attr.aria-label]="
                               column.alternateAction.ariaLabel?.(row) ??
                               actionLabel(column.alternateAction, row)
@@ -133,10 +125,10 @@ export interface TableAction {
                               onAction(getRowId(row), column.alternateAction.actionKey)
                             "
                           >
-                            @if (column.alternateAction.iconForRow?.(row) ?? column.alternateAction.icon) {
+                            @if (column.alternateAction.icon) {
                               <i
                                 class="bi"
-                                [ngClass]="column.alternateAction.iconForRow?.(row) ?? column.alternateAction.icon"
+                                [ngClass]="column.alternateAction.icon"
                                 aria-hidden="true"
                               ></i>
                             }
@@ -147,10 +139,8 @@ export interface TableAction {
                             <button
                               class="btn"
                               type="button"
-                              [ngClass]="action.cssClassForRow?.(row) ?? action.cssClass"
+                              [ngClass]="action.cssClass"
                               [disabled]="isColumnActionDisabled(row, column)"
-                              [attr.data-testid]="action.testId?.(row)"
-                              [ngbTooltip]="action.tooltip?.(row)" container="body"
                               [attr.aria-label]="
                                 action.ariaLabel?.(row) ?? actionLabel(action, row)
                               "
@@ -158,8 +148,8 @@ export interface TableAction {
                                 $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
                               "
                             >
-                              @if (action.iconForRow?.(row) ?? action.icon) {
-                                <i class="bi" [ngClass]="action.iconForRow?.(row) ?? action.icon" aria-hidden="true"></i>
+                              @if (action.icon) {
+                                <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
                               }
                               {{ actionLabel(action, row) }}
                             </button>
@@ -168,10 +158,8 @@ export interface TableAction {
                             <button
                               class="btn ms-1"
                               type="button"
-                              [ngClass]="action.cssClassForRow?.(row) ?? action.cssClass"
+                              [ngClass]="action.cssClass"
                               [disabled]="isColumnActionDisabled(row, column)"
-                              [attr.data-testid]="action.testId?.(row)"
-                              [ngbTooltip]="action.tooltip?.(row)" container="body"
                               [attr.aria-label]="
                                 action.ariaLabel?.(row) ?? actionLabel(action, row)
                               "
@@ -179,17 +167,13 @@ export interface TableAction {
                                 $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
                               "
                             >
-                              @if (action.iconForRow?.(row) ?? action.icon) {
-                                <i class="bi" [ngClass]="action.iconForRow?.(row) ?? action.icon" aria-hidden="true"></i>
+                              @if (action.icon) {
+                                <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
                               }
                               {{ actionLabel(action, row) }}
                             </button>
                           }
                         }
-                      </td>
-                    } @else if (column.badgeClass) {
-                      <td>
-                        <span class="badge" [ngClass]="column.badgeClass(row)">{{ getCellValue(row, column.key) }}</span>
                       </td>
                     } @else if (column.badges) {
                       <td>
@@ -215,7 +199,7 @@ export interface TableAction {
                           <button
                             class="btn mt-1"
                             type="button"
-                            [ngClass]="column.action.cssClassForRow?.(row) ?? column.action.cssClass"
+                            [ngClass]="column.action.cssClass"
                             [disabled]="isColumnActionDisabled(row, column)"
                             [attr.aria-label]="
                               column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
@@ -225,8 +209,8 @@ export interface TableAction {
                               onAction(getRowId(row), column.action.actionKey)
                             "
                           >
-                            @if (column.action.iconForRow?.(row) ?? column.action.icon) {
-                              <i class="bi" [ngClass]="column.action.iconForRow?.(row) ?? column.action.icon" aria-hidden="true"></i>
+                            @if (column.action.icon) {
+                              <i class="bi" [ngClass]="column.action.icon" aria-hidden="true"></i>
                             }
                             {{ actionLabel(column.action, row) }}
                           </button>
@@ -237,20 +221,18 @@ export interface TableAction {
                         <button
                           class="btn"
                           type="button"
-                          [ngClass]="column.action.cssClassForRow?.(row) ?? column.action.cssClass"
+                          [ngClass]="column.action.cssClass"
                           [disabled]="isColumnActionDisabled(row, column)"
                           [attr.aria-label]="
                             column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
                           "
-                          [attr.data-testid]="column.action.testId?.(row)"
-                          [ngbTooltip]="column.action.tooltip?.(row)" container="body"
                           (click)="
                             $event.stopPropagation();
                             onAction(getRowId(row), column.action.actionKey)
                           "
                         >
-                          @if (column.action.iconForRow?.(row) ?? column.action.icon) {
-                            <i class="bi" [ngClass]="column.action.iconForRow?.(row) ?? column.action.icon" aria-hidden="true"></i>
+                          @if (column.action.icon) {
+                            <i class="bi" [ngClass]="column.action.icon" aria-hidden="true"></i>
                           }
                           {{ actionLabel(column.action, row) }}
                         </button>
@@ -293,10 +275,10 @@ export interface TableAction {
                       @if (action.actionKey !== 'toggle') {
                         <button
                           class="btn"
-                          [ngClass]="action.cssClassForRow?.(row) ?? action.cssClass"
+                          [ngClass]="action.cssClass"
                           (click)="onAction(getRowId(row), action.actionKey)"
                         >
-                          <i class="bi" [ngClass]="action.iconForRow?.(row) ?? action.icon"></i> {{ actionLabel(action, row) }}
+                          <i class="bi" [ngClass]="action.icon"></i> {{ actionLabel(action, row) }}
                         </button>
                         <span>&nbsp;</span>
                       } @else {
@@ -376,10 +358,6 @@ export class Table {
   readonly showRowNumber = input<boolean>(true);
   readonly selectionEnabled = input<boolean>(false);
   readonly selectionLabel = input<string>('Seleccionar');
-  readonly emptyMessage = input<string>('No se encontraron registros');
-  readonly rowId = input<
-    string | ((row: object) => string | number | null | undefined) | null
-  >(null);
   readonly actionEvent = output<{
     id: string | number | null | undefined;
     actionKey: string;
@@ -573,12 +551,7 @@ export class Table {
   }
 
   public getRowId(row: object): string | number | null | undefined {
-    const accessor = this.rowId();
-    if (typeof accessor === 'function') {
-      return accessor(row);
-    }
-
-    const idKey = accessor ?? this.columns()[0]?.key;
+    const idKey = this.columns()[0]?.key;
 
     if (!idKey) {
       return undefined;

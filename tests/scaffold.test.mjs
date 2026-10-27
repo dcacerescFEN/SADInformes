@@ -170,10 +170,15 @@ test('Las pantallas de informes usan el page-header de las referencias', () => {
 test('La tabla y los filtros reutilizan shared y ng-select de las referencias', () => {
   const table = read('src/Web/WebUI/src/app/shared/components/table.ts');
   assert.ok(table.includes("selector: 'app-table'"));
+  assert.ok(!table.includes('NgbTooltip'), 'la tabla debe ser la de SADAlumnos');
+  const angular = json('src/Web/WebUI/angular.json');
+  assert.ok(angular.projects.webui.architect.build.options.styles
+    .includes('node_modules/@ng-select/ng-select/themes/default.theme.css'));
   assert.ok(table.includes('export interface TableColumn'));
   const page = read('src/Web/WebUI/src/app/postgraduate/teacher-survey/teacher-survey.ts');
   assert.ok(page.includes("import { Table, TableColumn } from '../../shared/components/table';"));
   assert.ok(page.includes('<app-table'));
+  assert.ok(page.includes('btn btn-create'), 'exportar debe usar el botón verde de SADAlumnos');
   assert.ok(page.includes('NgSelectModule'));
   assert.ok(page.includes('class="floating-label"'));
   assert.ok(page.includes('btn btn-search'));

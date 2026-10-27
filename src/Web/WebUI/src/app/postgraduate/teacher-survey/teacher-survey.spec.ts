@@ -117,11 +117,22 @@ describe('Informe Encuesta docente por curso', () => {
       data: { rows: [row({ teacherName: '<img src=x onerror=alert(1)>' })], total: 1 },
     });
     await settle();
-    const table = element('table');
+    const table = element('app-table table');
     expect(table.textContent).toContain('MBA101/1');
     expect(table.textContent).toContain('4.5');
     expect(table.querySelector('img')).toBeNull();
     expect(root.textContent).toContain('Total:1');
+    expect(root.querySelector('[data-action="export"]')?.classList.contains('btn-create')).toBe(true);
+  });
+
+  it('incluye la glosa de preguntas y la escala de respuestas del SAD', async () => {
+    expect(root.textContent).toContain('Glosa');
+    expect(root.textContent).toContain('El curso es un aporte para mi ejercicio profesional');
+    expect(root.textContent).toContain('Comentarios de la Evaluación del Profesor');
+    expect(root.textContent).toContain('B13');
+    expect(root.textContent).toContain('Totalmente de acuerdo');
+    expect(root.textContent).toContain('Ni de acuerdo ni en desacuerdo');
+    expect(root.querySelectorAll('[data-glossary] table')).toHaveLength(3);
   });
 
   it('informa un resultado vacío sin inventar filas', async () => {
@@ -129,7 +140,7 @@ describe('Informe Encuesta docente por curso', () => {
     await submit();
     http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
-    expect(root.querySelector('table')).toBeNull();
+    expect(root.querySelector('app-table table')).toBeNull();
     expect(root.textContent).toContain('Sin resultados para los filtros seleccionados.');
   });
 
@@ -140,7 +151,7 @@ describe('Informe Encuesta docente por curso', () => {
       .flush({ title: 'El informe no está disponible.' }, { status: 503, statusText: 'Unavailable' });
     await settle();
     expect(root.textContent).toContain('No se pudo cargar el informe.');
-    expect(root.querySelector('table')).toBeNull();
+    expect(root.querySelector('app-table table')).toBeNull();
   });
 
   it('exporta las filas visibles como CSV y no descarga vacío', async () => {

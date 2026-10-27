@@ -1,215 +1,237 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 import { Table, type TableColumn } from './table';
 
-describe('Table', () => {
+describe('Table sorting and filtering', () => {
   const columns: TableColumn[] = [
-    { key: 'name', name: 'Nombre', sortable: true },
-    { key: 'status', name: 'Estado' },
+    { key: 'folio', name: 'FOLIO', sortable: true },
+    { key: 'status', name: 'ESTADO', sortable: true },
+    { key: 'action', name: 'Acción' },
+  ];
+  const rows = [
+    { folio: '20', status: 'Vigente', action: 'Ver' },
+    { folio: '3', status: 'Anulado', action: 'Ver' },
   ];
 
-  it('pagina localmente de a 10 y filtra y ordena mediante entradas públicas', async () => {
+  it('filters rows and displays direction only on the active sortable header', async () => {
     const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', columns);
-    fixture.componentRef.setInput(
-      'data',
-      Array.from({ length: 12 }, (_, index) => ({
-        id: `id-${index}`,
-        name: `Nombre ${String(index).padStart(2, '0')}`,
-        status: index === 11 ? 'Especial' : 'Activo',
-      })),
-    );
-    fixture.componentRef.setInput('showRowNumber', false);
-    fixture.detectChanges();
+    const searchTerm = signal('');
+    // Direct Vitest JIT does not extract input metadata; replace the input signals for this fixture.
+    Object.defineProperties(fixture.componentInstance, {
+      columns: { value: signal(columns) },
+      data: { value: signal(rows) },
+      showRowNumber: { value: signal(false) },
+      searchTerm: { value: searchTerm },
+    });
+    await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelectorAll('tbody tr')).toHaveLength(10);
-    expect(fixture.nativeElement.querySelector('tbody .badge')).toBeNull();
-    expect(fixture.nativeElement.textContent).toContain('Mostrando 10 de 12 registros');
+    const headers = () =>
+      Array.from(fixture.nativeElement.querySelectorAll('thead th')) as HTMLElement[];
+    const buttons = () =>
+      Array.from(fixture.nativeElement.querySelectorAll('thead button')) as HTMLButtonElement[];
+    const folios = () =>
+      Array.from(
+        fixture.nativeElement.querySelectorAll(
+          'tbody tr td:first-child',
+        ) as NodeListOf<HTMLElement>,
+      ).map((cell) => cell.textContent?.trim());
 
-    const next = [...fixture.nativeElement.querySelectorAll('button')].find(
-      (button: HTMLButtonElement) => button.textContent?.trim() === 'Siguiente',
-    ) as HTMLButtonElement;
-    next.click();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('tbody tr')).toHaveLength(2);
-
-    fixture.componentRef.setInput('searchTerm', 'especial');
-    fixture.detectChanges();
-    expect(fixture.componentInstance.currentPage()).toBe(1);
-    expect(fixture.nativeElement.querySelectorAll('tbody tr')).toHaveLength(1);
-    expect(fixture.nativeElement.textContent).toContain('Nombre 11');
-
-    fixture.componentRef.setInput('searchTerm', '');
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('thead button') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('thead th')?.getAttribute('aria-sort')).toBe(
-      'ascending',
-    );
-  });
-
-  it('numera la segunda página desde 11 y conserva el identificador estable de sus acciones', () => {
-    const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', [
-      { key: 'name', name: 'Nombre' },
-      {
-        key: 'action',
-        name: 'Acciones',
-        action: {
-          icon: 'bi-eye',
-          label: '',
-          actionKey: 'detail',
-          ariaLabel: row => `Ver ${(row as { id: string }).id}`,
-          testId: row => `row-${(row as { id: string }).id}`,
-        },
-      },
-    ] satisfies TableColumn[]);
-    fixture.componentRef.setInput('data', Array.from({ length: 12 }, (_, index) => ({
-      id: `stable-${index}`,
-      name: `Fila ${index}`,
-      action: '',
-    })));
-    fixture.componentRef.setInput('rowId', 'id');
-    const events: unknown[] = [];
-    fixture.componentInstance.actionEvent.subscribe(event => events.push(event));
-    fixture.detectChanges();
-
-    expect([...fixture.nativeElement.querySelectorAll('thead th')].map((cell: HTMLElement) => cell.textContent?.trim()))
-      .toEqual(['#', 'Nombre', 'Acciones']);
-    const next = [...fixture.nativeElement.querySelectorAll('button')].find(
-      (button: HTMLButtonElement) => button.textContent?.trim() === 'Siguiente',
-    ) as HTMLButtonElement;
-    next.click();
-    fixture.detectChanges();
-
-    const firstRow = fixture.nativeElement.querySelector('tbody tr') as HTMLTableRowElement;
-    expect(firstRow.cells[0].textContent?.trim()).toBe('11');
-    const action = firstRow.querySelector('[data-testid="row-stable-10"]') as HTMLButtonElement;
-    expect(action.getAttribute('aria-label')).toBe('Ver stable-10');
-    expect(action.querySelector('i.bi-eye')).not.toBeNull();
-    action.click();
-    expect(events).toEqual([{ id: 'stable-10', actionKey: 'detail' }]);
-  });
-
-  it('usa rowId para acciones sin exigir una columna de ID y conserva el fallback', () => {
-    const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', [
-      { key: 'name', name: 'Nombre' },
-      { key: 'action', name: 'Detalle', action: { label: 'Ver detalle', actionKey: 'detail' } },
-    ] satisfies TableColumn[]);
-    fixture.componentRef.setInput('data', [{ id: 'internal-7', name: 'Visible', action: '' }]);
-    fixture.componentRef.setInput('rowId', 'id');
-    fixture.componentRef.setInput('showRowNumber', false);
-    const events: unknown[] = [];
-    fixture.componentInstance.actionEvent.subscribe(event => events.push(event));
-    fixture.detectChanges();
-
-    expect([...fixture.nativeElement.querySelectorAll('thead th')].map((cell: HTMLElement) => cell.textContent?.trim()))
-      .toEqual(['Nombre', 'Detalle']);
-    (fixture.nativeElement.querySelector('tbody button') as HTMLButtonElement).click();
-    expect(events).toEqual([{ id: 'internal-7', actionKey: 'detail' }]);
-
-    fixture.componentRef.setInput('rowId', null);
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('tbody button') as HTMLButtonElement).click();
-    expect(events.at(-1)).toEqual({ id: 'Visible', actionKey: 'detail' });
-  });
-
-  it('conserva la columna Actions reservada para las acciones globales', () => {
-    const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', [
-      { key: 'id', name: 'ID' },
-      { key: 'Actions', name: 'Acciones' },
-    ] satisfies TableColumn[]);
-    fixture.componentRef.setInput('data', [{ id: 'row-1', Actions: 'no-renderizar' }]);
-    fixture.componentRef.setInput('actions', [{ label: 'Editar', actionKey: 'edit' }]);
-    fixture.componentRef.setInput('showRowNumber', false);
-    const events: unknown[] = [];
-    fixture.componentInstance.actionEvent.subscribe(event => events.push(event));
-    fixture.detectChanges();
-
-    const row = fixture.nativeElement.querySelector('tbody tr') as HTMLTableRowElement;
-    expect(row.cells).toHaveLength(2);
-    expect(row.textContent).not.toContain('no-renderizar');
-    (row.querySelector('button') as HTMLButtonElement).click();
-    expect(events).toEqual([{ id: 'row-1', actionKey: 'edit' }]);
-  });
-
-  it('mantiene acciones alternas y adicionales visibles, deshabilitadas y accesibles', () => {
-    const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', [
-      { key: 'id', name: 'ID' },
-      {
-        key: 'action',
-        name: 'Acciones',
-        action: { label: 'Principal', actionKey: 'main' },
-        additionalActions: [
-          { label: 'Secundaria', actionKey: 'secondary', ariaLabel: row => `Secundaria ${(row as { id: string }).id}` },
-        ],
-        alternateAction: { label: 'Alterna', actionKey: 'alternate' },
-        alternateActionVisible: row => (row as { alternate: boolean }).alternate,
-        actionDisabled: row => (row as { disabled: boolean }).disabled,
-      },
-    ] satisfies TableColumn[]);
-    fixture.componentRef.setInput('data', [
-      { id: 'one', action: '', alternate: true, disabled: false },
-      { id: 'two', action: '', alternate: false, disabled: true },
+    expect(headers().map((header) => header.getAttribute('aria-sort'))).toEqual([
+      'none',
+      'none',
+      'none',
     ]);
-    fixture.componentRef.setInput('showRowNumber', false);
-    const events: unknown[] = [];
-    fixture.componentInstance.actionEvent.subscribe(event => events.push(event));
-    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('thead')?.classList.contains('table-light')).toBe(
+      true,
+    );
+    expect(fixture.nativeElement.querySelectorAll('thead i.bi-arrow-down-up')).toHaveLength(2);
+    expect(headers()[2].querySelector('i')).toBeNull();
+    expect(headers()[0].querySelector('i')?.getAttribute('aria-hidden')).toBe('true');
 
-    const rows = [...fixture.nativeElement.querySelectorAll('tbody tr')] as HTMLTableRowElement[];
-    expect(rows[0].querySelectorAll('button')).toHaveLength(1);
-    expect(rows[0].querySelector('button')?.textContent).toContain('Alterna');
-    expect(rows[1].querySelectorAll('button')).toHaveLength(2);
-    expect((rows[1].querySelector('button') as HTMLButtonElement).disabled).toBe(true);
-    expect(rows[1].querySelectorAll('button')[1].getAttribute('aria-label')).toBe('Secundaria two');
-    (rows[0].querySelector('button') as HTMLButtonElement).click();
-    expect(events).toEqual([{ id: 'one', actionKey: 'alternate' }]);
+    buttons()[0].click();
+    await fixture.whenStable();
+    expect(headers()[0].getAttribute('aria-sort')).toBe('ascending');
+    expect(headers()[1].getAttribute('aria-sort')).toBe('none');
+    expect(headers()[0].querySelector('i')?.classList.contains('bi-caret-up-fill')).toBe(true);
+    expect(headers()[0].querySelector('i')?.getAttribute('aria-hidden')).toBe('true');
+    expect(headers()[1].querySelector('i')?.classList.contains('bi-arrow-down-up')).toBe(true);
+    expect(folios()).toEqual(['3', '20']);
+
+    buttons()[0].click();
+    await fixture.whenStable();
+    expect(headers()[0].getAttribute('aria-sort')).toBe('descending');
+    expect(headers()[0].querySelector('i')?.classList.contains('bi-caret-down-fill')).toBe(true);
+    expect(folios()).toEqual(['20', '3']);
+
+    searchTerm.set('anulado');
+    await fixture.whenStable();
+    expect(folios()).toEqual(['3']);
+
+    buttons()[1].focus();
+    expect(document.activeElement).toBe(buttons()[1]);
+    // Browser-native buttons retain keyboard activation; jsdom cannot synthesize its Enter click.
+    buttons()[1].click();
+    await fixture.whenStable();
+    expect(headers()[0].getAttribute('aria-sort')).toBe('none');
+    expect(headers()[0].querySelector('i')?.classList.contains('bi-arrow-down-up')).toBe(true);
+    expect(headers()[1].getAttribute('aria-sort')).toBe('ascending');
   });
 
-  it('renderiza badges válidos antes de su acción y oculta fechas inválidas', () => {
+  it('leaves non-sortable consumer columns and row selection usable', async () => {
     const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', [
-      { key: 'id', name: 'ID' },
-      {
-        key: 'milestone',
-        name: 'Hito',
-        badges: true,
-        action: { label: 'Revisar', actionKey: 'review', ariaLabel: row => `Revisar ${(row as { id: string }).id}` },
-        actionVisible: row => (row as { visible: boolean }).visible,
-      },
-    ] satisfies TableColumn[]);
-    fixture.componentRef.setInput('data', [
-      { id: 'valid', milestone: 'Ana\n29/02/2024 12:00:00', visible: true },
-      { id: 'invalid', milestone: 'Bea\n31/02/2024 12:00:00', visible: false },
-    ]);
-    fixture.componentRef.setInput('showRowNumber', false);
-    fixture.detectChanges();
+    Object.defineProperties(fixture.componentInstance, {
+      columns: { value: signal([{ key: 'name', name: 'Nombre' }]) },
+      data: { value: signal([{ name: 'Alumno', selected: false }]) },
+      selectionEnabled: { value: signal(true) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
 
-    const rows = [...fixture.nativeElement.querySelectorAll('tbody tr')] as HTMLTableRowElement[];
-    expect([...rows[0].querySelectorAll('.badge')].map(value => value.textContent?.trim()))
-      .toEqual(['Ana', '29/02/2024 12:00:00']);
-    expect([...rows[1].querySelectorAll('.badge')].map(value => value.textContent?.trim()))
-      .toEqual(['Bea']);
-    expect(rows[0].querySelector('button')?.getAttribute('aria-label')).toBe('Revisar valid');
-    expect(rows[1].querySelector('button')).toBeNull();
-  });
-
-  it('mantiene botones accesibles, estado vacío y selección pública', () => {
-    const fixture = TestBed.createComponent(Table);
-    fixture.componentRef.setInput('columns', columns);
-    fixture.componentRef.setInput('data', []);
-    fixture.componentRef.setInput('selectionEnabled', true);
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No se encontraron registros');
-    expect(fixture.nativeElement.querySelector('nav')?.getAttribute('aria-label')).toBeTruthy();
-
-    fixture.componentRef.setInput('data', [{ name: 'Ana', status: 'Activo', selected: false }]);
-    fixture.detectChanges();
-    const checkbox = fixture.nativeElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    expect(fixture.nativeElement.querySelector('thead button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('thead i')).toBeNull();
+    expect(fixture.nativeElement.querySelector('tbody td:last-child')?.textContent).toContain(
+      'Alumno',
+    );
+    const checkbox = fixture.nativeElement.querySelector(
+      'tbody input[type="checkbox"]',
+    ) as HTMLInputElement;
     expect(checkbox).not.toBeNull();
+    checkbox.click();
+    await fixture.whenStable();
+    expect(checkbox.checked).toBe(true);
+  });
+
+  it('styles an emphasized action header like sortable buttons without enabling sorting', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: {
+        value: signal<TableColumn[]>([{ key: 'download', name: 'Descargar', emphasized: true }]),
+      },
+      data: { value: signal([{ download: '' }]) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+
+    const header = fixture.nativeElement.querySelector('thead th') as HTMLElement;
+    expect(header.textContent?.trim()).toBe('Descargar');
+    expect(header.querySelector('span.btn-link.fw-bold')).not.toBeNull();
+    expect(header.querySelector('button')).toBeNull();
+    expect(header.querySelector('i')).toBeNull();
+    expect(header.getAttribute('aria-sort')).toBe('none');
+    header.click();
+    expect(fixture.componentInstance.sortColumn()).toBeNull();
+  });
+
+  it('keeps ordinary action columns and plain multiline cells unchanged without opt-in', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: {
+        value: signal([
+          { key: 'id', name: 'ID' },
+          { key: 'owner', name: 'Owner', multiline: true },
+          { key: 'action', name: 'Action', action: { label: 'Open', actionKey: 'open' } },
+        ]),
+      },
+      data: { value: signal([{ id: '42', owner: 'Name\nDate', action: '' }]) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+    const row = fixture.nativeElement.querySelector('tbody tr') as HTMLElement;
+    expect(row.querySelectorAll('td')).toHaveLength(3);
+    expect(row.querySelectorAll('.badge')).toHaveLength(0);
+    expect(row.querySelectorAll('button')).toHaveLength(1);
+    expect(row.querySelector('td:nth-child(2)')?.textContent?.trim()).toBe('Name\nDate');
+    const events: unknown[] = [];
+    fixture.componentInstance.actionEvent.subscribe((event) => events.push(event));
+    row.querySelector('button')?.click();
+    expect(events).toEqual([{ id: '42', actionKey: 'open' }]);
+  });
+
+  it('omits invalid milestone dates while keeping a valid user badge', () => {
+    const table = TestBed.createComponent(Table).componentInstance;
+    expect(table.milestoneBadges('User\n31/02/2026 12:00:00')).toEqual({ user: 'User', date: '' });
+    expect(table.milestoneBadges('User\n29/02/2024 12:00:00')).toEqual({
+      user: 'User',
+      date: '29/02/2024 12:00:00',
+    });
+    expect(table.milestoneBadges(null)).toEqual({ user: '', date: '' });
+  });
+
+  it('renders milestone badges before visible actions and retains badges when actions are hidden', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: {
+        value: signal<TableColumn[]>([
+          { key: 'folio', name: 'Folio' },
+          {
+            key: 'milestone',
+            name: 'Milestone',
+            badges: true,
+            action: {
+              label: 'Review',
+              actionKey: 'review',
+              ariaLabel: (row) => `Review ${(row as { folio: string }).folio}`,
+            },
+            actionVisible: (row) => (row as { visible: boolean }).visible,
+            actionDisabled: (row) => (row as { disabled: boolean }).disabled,
+          },
+        ]),
+      },
+      data: {
+        value: signal([
+          {
+            folio: 'F-1',
+            milestone: 'User One\n29/02/2024 12:00:00',
+            visible: true,
+            disabled: false,
+          },
+          {
+            folio: 'F-2',
+            milestone: 'User Two\n01/03/2024 13:00:00',
+            visible: false,
+            disabled: false,
+          },
+          {
+            folio: 'F-3',
+            milestone: 'User Three\n02/03/2024 14:00:00',
+            visible: true,
+            disabled: true,
+          },
+        ]),
+      },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+
+    const rows = Array.from(fixture.nativeElement.querySelectorAll('tbody tr')) as HTMLElement[];
+    expect(rows).toHaveLength(3);
+    for (const [index, row] of rows.entries()) {
+      expect(row.querySelectorAll('td')).toHaveLength(2);
+      expect(
+        Array.from(row.querySelectorAll('td:nth-child(2) .badge')).map((badge) =>
+          badge.textContent?.trim(),
+        ),
+      ).toEqual(
+        [
+          ['User One', '29/02/2024 12:00:00'],
+          ['User Two', '01/03/2024 13:00:00'],
+          ['User Three', '02/03/2024 14:00:00'],
+        ][index],
+      );
+    }
+
+    const enabledAction = rows[0].querySelector('td:nth-child(2) button') as HTMLButtonElement;
+    expect(enabledAction.getAttribute('aria-label')).toBe('Review F-1');
+    expect(enabledAction.disabled).toBe(false);
+    expect(rows[1].querySelector('button')).toBeNull();
+    const disabledAction = rows[2].querySelector('td:nth-child(2) button') as HTMLButtonElement;
+    expect(disabledAction.disabled).toBe(true);
+
+    const events: unknown[] = [];
+    fixture.componentInstance.actionEvent.subscribe((event) => events.push(event));
+    enabledAction.click();
+    disabledAction.click();
+    expect(events).toEqual([{ id: 'F-1', actionKey: 'review' }]);
   });
 });

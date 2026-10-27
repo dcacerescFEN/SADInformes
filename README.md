@@ -314,8 +314,13 @@ detalle interno.
 
 Diferencias conocidas con la pantalla legada: la exportación es CSV UTF-8 con separador
 `;` y nombre `.csv` (el SAD generaba el mismo formato con extensión `.xls` y Windows-1252),
-no se enlaza al curso del SAD legado y no se pagina el resultado. Ambas pantallas usan
-los mismos SP, por lo que los valores coinciden para los mismos filtros.
+no se enlaza al curso del SAD legado y no se pagina el resultado del legado, mientras
+que la tabla nueva pagina de a 10 filas. Ambas pantallas usan los mismos SP, por lo que
+los valores coinciden para los mismos filtros.
+
+La pantalla conserva la glosa de preguntas (A1–A4, B1–B13, B_Nota y comentarios) y la
+escala de respuestas 1–7 transcripta del SAD, para que los códigos numéricos de la
+tabla sean interpretables sin abrir el sistema antiguo.
 
 El acceso al SAD sigue la forma de las aplicaciones de referencia: `SadContext`
 registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
@@ -326,13 +331,18 @@ SQL de negocio duplicado.
 
 La interfaz reutiliza los componentes de las referencias: `page-header`,
 `form-floating` con etiqueta flotante sobre `ng-select`
-(`@ng-select/ng-select`), botones `btn-search`, `btn-clear` y `btn-back`, y la
-tabla compartida `app-table` de `src/app/shared/components/table.ts` con
-paginación, orden y estado vacío.
+(`@ng-select/ng-select` con su tema `default.theme.css`), botones `btn-search`,
+`btn-clear` y `btn-create` (verde, usado para exportar), y la tabla compartida
+`app-table` de `src/app/shared/components/table.ts` —la versión de SADAlumnos, con
+paginación, orden y estado vacío—.
 
 Con `dotnet run` el frontend de desarrollo está en 4200; la API y Scalar, en 7070.
 Una consulta real requiere la conexión de solo lectura y los roles de Keycloak;
 ninguna credencial se guarda en el repositorio.
+
+El acceso requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY`. La
+equivalencia con los servicios del SAD legado y los permisos aún propuestos están en
+[docs/permissions-equivalence.md](docs/permissions-equivalence.md).
 
 ## Requisitos
 
