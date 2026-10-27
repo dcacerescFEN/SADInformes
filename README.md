@@ -61,8 +61,10 @@ un usuario del realm y que el administrador haya registrado estas URLs.
 
 ## Menú central de AppConfig
 
-`GET /api/config/site` requiere un Bearer de SADInformes y devuelve únicamente
-`{ menu: { ... } }`. Lee registros activos de aplicación **SADInformes** y
+`GET /api/config/site` requiere un Bearer de SADInformes y la política
+`REPORT_ACCESS` (permiso de entrada o rol administrativo REPORT) y devuelve únicamente
+`{ success: true, message: null, data: { ... } }`, con los 18 campos de
+`SiteConfigDto` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
 ambiente **DEV**; también exige aplicación y ambiente activos.
 
 Configurar `ConnectionStrings__AppConfig` en el entorno del proceso WebApi, fuera
@@ -75,8 +77,8 @@ Claves centrales admitidas, en pares URL/clientId:
 
 | Destino | URL | Cliente físico |
 | --- | --- | --- |
-| Alumnos | StudentUrl | StudentClientId |
-| Profesores | TeacherUrl | TeacherClientId |
+| Alumnos | StudentsMenuUrl | StudentsMenuClientId |
+| Profesores | TeachersMenuUrl | TeachersMenuClientId |
 | Cursos | CoursesMenuUrl | CoursesMenuClientId |
 | Exámenes | ExamsMenuUrl | ExamsMenuClientId |
 | Actividades | ActivitiesMenuUrl | ActivitiesMenuClientId |
@@ -84,6 +86,11 @@ Claves centrales admitidas, en pares URL/clientId:
 | Procesos | ProcessesMenuUrl | ProcessesMenuClientId |
 | Informes | ReportsMenuUrl | ReportsMenuClientId |
 | Administración | AdministrationMenuUrl | AdministrationMenuClientId |
+
+Como transición, se aceptan las claves antiguas `StudentUrl`, `TeacherUrl`,
+`StudentClientId` y `TeacherClientId` solo si falta su clave canónica. Si existen
+ambas, gana la canónica, incluso si su clientId está vacío. No se modifican filas
+SQL automáticamente. Angular consume únicamente el contrato canónico de `data`.
 
 `ConfigurationInitialiser` carga AppConfig una vez durante el arranque mediante
 `await app.InitialiseConfigurationAsync(...)`. Prepara todos los valores antes
@@ -118,8 +125,8 @@ publican valores parciales ni otras claves, incluidas credenciales.
 Sin conexión o ante errores de AppConfig, no se usan defaults para ocultar el
 error: el menú devuelve 503 con un mensaje genérico, sin detalles SQL. Health y
 Keycloak siguen disponibles después del intento de inicialización. Las pruebas
-del lector usan una base EF InMemory aislada y el endpoint HTTP real, no el SQL
-institucional.
+de carga de configuración usan una base EF InMemory aislada y el endpoint HTTP
+real, no el SQL institucional.
 
 ### Acceso a los destinos de la navbar
 
@@ -185,6 +192,53 @@ La infraestructura se registra con `AddInfrastructureServices`; no se copian
 inicializadores de datos académicos, tareas periódicas, correos ni credenciales
 de SADAlumnos.
 
+### Config y Mediator
+
+`Config/site` despacha `GetSiteConfig` mediante el mediador propio de NewSAD:
+`IRequestDispatcher` / `IRequestHandler`, sin MediatR. `Application/ConfigureServices.cs`
+registra automáticamente los handlers de esa capa mediante Scrutor 7.0.0.
+`AddWebApiServices` reúne autenticación y documentación de API.
+
+`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDto>`: success, message y data,
+sin el anterior objeto raíz menu. Se adaptó el consumidor Angular en conjunto.
+Los fallos de AppConfig siguen respondiendo 503 sin detalles privados.
+`/api/config/keycloak` sigue público, lee IConfiguration directamente como NewSAD
+y devuelve únicamente url, realm y clientId; ya no necesita consulta ni handler.
+
+`ConfigurationInitialiser` recibe directamente el `AppConfigContext` scoped,
+registrado con `AddDbContext`, siguiendo el patrón de NewSAD. Se eliminaron
+`AppConfigConfigurationReader` y su interfaz; la consulta y sus validaciones están
+en el inicializador. Las pruebas conservan filtros, rechazo de duplicados,
+publicación única y errores sanitizados sustituyendo el DbContext por uno aislado.
+La API no requiere una base de informes funcional para estas fichas.
+
+La política REPORT sigue el patrón `PermissionPolicyProvider` de NewSAD, con
+alcance al cliente físico exacto configurado en `Keycloak:ClientId`. Acepta
+`PERMISSION_REPORT_ACCESS`, `ROLE_REPORT_ADMIN` o `ROLE_REPORT_SUPERADMIN` dentro
+de su `resource_access`. No mezcla `SADInformes` con `SADInformes-iis`, no toma
+roles de otros clientes ni acepta nombres parciales. Sin token devuelve 401;
+con token válido sin acceso devuelve 403, sin configuración. Health y configuración
+pública de Keycloak siguen anónimos. No se crean roles ni asignaciones en Keycloak
+automáticamente; se requieren los existentes del cliente correspondiente.
+
+La comparación completa con NewSAD, SADAlumnos y SADAdministracion está en
+[docs/backend-comparison.md](docs/backend-comparison.md), incluyendo diferencias
+que se mantienen intencionalmente y faltantes previos a una migración funcional.
+
+### Scalar y OpenAPI en desarrollo
+
+Con ambiente `Development`, abrir `https://localhost:7070/scalar`
+(también admite `/scalar/v1`); el documento está en
+`/openapi/v1.json`. Fuera de Development ambas rutas responden 404. Scalar usa
+Authorization Code con PKCE S256 y el cliente público de SADInformes; no requiere
+client secret. Las operaciones protegidas están identificadas en OpenAPI; health
+y configuración pública no se anuncian como protegidas.
+
+Para probar OAuth desde Scalar, el administrador debe habilitar la URL de retorno
+correspondiente al origen real en Keycloak. No se cambia el cliente del servidor
+automáticamente. Este cambio no incorpora suplantación, permisos funcionales,
+repositorios académicos, tareas periódicas ni estado global estático de NewSAD.
+
 ## Sidebar de informes
 
 Se adapta el componente de SADAdministracion: panel de 280 px expandido y 76 px
@@ -227,8 +281,9 @@ este catálogo inicial.
 
 Las fichas no consultan APIs ni bases de datos, no abren aplicaciones externas y
 no permiten inscribir, registrar pagos, administrar firmas ni exportar informes.
-No se agregan permisos funcionales: mostrar una ficha no autoriza la operación
-futura. La migración de cada funcionalidad y sus permisos se decidirá después.
+No se agregan permisos por informe: mostrar una ficha no autoriza la operación
+futura. REPORT_ACCESS controla la configuración de entrada al módulo, no sustituye
+los permisos de consulta o modificación que requiera cada informe. La migración de cada funcionalidad y sus permisos se decidirá después.
 Las rutas desconocidas siguen redirigiendo a Inicio.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
@@ -282,8 +337,13 @@ y utiliza el certificado de desarrollo ASP.NET Core.
 
 En Visual Studio, abrir `SADInformes.slnx`: WebUI aparece como proyecto JavaScript
 junto a WebApi. Establecer WebApi como proyecto de inicio y utilizar el perfil
-`https`. La referencia a WebUI tiene `ReferenceOutputAssembly=false`, porque
-no es un ensamblado .NET.
+`https`. Los perfiles http/https tienen `launchBrowser: true` y `launchUrl: scalar`,
+como NewSAD: al iniciar desde el IDE se abre Scalar, no el inicio Angular.
+Con `dotnet run`, abrir manualmente https://localhost:7070/scalar si el launcher
+no abre navegador. Para entrar a la aplicación, usar https://localhost:7070/ o
+https://localhost:4200; `/scalar` no es una ruta del frontend en 4200.
+La referencia a WebUI tiene `ReferenceOutputAssembly=false`, porque no es un
+ensamblado .NET.
 
 Opcionalmente se puede ejecutar `pnpm start` manualmente en WebUI; el SPA proxy
 reutiliza ese servidor si ya está activo.
@@ -319,7 +379,12 @@ pnpm test
 Las pruebas .NET usan claves RSA efímeras y metadatos OIDC locales al proceso:
 validan tokens por HTTP sin usuarios ni acceso al servidor Keycloak real.
 Las pruebas Node comprueban estructura, dependencias y arranque HTTP real de la API.
-Las pruebas Angular comprueban contenedor, página inicial y redirección de rutas.
+Las pruebas Angular comprueban contenedor, página inicial, dropdowns, flyouts,
+fichas de Postgrado, panel móvil y redirección de rutas. Las pruebas HTTP .NET
+comprueban también el despacho de Config y Scalar/OpenAPI por ambiente.
+La restauración de paquetes advierte vulnerabilidades transitivas en
+`System.Security.Cryptography.Pkcs 9.0.11`, ya presentes antes de agregar Scalar;
+su actualización requiere una unidad de trabajo aparte.
 
 Para verificar el arranque integrado después de compilar, sin servidores previos
 en los puertos 7070 y 4200 (y 5086 para el listener HTTP compatible):
@@ -345,8 +410,22 @@ no instala paquetes npm ni modifica instalaciones globales.
 
 La salida Angular queda en `src/Web/WebUI/dist/webui/browser`.
 El enlace y arranque conjunto están configurados para desarrollo.
-El backend todavía no sirve esa salida en producción: publicación y despliegue
-quedan fuera de esta etapa.
+
+### Publicación integrada
+
+`dotnet publish src/Web/WebApi/WebApi.csproj` ejecuta `pnpm install --frozen-lockfile`
+y `pnpm build` y copia la salida Angular a `wwwroot` del artefacto publicado.
+El resultado se sirve desde el mismo origen que la API; no requiere un segundo
+servidor web ni un proxy de producción. Para omitir esa compilación en un entorno
+que ya entrega los assets por otro medio, usar `-p:SpaBuildOnPublish=false`.
+
+WebApi sirve archivos estáticos y devuelve `index.html` solo para rutas del cliente.
+Rutas bajo `/api`, `/scalar` u `/openapi` y archivos inexistentes conservan 404;
+un método no soportado sobre una ruta existente conserva 405. Esto evita que un
+error de API se presente como una página Angular exitosa.
+
+La publicación no despliega: no configura IIS, certificados, AppConfig ni Keycloak.
+Tampoco crea ni modifica roles. Esos pasos siguen siendo decisiones humanas.
 
 ## Siguientes etapas
 

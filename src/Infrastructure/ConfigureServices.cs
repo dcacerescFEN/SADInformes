@@ -1,5 +1,5 @@
-using Application.Configuration;
 using Application.Navigation;
+using Application.Common.Interfaces;
 using Infrastructure.Configuration;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -13,10 +13,10 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IAppConfigurationReader>(_ => new AppConfigConfigurationReader(
-            () => new AppConfigContext(new DbContextOptionsBuilder<AppConfigContext>()
-                .UseSqlServer(configuration.GetConnectionString("AppConfig"),
-                    options => options.CommandTimeout(10)).Options)));
+        services.AddDbContext<AppConfigContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("AppConfig"),
+                sql => sql.CommandTimeout(10)));
+        services.AddScoped<IApiResponseService, ApiResponseService>();
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();

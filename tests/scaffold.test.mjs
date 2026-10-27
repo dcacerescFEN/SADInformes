@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -33,8 +33,11 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
     if (layer === 'Web/WebApi') {
       assert.deepEqual(
         [...project.matchAll(/<PackageReference Include="([^"]+)"/g)].map((match) => match[1]),
-        ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer'],
+        ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer',
+          'Microsoft.AspNetCore.OpenApi', 'Scalar.AspNetCore'],
       );
+    } else if (layer === 'Application') {
+      assert.match(project, /PackageReference Include="Scrutor" Version="7.0.0"/);
     } else if (layer === 'Infrastructure') {
       assert.match(project, /PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12"/);
     } else {
@@ -77,6 +80,24 @@ test('El perfil de WebApi activa el SPA proxy hacia el frontend configurado', ()
   assert.match(ignore, /\*\*\/\.certs\//);
 });
 
+test('Los perfiles de desarrollo abren Scalar como los proyectos de referencia', () => {
+  const profiles = json('src/Web/WebApi/Properties/launchSettings.json').profiles;
+  for (const name of ['https', 'http']) {
+    assert.equal(profiles[name].launchBrowser, true, name);
+    assert.equal(profiles[name].launchUrl, 'scalar', name);
+    assert.equal(profiles[name].environmentVariables.ASPNETCORE_ENVIRONMENT, 'Development');
+  }
+});
+
+test('AppConfig se carga directamente sin lector ni interfaz redundantes', () => {
+  assert.equal(existsSync(resolve(root, 'src/Infrastructure/Configuration/AppConfigConfigurationReader.cs')), false);
+  assert.equal(existsSync(resolve(root, 'src/Application/Configuration/IAppConfigurationReader.cs')), false);
+  const initialiser = read('src/Infrastructure/Configuration/ConfigurationInitialiser.cs');
+  assert.match(initialiser, /AppConfigContext configContext/);
+  assert.match(initialiser, /configContext\.Configurations\.AsNoTracking\(\)/);
+  assert.match(read('src/Infrastructure/ConfigureServices.cs'), /AddDbContext<AppConfigContext>/);
+});
+
 test('WebApi descubre IEndpoint e inicializa configuración antes de servir', () => {
   const program = read('src/Web/WebApi/Program.cs');
   assert.match(program, /\.AddEndpoints\(/);
@@ -84,6 +105,29 @@ test('WebApi descubre IEndpoint e inicializa configuración antes de servir', ()
   assert.match(program, /await app\.InitialiseConfigurationAsync\(/);
   assert.doesNotMatch(program, /app\.MapGet\(|MapSiteConfiguration/);
   assert.match(read('src/Web/WebApi/Extension/IEndpoint.cs'), /interface IEndpoint/);
+});
+
+test('Application registra handlers por scan y Config conserva el patrón de NewSAD', () => {
+  const registration = read('src/Application/ConfigureServices.cs');
+  assert.match(registration, /AddApplicationServices/);
+  assert.match(registration, /services\.Scan\(/);
+  assert.doesNotMatch(read('src/Web/WebApi/ConfigureServices.cs'), /AddApplicationServices/);
+  const site = read('src/Web/WebApi/Endpoints/Config/ConfigEndpoints.cs');
+  assert.match(site, /IRequestDispatcher sender/);
+  assert.match(site, /sender\.Send\(/);
+  const keycloak = read('src/Web/WebApi/Endpoints/Config/PublicKeycloakConfigEndpoints.cs');
+  assert.match(keycloak, /IConfiguration configuration/);
+  assert.doesNotMatch(keycloak, /IRequestDispatcher/);
+});
+
+test('Publicar WebApi compila Angular y copia sus assets a wwwroot', () => {
+  const project = read('src/Web/WebApi/WebApi.csproj');
+  assert.match(project, /Target Name="PublishAngular"/);
+  assert.match(project, /pnpm install --frozen-lockfile/);
+  assert.match(project, /pnpm build/);
+  assert.match(project, /dist\/webui\/browser/);
+  assert.match(project, /ResolvedFileToPublish/);
+  assert.match(project, /wwwroot/);
 });
 
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {

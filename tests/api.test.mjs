@@ -53,6 +53,13 @@ test('La API mantiene health y publica configuración, sin permitir una sesión 
   assert.deepEqual(await config.json(), {
     url: 'https://sso-dev.fen.uchile.cl', realm: 'FenUChile', clientId: 'SADInformes',
   });
+  const scalar = await fetch(url + '/scalar');
+  assert.equal(scalar.status, 200);
+  assert.match(scalar.headers.get('content-type'), /text\/html/);
+  assert.match(await scalar.text(), /SADInformes API/);
+  const openapi = await fetch(url + '/openapi/v1.json');
+  assert.equal(openapi.status, 200);
+  assert.equal((await openapi.json()).info.title, 'SADInformes API');
   const session = await fetch(url + '/api/auth/me');
   assert.equal(session.status, 401);
   assert.equal(await session.text(), '');

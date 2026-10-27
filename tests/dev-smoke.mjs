@@ -115,6 +115,19 @@ test('WebApi inicia Angular y el frontend puede consultar la API', { timeout: 12
   assert.equal(health.status, 200);
   assert.match(health.headers.get('content-type'), /application\/json/);
   assert.deepEqual(await health.json(), { status: 'ok', application: 'SADInformes' });
+  // Scalar pertenece al origen del backend, no al router de Angular en :4200.
+  const scalarEntry = await fetchLocal(api + '/scalar');
+  assert.equal(scalarEntry.status, 302);
+  const scalarUrl = new URL(scalarEntry.headers.get('location'), api);
+  assert.equal(scalarUrl.origin, api, 'Scalar no debe redirigir al frontend');
+  assert.equal(scalarUrl.pathname, '/scalar/');
+  const scalar = await fetchLocal(scalarUrl);
+  assert.equal(scalar.status, 200);
+  assert.match(scalar.headers.get('content-type'), /text\/html/);
+  assert.match(await scalar.text(), /SADInformes API/);
+  const openapi = await fetchLocal(api + '/openapi/v1.json');
+  assert.equal(openapi.status, 200);
+  assert.equal((await openapi.json()).info.title, 'SADInformes API');
   const configuration = await fetchLocal(frontend + '/api/config/keycloak');
   assert.equal(configuration.status, 200);
   assert.deepEqual(await configuration.json(), {
