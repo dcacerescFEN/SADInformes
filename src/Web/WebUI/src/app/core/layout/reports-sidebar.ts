@@ -31,11 +31,6 @@ import { REPORT_SECTIONS, ReportSection } from './report-sections';
         <span class="sidebar-label">SAD Informes</span>
       </div>
       <nav class="sidebar-navigation" aria-label="Opciones de informes">
-        <a class="sidebar-link" routerLink="/" routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page"
-          title="Inicio" aria-label="Inicio" (click)="closeMobile()">
-          <i class="bi bi-house-door" aria-hidden="true"></i><span class="sidebar-label">Inicio</span>
-        </a>
         @for (section of sections; track section.id) {
           @if (collapsed() && !mobile) {
             <div ngbDropdown placement="end-top" container="body" class="sidebar-group" #menu="ngbDropdown">

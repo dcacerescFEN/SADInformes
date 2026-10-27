@@ -41,12 +41,11 @@ describe('Sidebar de Informes', () => {
     fixture.detectChanges();
   }
 
-  it('conserva Inicio, perfil y estado colapsado junto al catálogo de Postgrado', () => {
+  it('muestra solo las secciones, el perfil y el estado colapsado', () => {
     const root: HTMLElement = fixture.nativeElement;
     expect(root.querySelector('#reports-sidebar')?.getAttribute('aria-label')).toBe('Informes');
-    expect(root.querySelectorAll('.sidebar-navigation a').length).toBe(1);
-    expect(root.querySelector('.sidebar-navigation a')?.textContent).toContain('Inicio');
-    expect(root.querySelector('.sidebar-navigation a')?.getAttribute('aria-current')).toBe('page');
+    expect(root.querySelectorAll('.sidebar-navigation a').length).toBe(0);
+    expect(root.querySelector('.sidebar-navigation')?.textContent).not.toContain('Inicio');
     expect(root.textContent).toContain('usuario');
     expect(root.textContent).toContain('Usuario Prueba');
     expect(root.querySelector('.sidebar-avatar')?.textContent?.trim()).toBe('US');
@@ -152,7 +151,9 @@ describe('Sidebar de Informes', () => {
       expect(document.querySelector('[role="dialog"]')).not.toBeNull();
     };
     await open();
-    document.querySelector<HTMLAnchorElement>('[role="dialog"] .sidebar-navigation a')?.click();
+    document.querySelector<HTMLButtonElement>('[role="dialog"] [data-section="postgrado"]')!.click();
+    await settle();
+    document.querySelector<HTMLAnchorElement>('[role="dialog"] a[href="/postgrado/encuesta-docente-por-curso"]')!.click();
     await settle();
     expect(fixture.componentInstance.mobileOpen()).toBe(false);
     await open();

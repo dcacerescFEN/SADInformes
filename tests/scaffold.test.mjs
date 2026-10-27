@@ -197,6 +197,12 @@ test('La tabla y los filtros reutilizan shared y ng-select de las referencias', 
   assert.match(styles, /.app-table thead th .btn {[^}]*font-size: inherit/s, 'los encabezados deben conservar su tamaño');
 });
 
+test('La sidebar no incluye un acceso redundante a Inicio', () => {
+  const sidebar = read('src/Web/WebUI/src/app/core/layout/reports-sidebar.ts');
+  assert.ok(!sidebar.includes('bi-house-door'), 'no debe quedar el icono de Inicio');
+  assert.ok(!sidebar.includes('routerLink="/"'), 'la marca y la navbar conservan el acceso al inicio');
+});
+
 test('La navbar conserva breakpoints y espaciado de SADAlumnos', () => {
   const styles = read('src/Web/WebUI/src/app/core/layout/header.scss');
   assert.match(styles, /max-width:\s*991\.98px/);
