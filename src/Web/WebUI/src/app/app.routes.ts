@@ -13,8 +13,9 @@ export const routes: Routes = [
     path: 'postgrado/' + report.slug,
     canActivate: [authGuard],
     data: { report },
-    loadComponent: () => import('./postgraduate/postgraduate-placeholder')
-      .then(module => module.PostgraduatePlaceholder),
+    loadComponent: () => report.available
+      ? import('./postgraduate/teacher-survey/teacher-survey').then((module) => module.TeacherSurvey)
+      : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '' },
 ];

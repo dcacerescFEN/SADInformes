@@ -1,5 +1,7 @@
 using Application.Navigation;
 using Application.Common.Interfaces;
+using Application.Reports.Postgraduate.TeacherSurvey;
+using Infrastructure.Reports.Postgraduate;
 using Infrastructure.Configuration;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -17,6 +19,7 @@ public static class ConfigureServices
             options.UseSqlServer(configuration.GetConnectionString("AppConfig"),
                 sql => sql.CommandTimeout(10)));
         services.AddScoped<IApiResponseService, ApiResponseService>();
+        services.AddScoped<ITeacherSurveyReader, SqlTeacherSurveyReader>();
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();

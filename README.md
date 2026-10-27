@@ -289,6 +289,37 @@ Las rutas desconocidas siguen redirigiendo a Inicio.
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
 las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
 
+### Primer informe funcional: Encuesta docente por curso
+
+La opción **Encuesta docente por curso** ya no muestra la ficha pendiente: abre la
+pantalla real en `/postgrado/encuesta-docente-por-curso`, con los tres filtros del
+SAD, tabla de resultados, total y exportación CSV.
+
+| Elemento | Valor |
+| --- | --- |
+| Endpoints | `GET /api/reports/postgraduate/teacher-survey/filters` y `GET /api/reports/postgraduate/teacher-survey` |
+| Permiso | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` en el cliente físico configurado |
+| Datos | SP existentes `spRec_Encuesta_DocenteXCurso`, `spRec_PeriodosAcademicosProgramacion`, `spRec_TiposAlumno` y `spRec_TiposAlumnosModalidades` |
+| Conexión | `ConnectionStrings:Sad`, definida fuera del repositorio con una cuenta de solo lectura |
+
+`REPORT_ACCESS` habilita la entrada y la configuración del sitio, pero **no** concede
+este informe: sin el permiso específico la API responde 403. Los roles de otro cliente,
+incluida la variante `-iis` no configurada, no sirven para autorizar.
+
+Los tres filtros son obligatorios. El SP compara tipo de alumno y modalidad con
+igualdad, así que la API rechaza `Todos` y comodines con 400 en vez de devolver una
+tabla vacía que parezca un resultado válido. Los errores de base se traducen a 503 sin
+detalle interno.
+
+Diferencias conocidas con la pantalla legada: la exportación es CSV UTF-8 con separador
+`;` y nombre `.csv` (el SAD generaba el mismo formato con extensión `.xls` y Windows-1252),
+no se enlaza al curso del SAD legado y no se pagina el resultado. Ambas pantallas usan
+los mismos SP, por lo que los valores coinciden para los mismos filtros.
+
+Con `dotnet run` el frontend de desarrollo está en 4200; la API y Scalar, en 7070.
+Una consulta real requiere la conexión de solo lectura y los roles de Keycloak;
+ninguna credencial se guarda en el repositorio.
+
 ## Requisitos
 
 SDK .NET 10, Node.js compatible con Angular 22

@@ -34,9 +34,9 @@ describe('Navegación visual de Postgrado', () => {
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.endsWith('EncuestaSalidaGraduados/Default.aspx'))).toBe(true);
   });
 
-  it('cada ruta muestra su ficha pendiente sin formularios, acciones ni solicitudes HTTP', async () => {
+  it('cada ruta pendiente muestra su ficha sin formularios, acciones ni solicitudes HTTP', async () => {
     const harness = await RouterTestingHarness.create();
-    for (const report of POSTGRADUATE_REPORTS) {
+    for (const report of POSTGRADUATE_REPORTS.filter(item => item.available !== true)) {
       await harness.navigateByUrl('/postgrado/' + report.slug);
       const root = harness.routeNativeElement!;
       expect(root.querySelector('h1')?.textContent).toBe(report.title);
@@ -47,6 +47,26 @@ describe('Navegación visual de Postgrado', () => {
       expect(root.querySelector('a')?.getAttribute('href')).toBe('/');
     }
     TestBed.inject(HttpTestingController).expectNone(() => true);
+  });
+
+  it('la encuesta docente abre la pantalla funcional en lugar de la ficha pendiente', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/encuesta-docente-por-curso');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const requests = http.match(request =>
+      request.url.startsWith('/api/reports/postgraduate/teacher-survey/filters'));
+    expect(requests.map(request => request.request.url))
+      .toEqual(['/api/reports/postgraduate/teacher-survey/filters']);
+    requests[0].flush({
+      success: true, message: null,
+      data: { periods: [], studentTypes: [], modalities: [] },
+    });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent).toBe('Encuesta docente por curso');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    expect(root.querySelectorAll('select[data-filter]')).toHaveLength(3);
+    http.verify();
   });
 
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {

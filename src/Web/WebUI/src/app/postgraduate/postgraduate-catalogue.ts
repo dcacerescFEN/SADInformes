@@ -3,16 +3,21 @@ export interface PostgraduateReport {
   readonly title: string;
   readonly description: string;
   readonly legacyPath: string;
+  /** true cuando la pantalla ya está migrada y no usa la ficha pendiente. */
+  readonly available?: boolean;
 }
 
-function entry(slug: string, title: string, description: string, page: string): PostgraduateReport {
-  return { slug, title, description, legacyPath: 'Informes/Postgrado/' + page };
+function entry(slug: string, title: string, description: string, page: string,
+  available = false): PostgraduateReport {
+  return available
+    ? { slug, title, description, legacyPath: 'Informes/Postgrado/' + page, available: true }
+    : { slug, title, description, legacyPath: 'Informes/Postgrado/' + page };
 }
 
 // Visual inventory only: these entries do not grant access to business operations.
 export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('encuesta-docente-por-curso', 'Encuesta docente por curso',
-    'Resultados de la evaluación docente por período, programa y modalidad.', 'EncuestaDocenteXCurso.aspx'),
+    'Resultados de la evaluación docente por período, programa y modalidad.', 'EncuestaDocenteXCurso.aspx', true),
   entry('pago-derecho-basico-anual', 'Pago derecho básico anual',
     'Consulta y registro del pago anual de derecho básico de alumnos.', 'PagoDerechoBasicoAnual.aspx'),
   entry('cursos-por-alumnos', 'Cursos vs. alumnos',

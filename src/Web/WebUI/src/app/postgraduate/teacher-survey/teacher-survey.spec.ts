@@ -1,0 +1,164 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TeacherSurvey } from './teacher-survey';
+
+const filters = {
+  success: true,
+  message: null,
+  data: {
+    periods: [{ value: '2024A', text: '2024 - Primer Semestre' }],
+    studentTypes: [{ value: 'MBA', text: 'MBA' }, { value: 'MGP', text: 'Magíster en Gestión Pública' }],
+    modalities: ['PT', 'FT'],
+  },
+};
+const FILTERS = '/api/reports/postgraduate/teacher-survey/filters';
+const REPORT = '/api/reports/postgraduate/teacher-survey';
+const COMPLETE = '?periodo=2024A&tipoAlumno=MBA&modalidad=PT';
+
+function row(overrides: Record<string, unknown> = {}) {
+  return {
+    period: '2024A', course: 'MBA101/1', name: 'Gestión (MBA101)', teacherId: '12345678-9',
+    teacherName: 'Profesora Prueba', assistants: 'Ayudante Uno',
+    a1: 4.5, a2: 4, a3: 4, a4: 4, aComments: 'comentario A',
+    b1: 4, b2: 4, b3: 4, b4: 4, b5: 4, b6: 4, b7: 4, b8: 4, b9: 4, b10: 4, b11: 4, b12: 4,
+    b13: null, bGrade: 4.2, bComments: 'comentario B', ...overrides,
+  };
+}
+
+describe('Informe Encuesta docente por curso', () => {
+  let http: HttpTestingController;
+  let fixture: ComponentFixture<TeacherSurvey>;
+  let root: HTMLElement;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TeacherSurvey],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(TeacherSurvey);
+    root = fixture.nativeElement;
+    fixture.detectChanges();
+    http.expectOne(FILTERS).flush(filters);
+    await settle();
+  });
+
+  afterEach(() => {
+    http.verify();
+    fixture.destroy();
+  });
+
+  async function settle() {
+    await fixture.whenStable();
+    fixture.detectChanges();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+  }
+
+  function element(selector: string): HTMLElement {
+    const found = root.querySelector<HTMLElement>(selector);
+    if (!found) throw new Error('No se encontró ' + selector);
+    return found;
+  }
+
+  async function selectFilter(control: string, value: string) {
+    const select = element(`select[data-filter="${control}"]`) as HTMLSelectElement;
+    select.value = value;
+    select.dispatchEvent(new Event('change'));
+    await settle();
+  }
+
+  async function completeFilters() {
+    await selectFilter('periodo', '2024A');
+    await selectFilter('tipoAlumno', 'MBA');
+    http.expectOne(FILTERS + '?tipoAlumno=MBA').flush(filters);
+    await settle();
+    await selectFilter('modalidad', 'PT');
+  }
+
+  it('carga los catálogos y recarga modalidades al cambiar el tipo de alumno', async () => {
+    expect(root.querySelectorAll('select[data-filter]')).toHaveLength(3);
+    expect(root.textContent).toContain('2024 - Primer Semestre');
+    expect(root.textContent).toContain('Magíster en Gestión Pública');
+    await selectFilter('tipoAlumno', 'MBA');
+    http.expectOne(FILTERS + '?tipoAlumno=MBA').flush(filters);
+    await settle();
+    expect(root.textContent).toContain('PT');
+    expect(root.textContent).toContain('FT');
+  });
+
+  it('no consulta sin filtros completos y explica qué falta', async () => {
+    element('[data-action="show"]').click();
+    await settle();
+    expect(root.querySelector('[role="alert"]')?.textContent)
+      .toContain('Seleccione período, tipo de alumno y modalidad');
+    http.expectNone(REPORT);
+  });
+
+  it('muestra filas, total y columnas del SAD sin interpretar HTML', async () => {
+    await completeFilters();
+    element('[data-action="show"]').click();
+    await settle();
+    http.expectOne(REPORT + COMPLETE).flush({
+      success: true, message: null,
+      data: { rows: [row({ teacherName: '<img src=x onerror=alert(1)>' })], total: 1 },
+    });
+    await settle();
+    const table = element('table');
+    expect(table.textContent).toContain('MBA101/1');
+    expect(table.textContent).toContain('4.5');
+    expect(table.querySelector('img')).toBeNull();
+    expect(root.textContent).toContain('Total:1');
+  });
+
+  it('informa un resultado vacío sin inventar filas', async () => {
+    await completeFilters();
+    element('[data-action="show"]').click();
+    await settle();
+    http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [], total: 0 } });
+    await settle();
+    expect(root.querySelector('table')).toBeNull();
+    expect(root.textContent).toContain('Sin resultados para los filtros seleccionados.');
+  });
+
+  it('muestra un aviso sanitizado y descarta datos previos si el informe falla', async () => {
+    await completeFilters();
+    element('[data-action="show"]').click();
+    await settle();
+    http.expectOne(REPORT + COMPLETE)
+      .flush({ title: 'El informe no está disponible.' }, { status: 503, statusText: 'Unavailable' });
+    await settle();
+    expect(root.textContent).toContain('No se pudo cargar el informe.');
+    expect(root.querySelector('table')).toBeNull();
+  });
+
+  it('exporta las filas visibles como CSV y no descarga vacío', async () => {
+    const downloads: Blob[] = [];
+    const created: string[] = [];
+    vi.spyOn(URL, 'createObjectURL').mockImplementation((blob) => { downloads.push(blob as Blob); return 'blob:prueba'; });
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      created.push(this.download);
+    });
+
+    const exportButton = () => element('[data-action="export"]') as HTMLButtonElement;
+    expect(exportButton().disabled).toBe(true);
+    await completeFilters();
+    element('[data-action="show"]').click();
+    await settle();
+    http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [row()], total: 1 } });
+    await settle();
+    expect(exportButton().disabled).toBe(false);
+    exportButton().click();
+
+    expect(created).toEqual(['EncuestaDocenteXCurso.csv']);
+    // Blob.text() consume el BOM: se verifica en los bytes reales del archivo.
+    const bytes = new Uint8Array(await downloads[0].arrayBuffer());
+    expect([bytes[0], bytes[1], bytes[2]]).toEqual([0xEF, 0xBB, 0xBF]);
+    const text = await downloads[0].text();
+    expect(text.split('\r\n')[0]).toContain('Curso;Cátedra;Período');
+    expect(text).toContain('MBA101/1');
+    expect(text).toContain('comentario B');
+  });
+});
