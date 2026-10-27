@@ -4,6 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { ReportsSidebar } from './reports-sidebar';
+import { POSTGRADUATE_REPORTS } from '../../postgraduate/postgraduate-catalogue';
 
 @Component({ template: '' })
 class TestPage {}
@@ -15,7 +16,10 @@ describe('Sidebar de Informes', () => {
     originalWidth = Object.getOwnPropertyDescriptor(window, 'innerWidth')!;
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 375 });
     await TestBed.configureTestingModule({ imports: [ReportsSidebar], providers: [
-      provideRouter([{ path: '', component: TestPage }, { path: 'otra', component: TestPage }]),
+      provideRouter([
+        { path: '', component: TestPage }, { path: 'otra', component: TestPage },
+        ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgrado/' + report.slug, component: TestPage })),
+      ]),
       { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba' } },
     ] }).compileComponents();
     TestBed.inject(NgbConfig).animation = false;
@@ -37,7 +41,7 @@ describe('Sidebar de Informes', () => {
     fixture.detectChanges();
   }
 
-  it('muestra solo Inicio, perfil y estado colapsado, sin opciones administrativas', () => {
+  it('conserva Inicio, perfil y estado colapsado junto al catálogo de Postgrado', () => {
     const root: HTMLElement = fixture.nativeElement;
     expect(root.querySelector('#reports-sidebar')?.getAttribute('aria-label')).toBe('Informes');
     expect(root.querySelectorAll('.sidebar-navigation a').length).toBe(1);
@@ -52,6 +56,70 @@ describe('Sidebar de Informes', () => {
     fixture.detectChanges();
     expect(root.classList.contains('collapsed')).toBe(true);
     expect(root.querySelector('aside')?.classList.contains('sidebar--collapsed')).toBe(true);
+  });
+
+  it('muestra cada opción con nombre accesible, ruta propia y estado activo', async () => {
+    const root: HTMLElement = fixture.nativeElement;
+    const toggle = root.querySelector<HTMLButtonElement>('[data-section="postgrado"]')!;
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    toggle.click();
+    await settle();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    for (const report of POSTGRADUATE_REPORTS) {
+      const link = root.querySelector<HTMLAnchorElement>(`a[href="/postgrado/${report.slug}"]`)!;
+      expect(link.textContent).toContain(report.title);
+      expect(link.getAttribute('aria-label')).toBe(report.title);
+      expect(link.title).toBe(report.title);
+    }
+    await TestBed.inject(Router).navigateByUrl('/postgrado/' + POSTGRADUATE_REPORTS[0].slug);
+    await settle();
+    expect(root.querySelectorAll('a[aria-current="page"]')).toHaveLength(1);
+    expect(root.querySelector('a[aria-current="page"]')?.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
+  });
+
+  it('navega a Postgrado desde el panel móvil y lo cierra', async () => {
+    fixture.componentInstance.openMobile();
+    await settle();
+    const target = '/postgrado/' + POSTGRADUATE_REPORTS[0].slug;
+    document.querySelector<HTMLButtonElement>('[role="dialog"] [data-section="postgrado"]')!.click();
+    await settle();
+    document.querySelector<HTMLAnchorElement>(`[role="dialog"] a[href="${target}"]`)!.click();
+    await settle();
+    expect(TestBed.inject(Router).url).toBe(target);
+    expect(fixture.componentInstance.mobileOpen()).toBe(false);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it('incluye las 14 secciones del SAD como dropdowns sin activar funcionalidades', async () => {
+    const root: HTMLElement = fixture.nativeElement;
+    const toggles = [...root.querySelectorAll<HTMLButtonElement>('[data-section]')];
+    expect(toggles.map(button => button.getAttribute('aria-label'))).toEqual([
+      'Inscripción académica', 'Solicitudes', 'Aplicación de reglamento', 'Certificados',
+      'Bienestar', 'Ceremonia', 'Acreditación', 'Postgrado', 'Gestión docente', 'Cadfpreg',
+      'Otros', 'NexoComunicacion', 'SEE', 'Híbridas y actividades extracurriculares',
+    ]);
+    toggles[0].click();
+    await settle();
+    expect(toggles[0].getAttribute('aria-expanded')).toBe('true');
+    expect(root.querySelector('[data-section-content="inscripcion-academica"]')?.textContent)
+      .toContain('Pendiente de migración');
+    toggles[0].click();
+    await settle();
+    expect(toggles[0].getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('muestra un flyout navegable al pulsar Postgrado en modo colapsado', async () => {
+    fixture.componentRef.setInput('collapsed', true);
+    await settle();
+    fixture.nativeElement.querySelector('[data-section="postgrado"]').click();
+    await settle();
+    const menu = document.querySelector<HTMLElement>('.dropdown-menu.show')!;
+    expect(menu.querySelectorAll('a')).toHaveLength(30);
+    expect(menu.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
+    menu.querySelector<HTMLAnchorElement>('a')!.click();
+    await settle();
+    expect(TestBed.inject(Router).url).toBe('/postgrado/' + POSTGRADUATE_REPORTS[0].slug);
+    expect(document.querySelector('.dropdown-menu.show')).toBeNull();
   });
 
   it('abre un solo panel, enfoca cierre y Escape lo cierra', async () => {

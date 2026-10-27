@@ -1,7 +1,7 @@
 # SADInformes
 
 Base independiente del sistema de informes, basada en SADAlumnos sin copiar
-sus funcionalidades ni configuración sensible. Etapa 4: sidebar y shell responsive.
+sus funcionalidades ni configuración sensible. Etapa 5: navegación visual de Postgrado.
 
 ## Alcance
 
@@ -11,7 +11,7 @@ sus funcionalidades ni configuración sensible. Etapa 4: sidebar y shell respons
 - Página inicial y diagnóstico `GET /api/health`.
 - Autenticación JWT con Keycloak y navbar basada en SADAlumnos.
 - AppConfig SQL de solo lectura y sidebar adaptada de SADAdministracion.
-- Sin base funcional ni catálogo nuevo de informes.
+- Catálogo visual de Postgrado, sin informes funcionales ni acceso a datos académicos.
 - No se modifican SADAlumnos ni SADAdministracion.
 
 Esta etapa no está preparada para exposición pública ni uso con datos reales.
@@ -188,9 +188,12 @@ de SADAlumnos.
 ## Sidebar de informes
 
 Se adapta el componente de SADAdministracion: panel de 280 px expandido y 76 px
-colapsado, con perfil del usuario y temas de la aplicación. Muestra únicamente
-**Inicio**, la ruta que ya existe; no copia períodos académicos, gestión de
-usuarios ni permisos administrativos.
+colapsado, con perfil del usuario y temas de la aplicación. Conserva **Inicio**
+e incorpora las 14 secciones de Informes del SAD como dropdowns con flecha,
+submenú y estado activo. En escritorio colapsado, cada icono abre un flyout
+mediante clic o teclado, sin quedar recortado por el scroll. En móvil se mantiene
+el panel con backdrop. No copia períodos académicos, gestión de usuarios ni
+permisos administrativos.
 
 El botón de la navbar colapsa/expande en escritorio. Antes de 992 px abre un
 panel lateral con backdrop, cierre por Escape, enlace, botón o navegación, y
@@ -209,6 +212,27 @@ en ventanas más bajas que el menú expandido sigue pendiente; no se considera
 cerrada esta integración hasta resolverla. La sidebar respeta
 `prefers-reduced-motion`. Los controles de sidebar del Header son opcionales
 para conservar sus usos anteriores.
+
+### Postgrado: etapa visual
+
+Las secciones ajenas a Postgrado muestran **Pendiente de migración** al
+expandirse; todavía no tienen pantallas funcionales ni rutas nuevas.
+Postgrado muestra 30 funcionalidades principales de `SAD/Informes/Postgrado`,
+incluidas Estadísticas ISS y Encuesta Salida. Cada opción abre una ruta autenticada
+`/postgrado/<opción>` con título, descripción, referencia al archivo legado y
+estado **Pendiente de migración**. Un catálogo compartido define menú y rutas.
+El detalle de profesor pertenece a Encuesta Salida, no tiene una opción separada.
+Programación Docente Postgrado apunta a otra carpeta del SAD y queda fuera de
+este catálogo inicial.
+
+Las fichas no consultan APIs ni bases de datos, no abren aplicaciones externas y
+no permiten inscribir, registrar pagos, administrar firmas ni exportar informes.
+No se agregan permisos funcionales: mostrar una ficha no autoriza la operación
+futura. La migración de cada funcionalidad y sus permisos se decidirá después.
+Las rutas desconocidas siguen redirigiendo a Inicio.
+
+La comprobación visual en navegador de esta nueva navegación sigue pendiente;
+las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
 
 ## Requisitos
 
@@ -326,8 +350,9 @@ quedan fuera de esta etapa.
 
 ## Siguientes etapas
 
-1. Definir catálogo de informes y fuentes de datos aprobados.
-2. Incorporar informes y permisos funcionales correspondientes.
+1. Validar visualmente el catálogo de Postgrado y elegir la primera funcionalidad.
+2. Completar sus dependencias y fuentes de datos aprobadas.
+3. Incorporar el informe y sus permisos funcionales correspondientes.
 
 No copiar connection strings, secretos, entidades, procedimientos ni servicios
 funcionales de los sistemas de referencia.
