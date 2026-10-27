@@ -46,3 +46,11 @@ L24. T5 authentication regression GREEN47/47. REPORT_ACCESS policy accepts exact
 
 L25. T6 observed RED: SpaHostingTests 4 failed/9 passed and the publish-target structural test failed. Implemented UseDefaultFiles/UseStaticFiles, a GET/HEAD-only MapFallback delegate and the PublishAngular MSBuild target. The first GREEN attempt left POST /api/health at 404 because the fallback accepted every method; restricting the fallback to GET/HEAD restored 405 while keeping 404 for reserved paths and missing assets. Final SpaHosting13/13, structural13/13, dotnet publish produced wwwroot/index.html, and the published Production artifact passed 9/9 live probes.
 L26. T7 full regressions GREEN: .NET63/63, Angular90/90, Node14/14 and HTTPS development smoke1/1. Committed the backend slice as `685ec60`, which intentionally carries both named risk items (dependency/publish pipeline and authorization) because Program.cs, the WebApi project and the shared test file are interlocked across them; both remain candidates for native review at that boundary. Independent verification, real browser and Keycloak login are still unavailable and are not claimed as verified. Push and PR remain unauthorized.
+
+S6. "implementa la primera parte encuesta docente por curso"
+
+T8 | S6 | route: inline | in_progress | Teacher survey backend: SP contract, filters, validation, permission, sanitized failures with tests. Risk: item 2 (report data authorization); commit: pending.
+T9 | S6 | route: inline | pending | Teacher survey Angular page replacing the placeholder card, with filters, table, total and CSV export.
+T10 | S6 | route: inline | pending | Docs, full regressions, commit.
+
+L27. Implemented scope decision for S6: reuse the deployed SP `spRec_Encuesta_DocenteXCurso` and the three filter SPs instead of duplicating SQL. Because the SP compares Tipo_Alumno and Modalidad with `=`, the API requires exact values and rejects 'Todos' rather than returning an empty table. Filters come from spRec_PeriodosAcademicosProgramacion (20040,0,NO,POSTGRADO), spRec_TiposAlumno ('SI') and spRec_TiposAlumnosModalidades. Access requires the new REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY permission; REPORT_ACCESS alone is not enough for data. Connection string name: ConnectionStrings:Sad, supplied outside the repository.
