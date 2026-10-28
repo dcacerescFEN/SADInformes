@@ -8,11 +8,12 @@ Branch: feat/postgraduate-teaching-schedule; baseline: 0c148a4; delivery: auto-c
 - S3: "prepara el plan e implementalo"
 
 ## Tasks
-- T1 | S1-S3 | inline | done | Add canonical typed SP wrappers/models, Application action queries/DTOs, specific permission and read-only API with HTTP/contract tests | Risk: item 2 (report-data authorization) | commit: pending.
+- T1 | S1-S3 | inline | done | Add canonical typed SP wrappers/models, Application action queries/DTOs, specific permission and read-only API with HTTP/contract tests | Risk: item 2 (report-data authorization) | commits: f26be17 (canonical contracts), 10839b9 (protected API).
 - T2 | S1-S3 | inline | done | Add catalogue route and shared report screen with five legacy filters, seven columns, safe CSV and stale-state/component/route regression tests | commit: pending.
 - T3 | S1-S3 | inline + independent verifier | in_progress | Document exact legacy semantics; run applicable checks and independent verification; assess native review and record local delivery slices | commit: pending.
 
 ## Log
+- L19: Protected API slice committed as 10839b9e7cabb0dbc280da8415eae6b0b7bce022 (465 authored lines), boundary f26be17..10839b9; Risk item 2 is isolated in this commit. Native review is unavailable because the provider binary is missing, not approved or declined. Screen/catalogue/state/CSV slice is next against this boundary. Parent post-verifier Node spot check passed33/33; no source changes after independent verification.
 - L18: Canonical-contract slice committed as f26be17158b03da36f237d42d82d934a2d838cea (416 authored lines), boundary 0c148a4..f26be17. Native assessment/review remains unavailable; no tier/verdict fabricated. Next protected API slice is based on f26be17 and contains the dedicated permission plus HTTP regressions; source candidate proof remains unchanged.
 - L16: Independent verifier mvslxhk8-3-g4zk PASS, no blockers: S1-S3 and functional T1-T3 met. Candidate isolated .NET65/65, Angular component/routes/sidebar30/30, Node33/33; baseline comparisons .NET40/40 and Node31/31. Exact Descripcion binding, varchar7, legacy SQL semantics and original30 catalogue entries verified. Optional extra sibling-role examples are advisory; exact permission matching and current HTTP/public-interface tests already cover the rule, so no additional gate or correction was started.
 - L17: Delivery slicing refined to three cohesive local units: canonical SP contracts/tests, protected Application API/tests, then screen/catalogue/state/CSV/tests. This keeps the security-sensitive API unit separate. The ~400-line heuristic is advisory; retain complete metadata, public-interface tests and docs rather than minify or omit them. No publishing or new-feature merge authorized.

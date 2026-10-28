@@ -24,11 +24,12 @@ describe('Navegación visual de Postgrado', () => {
 
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-  it('incluye las 30 pantallas principales, sin duplicar el detalle de profesor', () => {
-    expect(POSTGRADUATE_REPORTS).toHaveLength(30);
-    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.slug)).size).toBe(30);
-    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.legacyPath)).size).toBe(30);
-    expect(POSTGRADUATE_REPORTS.every(report => report.legacyPath.startsWith('Informes/Postgrado/'))).toBe(true);
+  it('incluye las 31 pantallas principales, sin duplicar el detalle de profesor', () => {
+    expect(POSTGRADUATE_REPORTS).toHaveLength(31);
+    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.slug)).size).toBe(31);
+    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.legacyPath)).size).toBe(31);
+    expect(POSTGRADUATE_REPORTS.slice(0, 30).every(report => report.legacyPath.startsWith('Informes/Postgrado/'))).toBe(true);
+    expect(POSTGRADUATE_REPORTS[30].legacyPath).toBe('Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx');
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.includes('DetalleProfesor'))).toBe(false);
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.endsWith('EstadisticasISS/Resumen.aspx'))).toBe(true);
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.endsWith('EncuestaSalidaGraduados/Default.aspx'))).toBe(true);
@@ -120,6 +121,19 @@ describe('Navegación visual de Postgrado', () => {
       .toBe('Alumnos sin contestar encuesta docente');
     expect(harness.routeNativeElement?.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
     expect(harness.routeNativeElement?.textContent).not.toContain('Pendiente de migración');
+  });
+
+  it('opens teaching schedule with its postgraduate route and scoped period catalogue', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/programacion-docente-programa-modalidad');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const request = http.expectOne(request => request.url === '/api/reports/postgraduate/teaching-schedule/filters');
+    expect(request.request.params.get('tipoPeriodo')).toBe('PERÍODO');
+    request.flush({ success: true, message: null, data: { periodTypes: [], periods: [], programs: [], modalities: [], promotions: [] } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim())
+      .toBe('Programación Docente Postgrado X Programa y Modalidad');
+    expect(harness.routeNativeElement?.querySelectorAll('ng-select[data-filter]')).toHaveLength(5);
   });
 
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {

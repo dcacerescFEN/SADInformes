@@ -271,13 +271,14 @@ para conservar sus usos anteriores.
 
 Las secciones ajenas a Postgrado muestran **Pendiente de migración** al
 expandirse; todavía no tienen pantallas funcionales ni rutas nuevas.
-Postgrado muestra 30 funcionalidades principales de `SAD/Informes/Postgrado`,
+Postgrado muestra 31 funcionalidades: las 30 principales de `SAD/Informes/Postgrado`,
 incluidas Estadísticas ISS y Encuesta Salida. Cada opción abre una ruta autenticada
 `/postgrado/<opción>` con título, descripción, referencia al archivo legado y
 estado **Pendiente de migración**. Un catálogo compartido define menú y rutas.
 El detalle de profesor pertenece a Encuesta Salida, no tiene una opción separada.
-Programación Docente Postgrado apunta a otra carpeta del SAD y queda fuera de
-este catálogo inicial.
+Programación Docente Postgrado X Programa y Modalidad se incorpora desde
+`SAD/Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx`; las 30 rutas
+anteriores se conservan.
 
 Las fichas no consultan APIs ni bases de datos, no abren aplicaciones externas y
 no permiten inscribir, registrar pagos, administrar firmas ni exportar informes.
@@ -288,6 +289,14 @@ Las rutas desconocidas siguen redirigiendo a Inicio.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
 las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
+
+### Programación Docente Postgrado X Programa y Modalidad
+
+Ruta: `/postgrado/programacion-docente-programa-modalidad`. Conserva los cinco
+filtros y las siete columnas del SAD. Promoción sigue mostrando `Promocion` y
+enviando `Descripcion`, sin corregir el binding ni cambiar el parámetro SQL de 7
+caracteres. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE`.
+Contrato, compatibilidad y pruebas en [`docs/teaching-schedule.md`](docs/teaching-schedule.md).
 
 ### Alumnos sin contestar encuesta docente
 
