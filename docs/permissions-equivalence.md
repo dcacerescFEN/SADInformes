@@ -40,6 +40,7 @@ roles ni asignaciones**.
 | Permiso SAD legado | Equivalente en SADInformes | Estado |
 | --- | --- | --- |
 | `ver Postgrado` + `informes acreditación` (Encuesta docente por curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` | Implementado |
+| `ver Postgrado` + `informes acreditación` (Alumnos sin contestar encuesta docente) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `informes acreditación` (Cursos vs alumnos) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSES_BY_STUDENT` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Inscripción masiva: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT` | Implementado |
 | Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` | Implementado; exige también el permiso de consulta |

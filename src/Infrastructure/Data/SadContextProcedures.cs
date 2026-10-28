@@ -443,4 +443,45 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
 
         return _;
     }
+
+    public virtual async Task<List<SpRecAlumnosSinEvaluacionDocenteResult>?> SpRec_Alumnos_Sin_Evaluacion_DocenteAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Periodo",
+                Size = 20,
+                Value = periodo ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Tipo_Alumno",
+                Size = 30,
+                Value = tipo_Alumno ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Modalidad",
+                Size = 30,
+                Value = modalidad ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecAlumnosSinEvaluacionDocenteResult>("EXEC @returnValue = [dbo].[spRec_Alumnos_Sin_Evaluacion_Docente] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
 }

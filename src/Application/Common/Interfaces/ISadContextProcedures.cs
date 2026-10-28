@@ -34,4 +34,8 @@ public partial interface ISadContextProcedures
     Task<List<SpRecEnrollmentPeriodsResult>?> SpRec_PeriodosAcademicosFiltradosAsync(string? propiedad, string? filtro, string? orden, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
     Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(string? cod_Alumno, string? periodo, string? cod_Catedra, string? cod_Seccion, string? accion, string? pc, string? extracurricular, string? mencionCurso, string? tipo_Catedra, int? eliminaAcademico, int? autorizadoPorAlumno, string? nota, string? situacion, string? observacionesNota, int? registroEspecial, string? usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string? sistemaProcesa, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecAlumnosSinEvaluacionDocenteResult>?> SpRec_Alumnos_Sin_Evaluacion_DocenteAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }

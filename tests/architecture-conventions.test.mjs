@@ -9,6 +9,7 @@ const read = path => readFileSync(resolve(root, path), 'utf8');
 const modules = [
   'src/Application/Config',
   'src/Application/Reports/Postgraduate/TeacherSurvey',
+  'src/Application/Reports/Postgraduate/UnansweredTeacherSurvey',
   'src/Application/Reports/Postgraduate/CoursesByStudents',
   'src/Application/Reports/Postgraduate/MassEnrollment',
 ];
