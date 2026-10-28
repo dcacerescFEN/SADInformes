@@ -489,6 +489,13 @@ curso y sin opción Todos. Consulta por semestre de ingreso, tipo y modalidad.
 Contrato API, permiso específico, exportación y dependencias en
 [Courses vs. students](docs/courses-by-students.md).
 
+## Inscripción masiva de Postgrado
+
+`/postgrado/inscripcion-masiva` incorpora consulta, selección y escritura real de
+inscripciones administrativas. Requiere permisos separados de consulta y gestión.
+Uso, API, transacciones y validación necesaria antes de operar con SAD real en
+[Inscripción masiva](docs/mass-enrollment.md).
+
 ## Siguientes etapas
 
 1. Validar visualmente el catálogo de Postgrado y elegir la primera funcionalidad.

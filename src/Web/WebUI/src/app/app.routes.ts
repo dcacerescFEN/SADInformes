@@ -13,7 +13,9 @@ export const routes: Routes = [
     path: 'postgrado/' + report.slug,
     canActivate: [authGuard],
     data: { report },
-    loadComponent: () => report.slug === 'cursos-por-alumnos'
+    loadComponent: () => report.slug === 'inscripcion-masiva'
+      ? import('./postgraduate/mass-enrollment/mass-enrollment').then((module) => module.MassEnrollment)
+      : report.slug === 'cursos-por-alumnos'
       ? import('./postgraduate/courses-by-students/courses-by-students').then((module) => module.CoursesByStudents)
       : report.available
         ? import('./postgraduate/teacher-survey/teacher-survey').then((module) => module.TeacherSurvey)
