@@ -1,5 +1,8 @@
-using Application.Common.Interfaces;
-using Application.Reports.Postgraduate.MassEnrollment;
+using Application.Common.Mediator;
+using Application.Reports.Postgraduate.MassEnrollment.Common;
+using Application.Reports.Postgraduate.MassEnrollment.Commands.EnrollMassEnrollment;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
 using WebApi.Extension;
@@ -20,22 +23,22 @@ public sealed class MassEnrollmentEndpoints : IEndpoint
             .WithSummary("Inscribir el lote confirmado de alumnos");
     }
 
-    private static Task<IResult> Filters(HttpContext context, MassEnrollmentService service,
-        IApiResponseService responses, string? studentType, string? modality, string? cohort,
+    private static Task<IResult> Filters(HttpContext context, IRequestDispatcher sender,
+        string? studentType, string? modality, string? cohort,
         string? period, string? course, CancellationToken ct) =>
-        Execute(async () => Results.Ok(responses.Success(await service.FiltersAsync(
-            Selection(studentType, modality, cohort, period, course), User(context), ct))));
+        Execute(async () => Results.Ok(await sender.Send(new GetMassEnrollmentFilters(
+            Selection(studentType, modality, cohort, period, course), User(context)), ct)));
 
-    private static Task<IResult> Candidates(HttpContext context, MassEnrollmentService service,
-        IApiResponseService responses, string? studentType, string? modality, string? cohort,
+    private static Task<IResult> Candidates(HttpContext context, IRequestDispatcher sender,
+        string? studentType, string? modality, string? cohort,
         string? period, string? course, CancellationToken ct) =>
-        Execute(async () => Results.Ok(responses.Success(await service.CandidatesAsync(
-            Selection(studentType, modality, cohort, period, course), User(context), ct))));
+        Execute(async () => Results.Ok(await sender.Send(new GetMassEnrollmentCandidates(
+            Selection(studentType, modality, cohort, period, course), User(context)), ct)));
 
-    private static Task<IResult> Enroll(HttpContext context, MassEnrollmentService service,
-        IApiResponseService responses, EnrollmentRequest request, CancellationToken ct) =>
-        Execute(async () => Results.Ok(responses.Success(await service.EnrollAsync(request,
-            User(context), context.Connection.RemoteIpAddress?.ToString() ?? "desconocida", ct))));
+    private static Task<IResult> Enroll(HttpContext context, IRequestDispatcher sender,
+        EnrollmentRequest request, CancellationToken ct) =>
+        Execute(async () => Results.Ok(await sender.Send(new EnrollMassEnrollment(request,
+            User(context), context.Connection.RemoteIpAddress?.ToString() ?? "desconocida"), ct)));
 
     private static EnrollmentSelection Selection(string? type, string? modality, string? cohort, string? period, string? course) =>
         new(type ?? "", modality ?? "", cohort ?? "", period ?? "", course ?? "");

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Application.Reports.Postgraduate.MassEnrollment;
+using Application.Reports.Postgraduate.MassEnrollment.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -172,6 +172,19 @@ public sealed class MassEnrollmentTests
         using var client = Client(factory, tokens, View, Manage);
         Assert.Equal(HttpStatusCode.Conflict,
             (await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+        Assert.Equal(0, data.Writes);
+    }
+
+    [Fact]
+    public async Task Manage_permission_without_view_permission_cannot_call_the_write_endpoint()
+    {
+        var data = new FakeEnrollmentData();
+        var (factory, tokens) = Create(data);
+        using var f = factory; using var t = tokens;
+        using var client = Client(factory, tokens, Manage);
+        var response = await client.PostAsJsonAsync(
+            Route, new EnrollmentRequest(Selection, ["A1"], true));
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(0, data.Writes);
     }
 

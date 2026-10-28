@@ -71,6 +71,23 @@ selección ajena al listado o ya inscrita, 409. Sin sesión, 401; sin permiso, 4
 Errores de almacenamiento dan 503 sin detalles SQL. Un error al confirmar puede
 tener resultado incierto: actualizar el listado antes de cualquier reintento.
 
+## Organización del backend
+
+Cada request y handler sigue el patrón de AcademicPeriods de SADAdministracion:
+
+- `Commands/EnrollMassEnrollment/EnrollMassEnrollment.cs`.
+- `Queries/GetMassEnrollmentFilters/GetMassEnrollmentFilters.cs`.
+- `Queries/GetMassEnrollmentCandidates/GetMassEnrollmentCandidates.cs`.
+- `Common/` contiene contratos y validación compartida, no un servicio de orquestación.
+
+El endpoint despacha requests con `IRequestDispatcher`. La ejecución SQL está
+centralizada en `SadContext` y el archivo principal `SadContextProcedures.cs`:
+el SP de escritura tiene un método tipado con sus 19 parámetros. No hay archivos
+`SadContextProcedures.MassEnrollment.cs` ni `ISadContextProcedures.MassEnrollment.cs`.
+El adaptador de datos solo mapea resultados y delega a esos contextos; no ejecuta
+SQL directamente. La transacción y la comprobación de inscripción permanecen en
+`SadContext`, sin cambiar permisos, auditoría ni contrato HTTP.
+
 ## Persistencia y reglas heredadas
 
 Se reutilizan `spRec_TiposAlumno`, `spRec_TiposAlumnosModalidades`, `spRec_Años`,

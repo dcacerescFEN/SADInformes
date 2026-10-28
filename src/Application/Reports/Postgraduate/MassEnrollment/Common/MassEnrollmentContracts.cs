@@ -1,4 +1,4 @@
-namespace Application.Reports.Postgraduate.MassEnrollment;
+namespace Application.Reports.Postgraduate.MassEnrollment.Common;
 
 public sealed record EnrollmentOption(string Value, string Text);
 public sealed record EnrollmentSelection(string StudentType, string Modality, string Cohort, string Period, string Course);
