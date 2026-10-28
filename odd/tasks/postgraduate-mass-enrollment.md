@@ -1,0 +1,25 @@
+# Postgraduate mass enrollment
+Migrate the complete legacy enrollment screen to SADInformes on feat/postgraduate-mass-enrollment.
+Delivery: feature-branch-chain (selected by user); roughly 1,400 authored lines in cohesive API and UI slices. Checks: .NET HTTP tests, Angular DOM tests/build, independent security/data verification.
+
+## Specs
+S1. "Ahora migrar el informe InscripcionMasiva"
+S2. "Funcionalidad completa, incluida la inscripción"
+
+## Tasks
+T1 [S1,S2] DONE: Map catalogs/candidates and expose authorized read API with tests. Route: inline. Commit: pending.
+T2 [S1,S2] DONE: Implement validated administrative enrollment, identity audit and transactional outcomes with tests. Route: inline; independent verification for Risk items 1,2,4. Commit: pending.
+T3 [S1,S2] DONE: Implement filters, candidate selection and confirmed enrollment screen using existing report format; update docs and tests. Route: inline. Commit: pending.
+T4 [S1,S2] IN_PROGRESS: Run suites/build and independent verification; record limits and commit coherent work units. Route: inline + gentle-ai-verify. Commit: pending.
+
+## Log
+L1. Ahora migrar el informe InscripcionMasiva
+L2. Funcionalidad completa, incluida la inscripción
+L3. User selected full functionality after being told that Inscribir writes real academic enrollments and audit records. No live SAD mutations are authorized for testing.
+L10. Chain plan (local only): 52480a6 (previous Courses migration) -> feat/postgraduate-mass-enrollment (tracker/tasks) -> feat/postgraduate-mass-enrollment-01-api (T1/T2 plus tests and persistence docs) -> feat/postgraduate-mass-enrollment-02-ui (T3/T4 plus UI tests and evidence). The tracker depends on the previous Courses migration before any eventual master integration. No local merges or remote actions. One honest slicing pass keeps API authorization, atomic writer, gateway and their tests together even though that cohesive slice exceeds 400 lines; UI is a separate dependent slice. Do not compress safety code/tests for cosmetic limits.
+L9. User delivery selection: "Cadena sobre rama de funcionalidad — recomendada". Strategy: feature-branch-chain; tracker feat/postgraduate-mass-enrollment; child API branch then dependent UI branch. Verified default origin/master. Prior migration base: 52480a6. Local branch/commit preparation only; no push or PR creation.
+L8. Independent verifier mvs6r3xr-5-cimy: S1 MET; S2 MET structurally and in isolated tests; no candidate-caused blockers for data/security/concurrency. Observed .NET107/107, Angular127/127, Node19/19. Real SQL transaction, audit rollback, simultaneous enrollment and real-browser proof unavailable; mandatory before enabling live writes. Final parent .NET107/107. Next: record local delivery shape and commits; no push, PR creation, deployment, role assignment or restart authorized.
+L7. T3 GREEN: 7/7 component tests; full Angular 127/127; production build passes with existing initial-bundle warning (732.23 kB vs 500 kB). Node structural 18/18. Component clears stale selections, rejects stale catalogue responses, confirms before POST, disables already-enrolled rows and reloads after confirmed success. Native assess unavailable: package-local-binary-missing; independent verification required for data/security/concurrency risks. T4 in progress.
+L6. Backend full suite GREEN 107/107, including candidate field mapping, authenticated catalogue scope, confirmation, forged/stale/duplicate selections, silent no-op and atomic rollback on isolated doubles. T2 complete on that proof; real SQL transaction effects/concurrency remain an environment-validation limitation. T3 in progress.
+L5. API RED observed (missing MassEnrollment types); UI RED observed (missing component). Backend contracts, read gateway, authorization and transactional enrollment implementation prepared together to exercise the public interface. Focused API GREEN: 15/15 HTTP tests pass. T1 complete; T2 in progress for persistence mapping and safety checks. This proves application orchestration on isolated fake data, not live SQL transaction behavior.
+L4. Exploration: legacy uses spRec_Alumnos_insc_masiva_catedra_disp and catalogs (types, modalities, years, filtered periods, courses). Write SP spCre_MovInscAdministrativo_Postgrado uses its own transaction, no explicit result, can silently skip or insert movement without enrollment. Engineering safety assumption: validate authoritative candidates/course and execute each requested batch atomically; verify actual enrollment before reporting success. Audit identity/IP come from authenticated server context, not client. Preserve legacy query/business rules; do not modify existing SQL.
