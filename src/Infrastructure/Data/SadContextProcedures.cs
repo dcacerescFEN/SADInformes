@@ -484,4 +484,154 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
 
         return _;
     }
+
+    public virtual async Task<List<SpRecPeriodosAcademicosXTipoResult>?> SpRec_PeriodosAcademicosXTipoAsync(string? tipo, string? escuela, string? limite, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Tipo",
+                Size = 20,
+                Value = tipo ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Escuela",
+                Size = 20,
+                Value = escuela ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Limite",
+                Size = 20,
+                Value = limite ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecPeriodosAcademicosXTipoResult>("EXEC @returnValue = [dbo].[spRec_PeriodosAcademicosXTipo] @Tipo = @Tipo, @Escuela = @Escuela, @Limite = @Limite", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<List<SpRecProgramacionDocenteXProgramaModalidadResult>?> SpRec_ProgramacionDocenteXProgramaModalidadAsync(string? periodo, string? tipoPeriodo, string? tipo_Alumno, string? modalidad, string? promocion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Periodo",
+                Size = 20,
+                Value = periodo ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "TipoPeriodo",
+                Size = 20,
+                Value = tipoPeriodo ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Tipo_Alumno",
+                Size = 30,
+                Value = tipo_Alumno ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Modalidad",
+                Size = 30,
+                Value = modalidad ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Promocion",
+                Size = 7,
+                Value = promocion ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecProgramacionDocenteXProgramaModalidadResult>("EXEC @returnValue = [dbo].[spRec_ProgramacionDocenteXProgramaModalidad] @Periodo = @Periodo, @TipoPeriodo = @TipoPeriodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad, @Promocion = @Promocion", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<List<SpRecPromocionesPostgradoTodosResult>?> SpRec_PromocionesPostgradoTodosAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecPromocionesPostgradoTodosResult>("EXEC @returnValue = [dbo].[spRec_PromocionesPostgradoTodos]", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<List<SpRecTiposAlumnoXEscuelaResult>?> SpRec_TiposAlumnoXEscuelaAsync(string? escuela, string? incluirTodos, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Escuela",
+                Size = 20,
+                Value = escuela ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "IncluirTodos",
+                Size = 2,
+                Value = incluirTodos ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecTiposAlumnoXEscuelaResult>("EXEC @returnValue = [dbo].[spRec_TiposAlumnoXEscuela] @Escuela = @Escuela, @IncluirTodos = @IncluirTodos", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
 }
