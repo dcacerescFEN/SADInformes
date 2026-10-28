@@ -51,6 +51,12 @@ roles ni asignaciones**.
 Los nombres propuestos **no existen todavía** en Keycloak: se definen al migrar
 cada informe, con su prueba de autorización.
 
+Programación Docente Postgrado X Programa y Modalidad agrega el permiso
+`PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE`. Su página legada no
+incluye una validación específica en el code-behind; la migración protege tanto
+el catálogo como el listado con este permiso o los roles administrativos REPORT.
+No se crean roles ni asignaciones de Keycloak automáticamente.
+
 ## Diferencias de comportamiento a tener presentes
 
 1. El SAD consultaba la tabla `Permisos` en cada sesión y aceptaba `*` como acceso

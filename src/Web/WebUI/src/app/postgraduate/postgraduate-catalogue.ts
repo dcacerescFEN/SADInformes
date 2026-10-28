@@ -76,4 +76,11 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
     'Informe de notificaciones de causal de eliminación de Postgrado.', 'InformeNce.aspx'),
   entry('actividades-cursos', 'Actividades cursos Postgrado',
     'Reporte de actividades de cursos de Postgrado por año.', 'ActividadesCursosPostgrado.aspx'),
+  {
+    slug: 'programacion-docente-programa-modalidad',
+    title: 'Programación Docente Postgrado X Programa y Modalidad',
+    description: 'Programación de cursos, profesores y clases por programa, modalidad, promoción y período.',
+    legacyPath: 'Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx',
+    available: true,
+  },
 ];
