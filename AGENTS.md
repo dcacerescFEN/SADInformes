@@ -37,8 +37,8 @@ its use cases through `Commands` and `Queries` folders:
   `*Queries.cs` or `*Commands.cs` file.
 - Endpoints dispatch requests with `IRequestDispatcher`; handlers return
   `ApiResponse<T>` through `IApiResponseService`.
-- Module-level interfaces such as `ITeacherSurveyReader` stay at the module root;
-  shared validation without a module owner goes in `Application/Common`.
+- Shared module queries stay within their owning Application module; do not call
+  one handler from another. Shared validation without an owner goes in `Application/Common`.
 
 ### DTOs
 
@@ -50,20 +50,26 @@ its use cases through `Commands` and `Queries` folders:
 
 ### Database contexts and queries
 
-- `SadContext` is the database definition: `DbSet` properties and their table,
-  key, column, length, Unicode and collation mappings. It contains no custom query,
-  command, SQL execution or transaction helpers.
+- `ISadContext` in Application exposes mapped tables as read-only `DbSet<T>` getters
+  and generic transaction creation. `SadContext` in Infrastructure implements it,
+  owns mappings and starts transactions on the same connection used by the SP wrappers.
+  The returned `IDbContextTransaction` supports commit, rollback and async disposal;
+  disposal of an uncommitted transaction rolls it back. No module-specific queries
+  or business rules belong in `SadContext`.
 - New table mappings are taken from the canonical models in `MappingDB/Models`.
   Add only the tables and columns the feature uses; never reference the whole
   reverse-engineered project or change the database.
-- Queries are LINQ over mapped `DbSet`s in the data adapter that owns the feature
-  (for example `MassEnrollmentData.FindCourseAsync`). Do not issue ad-hoc
-  `SELECT` strings from Application, endpoints or data adapters.
-- Existing stored procedures stay in `SadContextProcedures` with typed,
-  parameterized methods. Build their parameters there and execute through the
-  context connection; never concatenate values into SQL.
-- Transactions, command execution and business postconditions belong to the data
-  adapter that owns the operation, not to `SadContext`.
+- Queries are LINQ over `ISadContext` in each Application module. Handlers consume
+  `ISadContextProcedures` directly for typed SP calls. Application may depend on EF Core,
+  but never on Infrastructure, concrete contexts, SqlClient or ad-hoc SQL.
+- Stored procedures stay in `SadContextProcedures`, implementing the Application
+  contract `ISadContextProcedures`. Follow the canonical `MappingDB/Models` wrappers:
+  typed nullable parameters, sizes, `DBNull`, optional `OutputParameter<int>` and cancellation.
+  Read SPs use `SqlQueryAsync<T>`; non-query SPs such as administrative enrollment use
+  `ExecuteSqlRawAsync`. Never concatenate values or confuse affected rows with SP return values.
+- Application commands define transaction boundaries, isolation and business postconditions.
+  Generic setup belongs in `SadContext.BeginTransactionAsync` (including `XACT_ABORT ON`).
+  Preserve Serializable isolation and same-context SP participation for enrollment batches.
 - Audit identity and client address come from the authenticated server context,
   never from request JSON.
 

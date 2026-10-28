@@ -89,11 +89,16 @@ acción: `MassEnrollmentRequestDTO`, `MassEnrollmentResultDTO`,
 `MassEnrollmentCandidateDTO` y `MassEnrollmentCandidatesDTO`.
 `Common/` conserva solo contratos compartidos y reglas, no un servicio de orquestación.
 
-El endpoint despacha con `IRequestDispatcher`. `SadContext` es únicamente la
-definición de la base: `DbSet` y mapeos de tabla. `MassEnrollmentData` ejecuta las
-consultas LINQ, crea la transacción Serializable y comprueba la postcondición;
-`SadContextProcedures` conserva la ejecución tipada de los SP, incluido el contrato
-de 19 parámetros. No hay helpers de consulta en `SadContext` ni archivos
+El endpoint despacha con `IRequestDispatcher`. Las Queries de Application leen los
+SP mediante `ISadContextProcedures`. `MassEnrollmentLookup` comparte las consultas
+LINQ entre el listado y el Command mediante los getters `DbSet<T>` de `ISadContext`.
+El Command define la transacción Serializable y comprueba la postcondición;
+`SadContext.BeginTransactionAsync` implementa el inicio genérico con `XACT_ABORT ON`.
+La transacción devuelta permite commit, rollback y rollback al liberar sin commit.
+`SadContextProcedures` conserva el formato canónico de MappingDB: 19 parámetros de
+entrada y un parámetro de salida para el valor RETURN del SP de inscripción, ejecutado
+con `ExecuteSqlRawAsync`, no con `SqlQueryAsync<T>`. El número de filas afectadas no
+prueba que haya inscripción. No hay consultas de módulo en `SadContext` ni archivos
 `SadContextProcedures.MassEnrollment.cs`/`ISadContextProcedures.MassEnrollment.cs`.
 Se conservan permisos y auditoría.
 
@@ -135,8 +140,10 @@ Filas repetidas del mismo alumno se agrupan; si alguna indica SI, no es seleccio
 
 ## Verificación antes de habilitar uso real
 
-Las pruebas HTTP usan un gateway aislado con rollback simulado; las pruebas de
-mapeo usan procedimientos dobles. Las consultas LINQ se ejecutan además sobre un
+Las pruebas HTTP usan un contexto InMemory y procedimientos dobles con rollback
+simulado; ejercitan los handlers y sus consultas reales. Las pruebas del límite
+ADO.NET verifican parámetros, valor de retorno, aislamiento, participación de los
+SP en la transacción y liberación ante fallos sin conectar con una base real. Las consultas LINQ se ejecutan además sobre un
 contexto EF InMemory aislado para verificar las relaciones y el alcance tipo/modalidad. Angular verifica el DOM y la confirmación sin
 enviar inscripciones a SAD. Esto no prueba el motor SQL Server ni las auditorías
 reales de los procedimientos institucionales.

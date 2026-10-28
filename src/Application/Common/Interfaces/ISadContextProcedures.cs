@@ -25,16 +25,13 @@ public partial interface ISadContextProcedures
     Task<List<SpRecTiposAlumnosModalidadesResult>?> SpRec_TiposAlumnosModalidadesAsync(
         string? tipo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
-    Task<List<SpRecEnrollmentYearsResult>> SpRec_AnosAsync(CancellationToken ct);
-    Task<List<SpRecEnrollmentPeriodsResult>> SpRec_PeriodosAcademicosFiltradosAsync(string type, CancellationToken ct);
-    Task<List<SpRecEnrollmentCoursesResult>> SpRec_CursosxPeriodoAsync(string period, string type, string modality, CancellationToken ct);
-    Task<List<SpRecEnrollmentCandidatesResult>> SpRec_Alumnos_insc_masiva_catedra_dispAsync(
-        string type, string modality, string cohort, string course, CancellationToken ct);
+    Task<List<SpRecEnrollmentCandidatesResult>?> SpRec_Alumnos_insc_masiva_catedra_dispAsync(string? tipo_Alumno, string? modalidad, string? añoIngreso, string? cod_Catedra, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
-    Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(
-        string codAlumno, string periodo, string codCatedra, string codSeccion, string accion, string pc,
-        string extracurricular, string mencionCurso, string tipoCatedra, int eliminaAcademico,
-        int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
-        string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa,
-        CancellationToken ct);
+    Task<List<SpRecEnrollmentYearsResult>?> SpRec_AnosAsync(string? incluirTodos, string? tipoAlumno, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEnrollmentCoursesResult>?> SpRec_CursosxPeriodoAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEnrollmentPeriodsResult>?> SpRec_PeriodosAcademicosFiltradosAsync(string? propiedad, string? filtro, string? orden, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(string? cod_Alumno, string? periodo, string? cod_Catedra, string? cod_Seccion, string? accion, string? pc, string? extracurricular, string? mencionCurso, string? tipo_Catedra, int? eliminaAcademico, int? autorizadoPorAlumno, string? nota, string? situacion, string? observacionesNota, int? registroEspecial, string? usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string? sistemaProcesa, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }

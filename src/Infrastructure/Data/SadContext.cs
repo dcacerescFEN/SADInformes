@@ -1,11 +1,13 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 using Domain.Entities.Sad.Tables.dbo;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
 /// <summary>
-/// Definition of the SAD database: mapped tables and their keys/columns.
-/// Queries and commands belong to data gateways such as MassEnrollmentData;
+/// Definition of SAD tables and generic transaction support.
+/// Module queries and commands belong to Application;
 /// stored-procedure execution belongs to SadContextProcedures.
 /// </summary>
 public partial class SadContext(DbContextOptions<SadContext> options)
@@ -17,6 +19,23 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<VacantesCurso> VacantesCursos => Set<VacantesCurso>();
     public DbSet<AlumnosCatedra> AlumnosCatedras => Set<AlumnosCatedra>();
     public DbSet<MovimientosInscripcion> MovimientosInscripcions => Set<MovimientosInscripcion>();
+
+    /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
+    public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
+        IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
+    {
+        var transaction = await Database.BeginTransactionAsync(isolationLevel, cancellationToken);
+        try
+        {
+            await Database.ExecuteSqlRawAsync("SET XACT_ABORT ON;", cancellationToken);
+            return transaction;
+        }
+        catch
+        {
+            await transaction.DisposeAsync();
+            throw;
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

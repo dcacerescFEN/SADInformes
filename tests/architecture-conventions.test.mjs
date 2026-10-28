@@ -57,13 +57,14 @@ test('Every DTO is a sealed record in its own DTO file inside the action folder'
   }
 });
 
-test('SadContext is only the database definition', () => {
+test('SadContext owns database mappings and generic transactions, not module queries', () => {
   const context = read('src/Infrastructure/Data/SadContext.cs');
   assert.doesNotMatch(context,
-    /FindMassEnrollment|IsEnrollmentConfirmed|ExecuteSqlRawAsync|BeginTransactionAsync|SqlQueryAsync|SqlParameter/);
+    /FindMassEnrollment|IsEnrollmentConfirmed|SqlQueryAsync|SqlParameter|AsNoTracking|AnyAsync/);
   assert.match(context, /DbSet</);
   assert.match(context, /OnModelCreating/);
-  assert.match(read('src/Application/Common/Interfaces/ISadContext.cs'), /^namespace [\s\S]*public partial interface ISadContext;\s*$/m);
+  assert.match(context, /Database.BeginTransactionAsync/);
+  assert.match(read('src/Application/Common/Interfaces/ISadContext.cs'), /DbSet<Curso> Cursos \{ get; \}/);
 });
 
 test('AGENTS.md documents backend and frontend conventions', () => {

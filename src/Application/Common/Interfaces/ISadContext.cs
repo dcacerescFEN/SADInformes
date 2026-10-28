@@ -1,4 +1,18 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
+using Domain.Entities.Sad.Tables.dbo;
+using Microsoft.EntityFrameworkCore;
+
 namespace Application.Common.Interfaces;
 
-/// <summary>Marker for the SAD database definition; behavior lives in data gateways.</summary>
-public partial interface ISadContext;
+public partial interface ISadContext
+{
+    DbSet<Catedra> Catedras { get; }
+    DbSet<Curso> Cursos { get; }
+    DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras { get; }
+    DbSet<VacantesCurso> VacantesCursos { get; }
+    DbSet<AlumnosCatedra> AlumnosCatedras { get; }
+    DbSet<MovimientosInscripcion> MovimientosInscripcions { get; }
+
+    Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);
+}

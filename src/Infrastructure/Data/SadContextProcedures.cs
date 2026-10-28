@@ -130,67 +130,317 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
-    public virtual Task<List<SpRecEnrollmentYearsResult>> SpRec_AnosAsync(CancellationToken ct) =>
-        context.SqlQueryAsync<SpRecEnrollmentYearsResult>(
-            "EXEC dbo.spRec_Años @IncluirTodos = @include, @TipoAlumno = @type",
-            [Text("include", "NO", 4), Text("type", "Todos", 30)], ct);
+    public virtual async Task<List<SpRecEnrollmentCandidatesResult>?> SpRec_Alumnos_insc_masiva_catedra_dispAsync(string? tipo_Alumno, string? modalidad, string? añoIngreso, string? cod_Catedra, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
 
-    public virtual Task<List<SpRecEnrollmentPeriodsResult>> SpRec_PeriodosAcademicosFiltradosAsync(string type, CancellationToken ct) =>
-        context.SqlQueryAsync<SpRecEnrollmentPeriodsResult>(
-            "EXEC dbo.spRec_PeriodosAcademicosFiltrados @Propiedad = @property, @Filtro = @filter, @Orden = @order",
-            [Text("property", "Tipo_Alumno", 20), Text("filter", type, 100), Text("order", "DESCENDENTE", 20)], ct);
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Tipo_Alumno",
+                Size = 30,
+                Value = tipo_Alumno ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Modalidad",
+                Size = 30,
+                Value = modalidad ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "AñoIngreso",
+                Size = 4,
+                Value = añoIngreso ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Cod_Catedra",
+                Size = 30,
+                Value = cod_Catedra ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecEnrollmentCandidatesResult>("EXEC @returnValue = [dbo].[spRec_Alumnos_insc_masiva_catedra_disp] @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad, @AñoIngreso = @AñoIngreso, @Cod_Catedra = @Cod_Catedra", sqlParameters, cancellationToken ?? CancellationToken.None);
 
-    public virtual Task<List<SpRecEnrollmentCoursesResult>> SpRec_CursosxPeriodoAsync(
-        string period, string type, string modality, CancellationToken ct) =>
-        context.SqlQueryAsync<SpRecEnrollmentCoursesResult>(
-            "EXEC dbo.spRec_CursosxPeriodo @Periodo = @period, @Tipo_Alumno = @type, @Modalidad = @modality",
-            [Text("period", period, 5), Text("type", type, 30), Text("modality", modality, 30)], ct);
+        returnValue?.SetValue(parameterreturnValue.Value);
 
-    public virtual Task<List<SpRecEnrollmentCandidatesResult>> SpRec_Alumnos_insc_masiva_catedra_dispAsync(
-        string type, string modality, string cohort, string course, CancellationToken ct) =>
-        context.SqlQueryAsync<SpRecEnrollmentCandidatesResult>(
-            "EXEC dbo.spRec_Alumnos_insc_masiva_catedra_disp @Tipo_Alumno = @type, @Modalidad = @modality, @AñoIngreso = @cohort, @Cod_Catedra = @course",
-            [Text("type", type, 30), Text("modality", modality, 30), Text("cohort", cohort, 4), Text("course", course, 30)], ct);
+        return _;
+    }
 
+    public virtual async Task<List<SpRecEnrollmentYearsResult>?> SpRec_AnosAsync(string? incluirTodos, string? tipoAlumno, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
 
-    public virtual Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(
-        string codAlumno, string periodo, string codCatedra, string codSeccion, string accion, string pc,
-        string extracurricular, string mencionCurso, string tipoCatedra, int eliminaAcademico,
-        int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
-        string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa,
-        CancellationToken ct) =>
-        context.Database.ExecuteSqlRawAsync(
-            """
-            EXEC dbo.spCre_MovInscAdministrativo_Postgrado
-              @Cod_Alumno=@student, @Periodo=@period, @Cod_Catedra=@course, @Cod_Seccion=@section,
-              @Accion=@action, @Pc=@pc, @Extracurricular=@extra, @MencionCurso=@mention, @Tipo_Catedra=@type,
-              @EliminaAcademico=@removeAcademic, @AutorizadoPorAlumno=@authorized, @Nota=@grade, @Situacion=@situation,
-              @ObservacionesNota=@notes, @RegistroEspecial=@special, @Usuario=@user, @CalificadorElectivo=@elective,
-              @TipoCatedraSeleccionable=@selectableType, @SistemaProcesa=@system
-            """,
-            BuildMovInscAdministrativoParameters(codAlumno, periodo, codCatedra, codSeccion, accion, pc,
-                extracurricular, mencionCurso, tipoCatedra, eliminaAcademico, autorizadoPorAlumno, nota,
-                situacion, observacionesNota, registroEspecial, usuario, calificadorElectivo,
-                tipoCatedraSeleccionable, sistemaProcesa),
-            ct);
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "IncluirTodos",
+                Size = 4,
+                Value = incluirTodos ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "TipoAlumno",
+                Size = 30,
+                Value = tipoAlumno ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecEnrollmentYearsResult>("EXEC @returnValue = [dbo].[spRec_Años] @IncluirTodos = @IncluirTodos, @TipoAlumno = @TipoAlumno", sqlParameters, cancellationToken ?? CancellationToken.None);
 
-    /// <summary>Exact parameter contract of the administrative enrollment procedure.</summary>
-    public static SqlParameter[] BuildMovInscAdministrativoParameters(
-        string codAlumno, string periodo, string codCatedra, string codSeccion, string accion, string pc,
-        string extracurricular, string mencionCurso, string tipoCatedra, int eliminaAcademico,
-        int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
-        string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa) =>
-        [Text("student", codAlumno, 20), Text("period", periodo, 20), Text("course", codCatedra, 30),
-         Text("section", codSeccion, 2), Text("action", accion, 10), Text("pc", pc, 100),
-         Text("extra", extracurricular, 2), Text("mention", mencionCurso, 2), Text("type", tipoCatedra, 2),
-         Integer("removeAcademic", eliminaAcademico), Integer("authorized", autorizadoPorAlumno),
-         Text("grade", nota, 5), Text("situation", situacion, 10), Text("notes", observacionesNota, 1000),
-         Integer("special", registroEspecial), Text("user", usuario, 30), Text("elective", calificadorElectivo, 10),
-         Text("selectableType", tipoCatedraSeleccionable, 1), Text("system", sistemaProcesa, 15)];
+        returnValue?.SetValue(parameterreturnValue.Value);
 
-    private static SqlParameter Text(string name, string? value, int size) =>
-        new("@" + name, SqlDbType.VarChar, size) { Value = value ?? (object)DBNull.Value };
+        return _;
+    }
 
-    private static SqlParameter Integer(string name, int value) =>
-        new("@" + name, SqlDbType.Int) { Value = value };
+    public virtual async Task<List<SpRecEnrollmentCoursesResult>?> SpRec_CursosxPeriodoAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Periodo",
+                Size = 5,
+                Value = periodo ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Tipo_Alumno",
+                Size = 30,
+                Value = tipo_Alumno ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Modalidad",
+                Size = 30,
+                Value = modalidad ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecEnrollmentCoursesResult>("EXEC @returnValue = [dbo].[spRec_CursosxPeriodo] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<List<SpRecEnrollmentPeriodsResult>?> SpRec_PeriodosAcademicosFiltradosAsync(string? propiedad, string? filtro, string? orden, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Propiedad",
+                Size = 20,
+                Value = propiedad ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Filtro",
+                Size = 100,
+                Value = filtro ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Orden",
+                Size = 20,
+                Value = orden ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecEnrollmentPeriodsResult>("EXEC @returnValue = [dbo].[spRec_PeriodosAcademicosFiltrados] @Propiedad = @Propiedad, @Filtro = @Filtro, @Orden = @Orden", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(string? cod_Alumno, string? periodo, string? cod_Catedra, string? cod_Seccion, string? accion, string? pc, string? extracurricular, string? mencionCurso, string? tipo_Catedra, int? eliminaAcademico, int? autorizadoPorAlumno, string? nota, string? situacion, string? observacionesNota, int? registroEspecial, string? usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string? sistemaProcesa, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Cod_Alumno",
+                Size = 20,
+                Value = cod_Alumno ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Periodo",
+                Size = 20,
+                Value = periodo ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Cod_Catedra",
+                Size = 30,
+                Value = cod_Catedra ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Cod_Seccion",
+                Size = 2,
+                Value = cod_Seccion ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Accion",
+                Size = 10,
+                Value = accion ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Pc",
+                Size = 100,
+                Value = pc ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Extracurricular",
+                Size = 2,
+                Value = extracurricular ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "MencionCurso",
+                Size = 2,
+                Value = mencionCurso ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Tipo_Catedra",
+                Size = 2,
+                Value = tipo_Catedra ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "EliminaAcademico",
+                Value = eliminaAcademico ?? Convert.DBNull,
+                SqlDbType = SqlDbType.Int,
+            },
+            new SqlParameter
+            {
+                ParameterName = "AutorizadoPorAlumno",
+                Value = autorizadoPorAlumno ?? Convert.DBNull,
+                SqlDbType = SqlDbType.Int,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Nota",
+                Size = 5,
+                Value = nota ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Situacion",
+                Size = 10,
+                Value = situacion ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "ObservacionesNota",
+                Size = 1000,
+                Value = observacionesNota ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "RegistroEspecial",
+                Value = registroEspecial ?? Convert.DBNull,
+                SqlDbType = SqlDbType.Int,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Usuario",
+                Size = 30,
+                Value = usuario ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "CalificadorElectivo",
+                Size = 10,
+                Value = calificadorElectivo ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "TipoCatedraSeleccionable",
+                Size = 1,
+                Value = tipoCatedraSeleccionable ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "SistemaProcesa",
+                Size = 15,
+                Value = sistemaProcesa ?? Convert.DBNull,
+                SqlDbType = SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [dbo].[spCre_MovInscAdministrativo_Postgrado] @Cod_Alumno = @Cod_Alumno, @Periodo = @Periodo, @Cod_Catedra = @Cod_Catedra, @Cod_Seccion = @Cod_Seccion, @Accion = @Accion, @Pc = @Pc, @Extracurricular = @Extracurricular, @MencionCurso = @MencionCurso, @Tipo_Catedra = @Tipo_Catedra, @EliminaAcademico = @EliminaAcademico, @AutorizadoPorAlumno = @AutorizadoPorAlumno, @Nota = @Nota, @Situacion = @Situacion, @ObservacionesNota = @ObservacionesNota, @RegistroEspecial = @RegistroEspecial, @Usuario = @Usuario, @CalificadorElectivo = @CalificadorElectivo, @TipoCatedraSeleccionable = @TipoCatedraSeleccionable, @SistemaProcesa = @SistemaProcesa", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
 }

@@ -329,9 +329,13 @@ registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
 archivo bajo `Domain/Entities/Sad/Sp`. No hay conexiones propias del informe ni
 SQL de negocio duplicado.
 
-Las Queries de los informes consumen directamente ISadContextProcedures desde
-Application: la llamada al SP y la proyección al DTO viven en su handler, sin
-lectores intermedios en Infrastructure.
+Las Queries y Commands de cada módulo en Application consumen directamente
+`ISadContextProcedures`; las consultas LINQ usan los getters `DbSet<T>` de
+`ISadContext`. No hay lectores de reportes ni un gateway de inscripción en
+Infrastructure. `SadContext` conserva los mappings y `BeginTransactionAsync`
+genérico; el Command define el aislamiento y confirma la transacción. Los wrappers
+siguen MappingDB: `SqlQueryAsync<T>` para resultados y `ExecuteSqlRawAsync` para
+operaciones sin filas, conservando parámetros de salida y cancelación.
 
 La interfaz reutiliza los componentes de las referencias: `page-header`,
 `form-floating` con etiqueta flotante sobre `ng-select`
