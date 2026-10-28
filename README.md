@@ -329,6 +329,10 @@ registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
 archivo bajo `Domain/Entities/Sad/Sp`. No hay conexiones propias del informe ni
 SQL de negocio duplicado.
 
+Las Queries de los informes consumen directamente ISadContextProcedures desde
+Application: la llamada al SP y la proyección al DTO viven en su handler, sin
+lectores intermedios en Infrastructure.
+
 La interfaz reutiliza los componentes de las referencias: `page-header`,
 `form-floating` con etiqueta flotante sobre `ng-select`
 (`@ng-select/ng-select` con su tema `default.theme.css`), botones `btn-search`,

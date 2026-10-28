@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Application.Reports.Postgraduate.TeacherSurvey;
+using Application.Common.Interfaces;
+using Domain.Common;
+using Domain.Entities.Sad.Sp;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurvey;
 using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurveyFilters;
 
@@ -16,7 +20,7 @@ public sealed class TeacherSurveyTests
     private const string Route = "/api/reports/postgraduate/teacher-survey";
 
     private static (WebApplicationFactory<Program> Factory, TokenFactory Tokens) Create(
-        ITeacherSurveyReader reader, params string[] roles)
+        ISadContextProcedures reader, params string[] roles)
     {
         var tokens = new TokenFactory();
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
@@ -40,7 +44,7 @@ public sealed class TeacherSurveyTests
     [Fact]
     public async Task Report_requires_authentication()
     {
-        var (factory, _) = Create(new FakeTeacherSurveyReader());
+        var (factory, _) = Create(new FakeTeacherSurveyProcedures());
         using var _factory = factory;
         using var client = factory.CreateClient();
         Assert.Equal(HttpStatusCode.Unauthorized,
@@ -52,7 +56,7 @@ public sealed class TeacherSurveyTests
     [Fact]
     public async Task Entry_permission_alone_cannot_read_report_data()
     {
-        var (factory, tokens) = Create(new FakeTeacherSurveyReader());
+        var (factory, tokens) = Create(new FakeTeacherSurveyProcedures());
         using var _factory = factory;
         using var tokensScope = tokens;
         using var client = Authorized(factory, tokens, "PERMISSION_REPORT_ACCESS");
@@ -64,7 +68,7 @@ public sealed class TeacherSurveyTests
     [Fact]
     public async Task Authorized_request_returns_shared_envelope_rows_and_total()
     {
-        var reader = new FakeTeacherSurveyReader();
+        var reader = new FakeTeacherSurveyProcedures();
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
@@ -98,7 +102,7 @@ public sealed class TeacherSurveyTests
     [InlineData("?periodo=%25&tipoAlumno=MBA&modalidad=PT")]
     public async Task Invalid_filters_are_rejected_instead_of_returning_an_empty_table(string query)
     {
-        var reader = new FakeTeacherSurveyReader();
+        var reader = new FakeTeacherSurveyProcedures();
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
@@ -111,7 +115,7 @@ public sealed class TeacherSurveyTests
     [Fact]
     public async Task Filters_are_returned_for_the_selected_student_type()
     {
-        var reader = new FakeTeacherSurveyReader();
+        var reader = new FakeTeacherSurveyProcedures();
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
@@ -129,7 +133,7 @@ public sealed class TeacherSurveyTests
     [Fact]
     public async Task Storage_failures_are_sanitized()
     {
-        var (factory, tokens) = Create(new FakeTeacherSurveyReader { Failure = new InvalidOperationException("private-sql-detail") });
+        var (factory, tokens) = Create(new FakeTeacherSurveyProcedures { Failure = new InvalidOperationException("private-sql-detail") });
         using var _factory = factory;
         using var tokensScope = tokens;
         using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY");
@@ -140,7 +144,7 @@ public sealed class TeacherSurveyTests
         Assert.Contains("no está disponible", body);
     }
 
-    private sealed class FakeTeacherSurveyReader : ITeacherSurveyReader
+    private sealed class FakeTeacherSurveyProcedures() : SadContextProcedures(new SadContext(new DbContextOptions<SadContext>()))
     {
         public Exception? Failure { get; init; }
         public string? LastPeriod { get; private set; }
@@ -148,29 +152,29 @@ public sealed class TeacherSurveyTests
         public string? LastModality { get; private set; }
         public string? LastFilterType { get; private set; }
 
-        public Task<TeacherSurveyFiltersDTO> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
+        public override Task<List<SpRecPeriodosAcademicosProgramacionResult>?> SpRec_PeriodosAcademicosProgramacionAsync(
+            string? limite, int? modo, string? conTodos, string? tipo,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecPeriodosAcademicosProgramacionResult>?>([new() { Periodo = "2024A", PeriodoLargo = "2024 - Primer Semestre" }]);
+
+        public override Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(string? incluirTodos, string? usuario,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecTiposAlumnoResult>?>([new() { Tipo = "MGP", Nombre = "Magíster en Gestión Pública" }, new() { Tipo = "MBA", Nombre = "MBA" }]);
+
+        public override Task<List<SpRecTiposAlumnosModalidadesResult>?> SpRec_TiposAlumnosModalidadesAsync(string? tipo,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
         {
-            if (Failure is not null) return Task.FromException<TeacherSurveyFiltersDTO>(Failure);
-            LastFilterType = studentType;
-            return Task.FromResult(new TeacherSurveyFiltersDTO(
-                [new("2024A", "2024 - Primer Semestre")],
-                [new("MGP", "Magíster en Gestión Pública"), new("MBA", "MBA")],
-                ["PT", "FT"]));
+            LastFilterType = tipo;
+            return Task.FromResult<List<SpRecTiposAlumnosModalidadesResult>?>([new() { Modalidad = "PT" }, new() { Modalidad = "FT" }]);
         }
 
-        public Task<IReadOnlyList<TeacherSurveyDTO>> GetRowsAsync(
-            string period, string studentType, string modality, CancellationToken cancellationToken)
+        public override Task<List<SpRecEncuestaDocenteXCursoResult>?> SpRec_Encuesta_DocenteXCursoAsync(
+            string? periodo, string? tipo_Alumno, string? modalidad,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
         {
-            if (Failure is not null) return Task.FromException<IReadOnlyList<TeacherSurveyDTO>>(Failure);
-            LastPeriod = period;
-            LastType = studentType;
-            LastModality = modality;
-            return Task.FromResult<IReadOnlyList<TeacherSurveyDTO>>(
-            [
-                new(period, "MBA101/1", "Gestión (MBA101)", "12345678-9", "Profesora Prueba", "Ayudante Uno",
-                    4.5, 4, 4, 4, "comentario A", 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-                    null, "comentario B"),
-            ]);
+            if (Failure is not null) return Task.FromException<List<SpRecEncuestaDocenteXCursoResult>?>(Failure);
+            LastPeriod = periodo; LastType = tipo_Alumno; LastModality = modalidad;
+            return Task.FromResult<List<SpRecEncuestaDocenteXCursoResult>?>([new() { Periodo = periodo!, Curso = "MBA101/1", Catedra = "Gestión (MBA101)", Cod_Profesor = "12345678-9", Nombre_Profesor = "Profesora Prueba", Ayudantes = "Ayudante Uno", A1 = 4.5, A2 = 4, A3 = 4, A4 = 4, AObservaciones = "comentario A", B1 = 4, B2 = 4, B3 = 4, B4 = 4, B5 = 4, B6 = 4, B7 = 4, B8 = 4, B9 = 4, B10 = 4, B11 = 4, B12 = 4, B13 = 4, BNota = null, BObservaciones = "comentario B" }]);
         }
     }
 }

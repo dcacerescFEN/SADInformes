@@ -1,10 +1,9 @@
-using Application.Reports.Postgraduate.CoursesByStudents;
 using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudents;
 using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudentsFilters;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Infrastructure.Data;
-using Infrastructure.Reports.Postgraduate;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -17,17 +16,19 @@ public sealed class CoursesByStudentsReaderTests
     {
         using var context = new SadContext(new DbContextOptionsBuilder<SadContext>().Options);
         var procedures = new CatalogueProcedures(context);
-        ICoursesByStudentsReader reader = new CoursesByStudentsReader(procedures);
-        var initial = await reader.GetFiltersAsync(null, default);
+        var responses = new ApiResponseService();
+        var filters = new GetCoursesByStudentsFiltersHandler(procedures, responses);
+        var report = new GetCoursesByStudentsHandler(procedures, responses);
+        var initial = (await filters.Handle(new GetCoursesByStudentsFilters(null), default)).Data!;
         Assert.Equal("NO", procedures.IncludeAll);
         Assert.Equal(("20040", 0, "NO", "POSTGRADO"), procedures.PeriodArguments);
         Assert.Empty(initial.Modalities);
         Assert.Null(procedures.SelectedType);
         Assert.Equal("MBA", Assert.Single(initial.StudentTypes).Value);
-        var selected = await reader.GetFiltersAsync("MBA", default);
+        var selected = (await filters.Handle(new GetCoursesByStudentsFilters("MBA"), default)).Data!;
         Assert.Equal("MBA", procedures.SelectedType);
         Assert.Equal(new[] { "PT" }, selected.Modalities);
-        var rows = await reader.GetRowsAsync("2023A", "MBA", "PT", default);
+        var rows = (await report.Handle(new GetCoursesByStudents("2023A", "MBA", "PT"), default)).Data!.Rows;
         Assert.Equal(("2023A", "MBA", "PT"), procedures.ReportArguments);
         Assert.Equal(new CoursesByStudentsDTO("2024B", "MBA101/1", "", "A001", "", "2023A"), Assert.Single(rows));
     }
