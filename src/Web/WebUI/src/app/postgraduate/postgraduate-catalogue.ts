@@ -23,7 +23,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('cursos-por-alumnos', 'Cursos vs. alumnos',
     'Relación de alumnos y cursos por semestre de ingreso, programa y modalidad.', 'CursosXAlumnos.aspx', true),
   entry('inscripcion-masiva', 'Inscripción masiva',
-    'Selección de alumnos para inscripción administrativa en cursos.', 'InscripcionMasiva.aspx'),
+    'Selección de alumnos para inscripción administrativa en cursos.', 'InscripcionMasiva.aspx', true),
   entry('alumnos-sin-contestar-encuesta', 'Alumnos sin contestar encuesta docente',
     'Listado de alumnos con evaluación docente pendiente.', 'AlumnosSinContestarEncuesta.aspx'),
   entry('cursos-profesores', 'Cursos profesores Postgrado',

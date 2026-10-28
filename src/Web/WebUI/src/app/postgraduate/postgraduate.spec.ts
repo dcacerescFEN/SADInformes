@@ -89,6 +89,26 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('inscripción masiva abre la pantalla funcional en lugar de la ficha pendiente', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/inscripcion-masiva');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const requests = http.match(request =>
+      request.url.startsWith('/api/reports/postgraduate/mass-enrollment/filters'));
+    expect(requests.map(request => request.request.url))
+      .toEqual(['/api/reports/postgraduate/mass-enrollment/filters']);
+    requests[0].flush({
+      success: true, message: null,
+      data: { periods: [], studentTypes: [], modalities: [], cohorts: [], courses: [] },
+    });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Inscripción masiva');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    expect(root.querySelectorAll('ng-select')).toHaveLength(5);
+    http.verify();
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
