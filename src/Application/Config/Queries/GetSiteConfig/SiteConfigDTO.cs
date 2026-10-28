@@ -1,6 +1,6 @@
-namespace Application.Common.Models;
+namespace Application.Config.Queries.GetSiteConfig;
 
-public record SiteConfigDto
+public sealed record SiteConfigDTO
 {
     public string? StudentsMenuClientId { get; init; }
     public string? TeachersMenuClientId { get; init; }

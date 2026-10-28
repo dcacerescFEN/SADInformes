@@ -77,21 +77,30 @@ tener resultado incierto: actualizar el listado antes de cualquier reintento.
 
 ## Organización del backend
 
-Cada request y handler sigue el patrón de AcademicPeriods de SADAdministracion:
+Cada request y handler vive en su carpeta de acción:
 
-- `Commands/EnrollMassEnrollment/EnrollMassEnrollment.cs`.
+- `Commands/CreateMassEnrollment/CreateMassEnrollment.cs`.
 - `Queries/GetMassEnrollmentFilters/GetMassEnrollmentFilters.cs`.
 - `Queries/GetMassEnrollmentCandidates/GetMassEnrollmentCandidates.cs`.
-- `Common/` contiene contratos y validación compartida, no un servicio de orquestación.
 
-El endpoint despacha requests con `IRequestDispatcher`. La ejecución SQL está
-centralizada en `SadContext` y el archivo principal `SadContextProcedures.cs`:
-el SP de escritura tiene un método tipado con sus 19 parámetros. No hay archivos
-`SadContextProcedures.MassEnrollment.cs` ni `ISadContextProcedures.MassEnrollment.cs`.
-El adaptador de datos solo mapea resultados y delega a esos contextos; no ejecuta
-SQL directamente. La transacción y la comprobación de inscripción permanecen en
-`SadContext`. Las consultas puntuales de curso e inscripción usan LINQ; las llamadas
-a SP siguen en el método tipado de `SadContextProcedures`. Se conservan permisos y auditoría.
+Los DTO son `sealed record` y cada uno tiene su archivo dentro de la carpeta de la
+acción: `MassEnrollmentRequestDTO`, `MassEnrollmentResultDTO`,
+`MassEnrollmentFiltersDTO`, `MassEnrollmentOptionDTO`,
+`MassEnrollmentCandidateDTO` y `MassEnrollmentCandidatesDTO`.
+`Common/` conserva solo contratos compartidos y reglas, no un servicio de orquestación.
+
+El endpoint despacha con `IRequestDispatcher`. Las Queries de Application leen los
+SP mediante `ISadContextProcedures`. `MassEnrollmentLookup` comparte las consultas
+LINQ entre el listado y el Command mediante los getters `DbSet<T>` de `ISadContext`.
+El Command define la transacción Serializable y comprueba la postcondición;
+`SadContext.BeginTransactionAsync` implementa el inicio genérico con `XACT_ABORT ON`.
+La transacción devuelta permite commit, rollback y rollback al liberar sin commit.
+`SadContextProcedures` conserva el formato canónico de MappingDB: 19 parámetros de
+entrada y un parámetro de salida para el valor RETURN del SP de inscripción, ejecutado
+con `ExecuteSqlRawAsync`, no con `SqlQueryAsync<T>`. El número de filas afectadas no
+prueba que haya inscripción. No hay consultas de módulo en `SadContext` ni archivos
+`SadContextProcedures.MassEnrollment.cs`/`ISadContextProcedures.MassEnrollment.cs`.
+Se conservan permisos y auditoría.
 
 ## Persistencia y reglas heredadas
 
@@ -131,8 +140,10 @@ Filas repetidas del mismo alumno se agrupan; si alguna indica SI, no es seleccio
 
 ## Verificación antes de habilitar uso real
 
-Las pruebas HTTP usan un gateway aislado con rollback simulado; las pruebas de
-mapeo usan procedimientos dobles. Las consultas LINQ se ejecutan además sobre un
+Las pruebas HTTP usan un contexto InMemory y procedimientos dobles con rollback
+simulado; ejercitan los handlers y sus consultas reales. Las pruebas del límite
+ADO.NET verifican parámetros, valor de retorno, aislamiento, participación de los
+SP en la transacción y liberación ante fallos sin conectar con una base real. Las consultas LINQ se ejecutan además sobre un
 contexto EF InMemory aislado para verificar las relaciones y el alcance tipo/modalidad. Angular verifica el DOM y la confirmación sin
 enviar inscripciones a SAD. Esto no prueba el motor SQL Server ni las auditorías
 reales de los procedimientos institucionales.

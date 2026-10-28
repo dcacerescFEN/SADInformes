@@ -2,7 +2,7 @@
 
 SADInformes conserva las cuatro capas y el mediador propio de los sistemas de
 referencia. Tras la homogeneización autorizada comparte con NewSAD el registro de
-handlers por scan, el contrato `ApiResponse<SiteConfigDto>`, la lectura directa de
+handlers por scan, el contrato `ApiResponse<SiteConfigDTO>`, la lectura directa de
 la configuración pública y el patrón de política de módulo. Además sirve Angular
 en producción desde WebApi. No se copiaron funcionalidades académicas,
 suplantación, administración de usuarios ni configuración sensible.
@@ -42,7 +42,7 @@ tratarlo como un ensamblado .NET.
 | Config público Keycloak | Lectura directa de `IConfiguration` | Lectura directa de `IConfiguration` | Lectura directa de `IConfiguration` | Lectura directa de `IConfiguration` |
 | Configuración SQL | DbContext scoped directo; sin lector intermedio | DbContext directo | DbContext directo y configuración académica adicional | DbContext directo |
 | Estado del menú | `SiteSettings` singleton por aplicación, publicación única | `ConfigSite` estático | `SiteSettings` estático | `ConfigSite` estático |
-| Respuesta de site | `ApiResponse<SiteConfigDto>` | `ApiResponse<SiteConfigDto>` | `ApiResponse<SiteConfigDto>` con menú y datos académicos | `ApiResponse<SiteConfigDto>` |
+| Respuesta de site | `ApiResponse<SiteConfigDTO>` | `ApiResponse<SiteConfigDTO>` | `ApiResponse<SiteConfigDTO>` con menú y datos académicos | `ApiResponse<SiteConfigDTO>` |
 | Autorización Config/site | `REPORT_ACCESS` del cliente físico exacto | Política SAD_Access | Política SADStudentsEnter | Política ADMINISTRATION_ACCESS |
 | Permisos funcionales | Solo entrada REPORT; por informe pendiente | Proveedor de políticas y permisos SAD | Permisos STUDENT | Permisos ADMINISTRATION |
 | Suplantación | No incorporada | Infraestructura de suplantación | Infraestructura de suplantación | Infraestructura de suplantación |

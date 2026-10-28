@@ -1,7 +1,18 @@
+using System.Data;
+using Application.Common.Interfaces;
+using Domain.Common;
+using Domain.Entities.Sad.Sp;
+using Domain.Entities.Sad.Tables.dbo;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
+using Application.Reports.Postgraduate.MassEnrollment.Commands.CreateMassEnrollment;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +27,7 @@ public sealed class MassEnrollmentTests
     private const string Query = "?studentType=MBA&modality=PT&cohort=2024&period=2024A&course=MBA00101/1/0";
     private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT";
     private const string Manage = "PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT";
-    private static readonly EnrollmentSelection Selection = new("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
+    private static readonly MassEnrollmentSelection Selection = new("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(FakeEnrollmentData data)
     {
@@ -28,7 +39,9 @@ public sealed class MassEnrollmentTests
                 new Dictionary<string, string?> { ["ConnectionStrings:AppConfig"] = "" }));
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton<IMassEnrollmentData>(data);
+                data.Seed();
+                services.AddSingleton<ISadContext>(data);
+                services.AddSingleton<ISadContextProcedures>(new EnrollmentProcedures(data));
                 tokens.Configure(services);
                 tokens.UseClient(services, "SADInformes");
             });
@@ -78,7 +91,7 @@ public sealed class MassEnrollmentTests
         using var anonymous = factory.CreateClient();
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + Query)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + "/filters")).StatusCode);
-        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         foreach (var role in new[] { "PERMISSION_REPORT_ACCESS", "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY" })
         {
             using var denied = Client(factory, tokens, role);
@@ -86,7 +99,7 @@ public sealed class MassEnrollmentTests
             Assert.Equal(HttpStatusCode.Forbidden, (await denied.GetAsync(Route + "/filters")).StatusCode);
         }
         using var reader = Client(factory, tokens, View);
-        Assert.Equal(HttpStatusCode.Forbidden, (await reader.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await reader.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         Assert.Equal(0, data.Writes);
     }
 
@@ -118,7 +131,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + Query);
-        var response = await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, codes.Split(',', StringSplitOptions.RemoveEmptyEntries), confirmed));
+        var response = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, codes.Split(',', StringSplitOptions.RemoveEmptyEntries), confirmed));
         Assert.Equal(expected, response.StatusCode);
         Assert.Equal(before, await client.GetStringAsync(Route + Query));
         Assert.Equal(0, data.Writes);
@@ -131,7 +144,7 @@ public sealed class MassEnrollmentTests
         var (factory, tokens) = Create(data);
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
-        var request = new EnrollmentRequest(Selection, ["A1", "A2"], true);
+        var request = new MassEnrollmentRequestDTO(Selection, ["A1", "A2"], true);
         var response = await client.PostAsJsonAsync(Route, request);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -156,7 +169,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + Query);
-        var response = await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1", "A2"], true));
+        var response = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1", "A2"], true));
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         Assert.DoesNotContain("private-sql-detail", await response.Content.ReadAsStringAsync());
         Assert.Equal(before, await client.GetStringAsync(Route + Query));
@@ -171,7 +184,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         Assert.Equal(HttpStatusCode.Conflict,
-            (await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+            (await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         Assert.Equal(0, data.Writes);
     }
 
@@ -183,7 +196,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, Manage);
         var response = await client.PostAsJsonAsync(
-            Route, new EnrollmentRequest(Selection, ["A1"], true));
+            Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true));
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(0, data.Writes);
     }
@@ -199,7 +212,7 @@ public sealed class MassEnrollmentTests
         using var client = Client(factory, tokens, View, Manage);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(Route + query)).StatusCode);
         Assert.Equal(HttpStatusCode.OK,
-            (await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1"], true))).StatusCode);
+            (await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A1"], true))).StatusCode);
         using var filters = JsonDocument.Parse(await client.GetStringAsync(Route + "/filters" + query));
         Assert.Equal(0, filters.RootElement.GetProperty("data").GetProperty("courses").GetArrayLength());
 
@@ -215,7 +228,7 @@ public sealed class MassEnrollmentTests
         Assert.False(result.GetProperty("rows")[1].GetProperty("enrolled").GetBoolean());
         Assert.Equal(snapshot, await client.GetStringAsync(Route + query));
 
-        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A2"], true));
+        var rejected = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A2"], true));
         Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
         Assert.Contains("El curso ya no tiene vacantes.", await rejected.Content.ReadAsStringAsync());
         Assert.Equal(1, data.Writes);
@@ -232,7 +245,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + query);
-        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1", "A2"], true));
+        var rejected = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A1", "A2"], true));
         Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
         Assert.Equal(0, data.Writes);
         Assert.Equal(before, await client.GetStringAsync(Route + query));
@@ -276,67 +289,121 @@ public sealed class MassEnrollmentTests
         Assert.Equal(0, data.Writes);
     }
 
-    private sealed class FakeEnrollmentData : IMassEnrollmentData
+    private sealed class FakeEnrollmentData() : SadContext(new DbContextOptionsBuilder<SadContext>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options)
     {
-        private HashSet<string> enrolled = ["A3"];
         public string Course { get; init; } = "MBA00101/1/0";
         public bool ExhaustAfterFirst { get; init; }
         public bool NoVacancies { get; init; }
-        public IReadOnlyList<EnrollmentOption> StudentTypes { get; init; } = [new("MBA", "MBA")];
+        public IReadOnlyList<MassEnrollmentOptionDTO> StudentTypes { get; init; } = [new("MBA", "MBA")];
         public IReadOnlyList<string> Modalities { get; init; } = ["PT"];
-        public int CandidateReads { get; private set; }
+        public int CandidateReads { get; set; }
         public bool FailSecond { get; init; }
         public bool SkipSecond { get; init; }
         public string? StaleStudent { get; init; }
-        public int Writes { get; private set; }
-        public string? AuditUser { get; private set; }
-        public string? AuditPc { get; private set; }
-        public string? CatalogueUser { get; private set; }
+        public int Writes { get; set; }
+        public string? AuditUser { get; set; }
+        public string? AuditPc { get; set; }
+        public string? CatalogueUser { get; set; }
 
-        public Task<MassEnrollmentFilters> GetFiltersAsync(EnrollmentSelection selection, string user, CancellationToken ct)
+        public void Seed()
         {
-            CatalogueUser = user;
-            return Task.FromResult(new MassEnrollmentFilters(StudentTypes, Modalities, ["2024"],
-                [new("2024A", "Primer semestre")], NoVacancies || (ExhaustAfterFirst && Writes > 0) ? [] : [new(Course, "Curso Uno")]));
+            var parts = Course.Split('/');
+            Catedras.Add(new() { CodCatedra = parts[0], NomCatedra = "Curso Uno" });
+            Cursos.Add(new() { Periodo = "2024A", CodCatedra = parts[0], CodSeccion = parts[1], DecretoPostgrado = "D1" });
+            PlanesFormacionCatedras.Add(new() { CodCatedra = parts[0], Decreto = "D1", CodPlanFormacion = "GRAL", TipoCatedra = parts[2] });
+            VacantesCursos.Add(new() { Periodo = "2024A", CodCatedra = parts[0], CodSeccion = parts[1], TipoAlumno = "MBA", VacOfrecidas = 1 });
+            MarkEnrolled("A3");
+            if (StaleStudent is not null) MarkEnrolled(StaleStudent);
+            SaveChanges();
         }
 
-        public Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct) =>
-            Task.FromResult<EnrollmentOption?>(selection.Course == Course && selection.StudentType == "MBA"
-                ? new(Course, "Curso Uno") : null);
-
-        public Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct)
+        public void MarkEnrolled(string student)
         {
-            CandidateReads++;
-            return Task.FromResult<IReadOnlyList<MassEnrollmentRow>>(
-                new[] { "A1", "A2", "A3" }.Select((id, i) => new MassEnrollmentRow(id,
-                    i == 0 ? "Alumno Uno" : id, "12345678-9", "2024A", "REGULAR", "", "D1", enrolled.Contains(id))).ToArray());
+            var parts = Course.Split('/');
+            AlumnosCatedras.Add(new() { CodAlumno = student, Periodo = "2024A", CodCatedra = parts[0], CodSeccion = parts[1], Categoria = "CURSADA" });
+            MovimientosInscripcions.Add(new() { CodAlumno = student, Periodo = "2024A", CodCatedra = parts[0], CodSeccion = parts[1], TipoMovimiento = "AGREGA", Estado = "ACEPTADA" });
         }
 
-        public Task<bool> IsEnrolledAsync(string student, EnrollmentSelection selection, CancellationToken ct) =>
-            Task.FromResult(enrolled.Contains(student) || StaleStudent == student);
-
-        public Task AddAsync(string student, EnrollmentSelection selection, string user, string pc, CancellationToken ct)
+        public override Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
         {
-            AuditUser = user; AuditPc = pc;
-            if (student == "A2" && FailSecond) throw new InvalidOperationException("private-sql-detail");
-            if (!(student == "A2" && SkipSecond)) { enrolled.Add(student); Writes++; }
-            return Task.CompletedTask;
+            Assert.Equal(IsolationLevel.Serializable, isolationLevel);
+            return Task.FromResult<IDbContextTransaction>(new Transaction(this));
         }
 
-        public Task<IEnrollmentTransaction> BeginAsync(CancellationToken ct) =>
-            Task.FromResult<IEnrollmentTransaction>(new Transaction(this));
-
-        private sealed class Transaction(FakeEnrollmentData data) : IEnrollmentTransaction
+        private sealed class Transaction(FakeEnrollmentData data) : IDbContextTransaction
         {
-            private readonly HashSet<string> snapshot = new(data.enrolled);
+            private readonly HashSet<string> snapshot = data.AlumnosCatedras.Select(row => row.CodAlumno).ToHashSet();
             private readonly int writes = data.Writes;
             private bool committed;
-            public Task CommitAsync(CancellationToken ct) { committed = true; return Task.CompletedTask; }
-            public ValueTask DisposeAsync()
+            public Guid TransactionId { get; } = Guid.NewGuid();
+            public void Commit() => committed = true;
+            public Task CommitAsync(CancellationToken cancellationToken = default) { Commit(); return Task.CompletedTask; }
+            public void Rollback()
             {
-                if (!committed) { data.enrolled = snapshot; data.Writes = writes; }
-                return ValueTask.CompletedTask;
+                data.AlumnosCatedras.RemoveRange(data.AlumnosCatedras.Where(row => !snapshot.Contains(row.CodAlumno)));
+                data.MovimientosInscripcions.RemoveRange(data.MovimientosInscripcions.Where(row => !snapshot.Contains(row.CodAlumno)));
+                data.SaveChanges();
+                data.Writes = writes;
             }
+            public Task RollbackAsync(CancellationToken cancellationToken = default) { Rollback(); return Task.CompletedTask; }
+            public void Dispose() { if (!committed) Rollback(); }
+            public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
+        }
+    }
+
+    private sealed class EnrollmentProcedures(FakeEnrollmentData data) : SadContextProcedures(data)
+    {
+        public override Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(string? incluirTodos, string? usuario,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+        {
+            data.CatalogueUser = usuario;
+            return Task.FromResult<List<SpRecTiposAlumnoResult>?>(data.StudentTypes.Select(row => new SpRecTiposAlumnoResult { Tipo = row.Value, Nombre = row.Text }).ToList());
+        }
+        public override Task<List<SpRecTiposAlumnosModalidadesResult>?> SpRec_TiposAlumnosModalidadesAsync(string? tipo,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecTiposAlumnosModalidadesResult>?>(data.Modalities.Select(value => new SpRecTiposAlumnosModalidadesResult { Modalidad = value }).ToList());
+        public override Task<List<SpRecEnrollmentYearsResult>?> SpRec_AnosAsync(string? incluirTodos, string? tipoAlumno,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecEnrollmentYearsResult>?>([new() { Año = "2024" }]);
+        public override Task<List<SpRecEnrollmentPeriodsResult>?> SpRec_PeriodosAcademicosFiltradosAsync(string? propiedad, string? filtro, string? orden,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecEnrollmentPeriodsResult>?>([new() { Periodo = "2024A", PeriodoLargo = "Primer semestre" }]);
+        public override Task<List<SpRecEnrollmentCoursesResult>?> SpRec_CursosxPeriodoAsync(string? periodo, string? tipo_Alumno, string? modalidad,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+            Task.FromResult<List<SpRecEnrollmentCoursesResult>?>(data.NoVacancies || (data.ExhaustAfterFirst && data.Writes > 0)
+                ? [] : [new() { Cod_Catedra = data.Course, NombreCatedra = "Curso Uno" }]);
+        public override Task<List<SpRecEnrollmentCandidatesResult>?> SpRec_Alumnos_insc_masiva_catedra_dispAsync(
+            string? tipo_Alumno, string? modalidad, string? añoIngreso, string? cod_Catedra,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+        {
+            data.CandidateReads++;
+            return Task.FromResult<List<SpRecEnrollmentCandidatesResult>?>(new[] { "A1", "A2", "A3" }.Select((id, i) =>
+                new SpRecEnrollmentCandidatesResult { Cod_Alumno = id, Nombre = i == 0 ? "Alumno Uno" : id,
+                    Rut = "12345678-9", Sem_Ingreso = "2024A", Situacion = "REGULAR", Motivo = "", Decreto = "D1", Tipo_Ingreso = "",
+                    curso_catedra = id == "A3" || (id != data.StaleStudent && data.AlumnosCatedras.Any(row => row.CodAlumno == id)) ? "SI" : "NO" }).ToList());
+        }
+        public override async Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(
+            string? cod_Alumno, string? periodo, string? cod_Catedra, string? cod_Seccion, string? accion, string? pc,
+            string? extracurricular, string? mencionCurso, string? tipo_Catedra, int? eliminaAcademico,
+            int? autorizadoPorAlumno, string? nota, string? situacion, string? observacionesNota, int? registroEspecial,
+            string? usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string? sistemaProcesa,
+            OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+        {
+            Assert.Equal(("2024A", data.Course.Split('/')[0], data.Course.Split('/')[1], "AGREGA", "NO", "NA",
+                data.Course.Split('/')[2], 0, 0, "", "PENDIENTE", "", 0, null, null, "SADInformes"),
+                (periodo, cod_Catedra, cod_Seccion, accion, extracurricular, mencionCurso, tipo_Catedra,
+                eliminaAcademico, autorizadoPorAlumno, nota, situacion, observacionesNota, registroEspecial,
+                calificadorElectivo, tipoCatedraSeleccionable, sistemaProcesa));
+            data.AuditUser = usuario; data.AuditPc = pc;
+            if (cod_Alumno == "A2" && data.FailSecond) throw new InvalidOperationException("private-sql-detail");
+            if (!(cod_Alumno == "A2" && data.SkipSecond))
+            {
+                data.MarkEnrolled(cod_Alumno!);
+                await data.SaveChangesAsync(cancellationToken ?? default);
+                data.Writes++;
+            }
+            return -1;
         }
     }
 }

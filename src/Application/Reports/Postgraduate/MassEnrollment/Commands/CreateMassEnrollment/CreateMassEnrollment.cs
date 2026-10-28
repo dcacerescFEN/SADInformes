@@ -1,17 +1,19 @@
+using System.Data;
 using Application.Common.Interfaces;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
 using Application.Common.Mediator;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
 using Domain.Common;
 
-namespace Application.Reports.Postgraduate.MassEnrollment.Commands.EnrollMassEnrollment;
+namespace Application.Reports.Postgraduate.MassEnrollment.Commands.CreateMassEnrollment;
 
-public sealed record EnrollMassEnrollment(EnrollmentRequest Enrollment, string User, string Pc)
-    : IRequest<ApiResponse<EnrollmentResult>>;
+public sealed record CreateMassEnrollment(MassEnrollmentRequestDTO Enrollment, string User, string Pc)
+    : IRequest<ApiResponse<MassEnrollmentResultDTO>>;
 
-public sealed class EnrollMassEnrollmentHandler(IMassEnrollmentData data, IApiResponseService responses)
-    : IRequestHandler<EnrollMassEnrollment, ApiResponse<EnrollmentResult>>
+public sealed class CreateMassEnrollmentHandler(ISadContext context, ISadContextProcedures procedures, IApiResponseService responses)
+    : IRequestHandler<CreateMassEnrollment, ApiResponse<MassEnrollmentResultDTO>>
 {
-    public async Task<ApiResponse<EnrollmentResult>> Handle(EnrollMassEnrollment request, CancellationToken ct)
+    public async Task<ApiResponse<MassEnrollmentResultDTO>> Handle(CreateMassEnrollment request, CancellationToken ct)
     {
         var user = request.User;
         var pc = request.Pc;
@@ -25,26 +27,29 @@ public sealed class EnrollMassEnrollmentHandler(IMassEnrollmentData data, IApiRe
             throw new ArgumentException("Seleccione alumnos válidos sin duplicados.");
 
         // Outer transaction contains the SP's nested transactions and every audit write.
-        await using var transaction = await data.BeginAsync(ct);
-        await MassEnrollmentRules.ValidateAvailableAsync(data, selection, user, ct);
-        var rows = await data.GetCandidatesAsync(selection, ct);
+        await using var transaction = await context.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+        await MassEnrollmentRules.ValidateAvailableAsync(context, procedures, selection, user, ct);
+        var rows = await GetMassEnrollmentCandidatesHandler.ReadAsync(procedures, selection, ct);
         foreach (var student in students.Order(StringComparer.Ordinal))
         {
             var eligible = rows.Where(row => row.StudentCode == student).ToArray();
             if (eligible.Length == 0 || eligible.Any(row => row.Enrolled)
-                || await data.IsEnrolledAsync(student, selection, ct))
+                || await MassEnrollmentLookup.IsEnrolledAsync(context, student, selection, ct))
                 throw new EnrollmentConflictException("La selección cambió o incluye alumnos ya inscritos. Actualice el listado.");
         }
         foreach (var student in students.Order(StringComparer.Ordinal))
         {
             // Each preceding add may have consumed the final vacancy in this transaction.
-            await MassEnrollmentRules.ValidateAvailableAsync(data, selection, user, ct);
-            await data.AddAsync(student, selection, user, pc, ct);
+            await MassEnrollmentRules.ValidateAvailableAsync(context, procedures, selection, user, ct);
+            var parts = selection.Course.Split('/');
+            await procedures.SpCre_MovInscAdministrativo_PostgradoAsync(
+                student, selection.Period, parts[0], parts[1], "AGREGA", pc, "NO", "NA", parts[2],
+                0, 0, "", "PENDIENTE", "", 0, user, null, null, "SADInformes", cancellationToken: ct);
             // The legacy SP has silent no-op paths; an affected-row count is not proof.
-            if (!await data.IsEnrolledAsync(student, selection, ct))
+            if (!await MassEnrollmentLookup.IsEnrolledAsync(context, student, selection, ct))
                 throw new InvalidOperationException("Enrollment postcondition failed.");
         }
         await transaction.CommitAsync(ct);
-        return responses.Success(new EnrollmentResult(students.Length));
+        return responses.Success(new MassEnrollmentResultDTO(students.Length));
     }
 }

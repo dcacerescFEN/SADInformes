@@ -64,7 +64,7 @@ un usuario del realm y que el administrador haya registrado estas URLs.
 `GET /api/config/site` requiere un Bearer de SADInformes y la política
 `REPORT_ACCESS` (permiso de entrada o rol administrativo REPORT) y devuelve únicamente
 `{ success: true, message: null, data: { ... } }`, con los 18 campos de
-`SiteConfigDto` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
+`SiteConfigDTO` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
 ambiente **DEV**; también exige aplicación y ambiente activos.
 
 Configurar `ConnectionStrings__AppConfig` en el entorno del proceso WebApi, fuera
@@ -199,7 +199,7 @@ de SADAlumnos.
 registra automáticamente los handlers de esa capa mediante Scrutor 7.0.0.
 `AddWebApiServices` reúne autenticación y documentación de API.
 
-`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDto>`: success, message y data,
+`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDTO>`: success, message y data,
 sin el anterior objeto raíz menu. Se adaptó el consumidor Angular en conjunto.
 Los fallos de AppConfig siguen respondiendo 503 sin detalles privados.
 `/api/config/keycloak` sigue público, lee IConfiguration directamente como NewSAD
@@ -328,6 +328,14 @@ registrado con `AddDbContext` sobre `ConnectionStrings:Sad`, `ISadContext` y
 `SqlParameter` y `OutputParameter<int>`). Cada resultado de SP vive en su propio
 archivo bajo `Domain/Entities/Sad/Sp`. No hay conexiones propias del informe ni
 SQL de negocio duplicado.
+
+Las Queries y Commands de cada módulo en Application consumen directamente
+`ISadContextProcedures`; las consultas LINQ usan los getters `DbSet<T>` de
+`ISadContext`. No hay lectores de reportes ni un gateway de inscripción en
+Infrastructure. `SadContext` conserva los mappings y `BeginTransactionAsync`
+genérico; el Command define el aislamiento y confirma la transacción. Los wrappers
+siguen MappingDB: `SqlQueryAsync<T>` para resultados y `ExecuteSqlRawAsync` para
+operaciones sin filas, conservando parámetros de salida y cancelación.
 
 La interfaz reutiliza los componentes de las referencias: `page-header`,
 `form-floating` con etiqueta flotante sobre `ng-select`

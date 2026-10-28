@@ -1,14 +1,18 @@
-using Application.Reports.Postgraduate.MassEnrollment.Common;
-using Domain.Entities.Sad.Sp;
+using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
+using Domain.Entities.Sad.Tables.dbo;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Common.Interfaces;
 
-/// <summary>Database operations shared by SAD readers, procedures and administrative enrollment.</summary>
 public partial interface ISadContext
 {
-    Task<SpRecEnrollmentCoursesResult?> FindMassEnrollmentCourseAsync(
-        string period, string course, string section, string courseType, string studentType, CancellationToken ct);
-    Task<int> ExecuteSqlRawAsync(string sql, object[] parameters, CancellationToken ct);
-    Task<IEnrollmentTransaction> BeginEnrollmentTransactionAsync(CancellationToken ct);
-    Task<bool> IsEnrollmentConfirmedAsync(string student, string period, string course, string section, CancellationToken ct);
+    DbSet<Catedra> Catedras { get; }
+    DbSet<Curso> Cursos { get; }
+    DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras { get; }
+    DbSet<VacantesCurso> VacantesCursos { get; }
+    DbSet<AlumnosCatedra> AlumnosCatedras { get; }
+    DbSet<MovimientosInscripcion> MovimientosInscripcions { get; }
+
+    Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);
 }
