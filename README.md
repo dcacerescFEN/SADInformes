@@ -482,6 +482,13 @@ error de API se presente como una página Angular exitosa.
 La publicación no despliega: no configura IIS, certificados, AppConfig ni Keycloak.
 Tampoco crea ni modifica roles. Esos pasos siguen siendo decisiones humanas.
 
+## Cursos vs. alumnos de Postgrado
+
+Informe en `/postgrado/cursos-por-alumnos`, con el formato de Encuesta docente por
+curso y sin opción Todos. Consulta por semestre de ingreso, tipo y modalidad.
+Contrato API, permiso específico, exportación y dependencias en
+[Courses vs. students](docs/courses-by-students.md).
+
 ## Siguientes etapas
 
 1. Validar visualmente el catálogo de Postgrado y elegir la primera funcionalidad.
