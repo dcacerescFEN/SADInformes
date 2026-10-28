@@ -17,6 +17,8 @@ export const routes: Routes = [
       ? import('./postgraduate/mass-enrollment/mass-enrollment').then((module) => module.MassEnrollment)
       : report.slug === 'cursos-por-alumnos'
       ? import('./postgraduate/courses-by-students/courses-by-students').then((module) => module.CoursesByStudents)
+      : report.slug === 'alumnos-sin-contestar-encuesta'
+      ? import('./postgraduate/unanswered-teacher-survey/unanswered-teacher-survey').then((module) => module.UnansweredTeacherSurvey)
       : report.available
         ? import('./postgraduate/teacher-survey/teacher-survey').then((module) => module.TeacherSurvey)
         : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),

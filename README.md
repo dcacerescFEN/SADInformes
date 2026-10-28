@@ -289,6 +289,16 @@ Las rutas desconocidas siguen redirigiendo a Inicio.
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
 las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
 
+### Alumnos sin contestar encuesta docente
+
+La ruta `/postgrado/alumnos-sin-contestar-encuesta` ya abre el informe real:
+período, tipo y modalidad concretos, tabla con las cinco columnas del SAD y CSV
+seguro. Usa el SP existente `spRec_Alumnos_Sin_Evaluacion_Docente`, sin cambios de
+base. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY`;
+el permiso de entrada no concede acceso a los datos. El contrato, la semántica
+exacta de las evaluaciones pendientes y la verificación están en
+[`docs/unanswered-teacher-survey.md`](docs/unanswered-teacher-survey.md).
+
 ### Primer informe funcional: Encuesta docente por curso
 
 La opción **Encuesta docente por curso** ya no muestra la ficha pendiente: abre la

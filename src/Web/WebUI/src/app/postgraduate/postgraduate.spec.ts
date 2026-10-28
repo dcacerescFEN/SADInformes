@@ -109,6 +109,19 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens unanswered teacher survey on its existing catalogue slug', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/alumnos-sin-contestar-encuesta');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const request = http.expectOne('/api/reports/postgraduate/unanswered-teacher-survey/filters');
+    request.flush({ success: true, message: null, data: { periods: [], studentTypes: [], modalities: [] } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim())
+      .toBe('Alumnos sin contestar encuesta docente');
+    expect(harness.routeNativeElement?.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
+    expect(harness.routeNativeElement?.textContent).not.toContain('Pendiente de migración');
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
