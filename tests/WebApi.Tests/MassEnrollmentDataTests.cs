@@ -1,10 +1,13 @@
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Infrastructure.Data;
 using Infrastructure.Reports.Postgraduate;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -12,13 +15,16 @@ namespace WebApi.Tests;
 
 public sealed class MassEnrollmentDataTests
 {
+    private static SadContext Context() => new(new DbContextOptionsBuilder<SadContext>()
+        .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+
     [Fact]
     public async Task Gateway_uses_authenticated_catalogue_scope_and_exact_legacy_candidate_contract()
     {
-        using var context = new SadContext(new DbContextOptionsBuilder<SadContext>().Options);
+        using var context = Context();
         var procedures = new Procedures(context);
         IMassEnrollmentData data = new MassEnrollmentData(context, procedures);
-        var selection = new EnrollmentSelection("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
+        var selection = new MassEnrollmentSelection("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
         var filters = await data.GetFiltersAsync(selection, "usuario-prueba", default);
         Assert.Equal(("NO", "usuario-prueba"), procedures.TypeArguments);
         Assert.Equal("PT", Assert.Single(filters.Modalities));
@@ -27,98 +33,45 @@ public sealed class MassEnrollmentDataTests
         Assert.Equal(("2024A", "MBA", "PT"), procedures.CourseArguments);
         var row = Assert.Single(await data.GetCandidatesAsync(selection, default));
         Assert.Equal(("MBA", "PT", "2024", "MBA00101/1/0"), procedures.CandidateArguments);
-        Assert.Equal(new MassEnrollmentRow("A1", "Alumno", "123", "2024A", "REGULAR", "Motivo", "D1", true, "Ingreso"), row);
+        Assert.Equal(new MassEnrollmentCandidateDTO("A1", "Alumno", "123", "2024A", "REGULAR", "Motivo", "D1", true, "Ingreso"), row);
     }
 
     [Fact]
-    public async Task Gateway_executes_the_typed_procedure_on_SadContext_and_preserves_all_audit_parameters()
+    public async Task Administrative_write_delegates_all_nineteen_arguments_to_the_typed_procedure()
     {
-        using var context = new CapturingContext();
-        var data = new MassEnrollmentData(context, new SadContextProcedures(context));
-        var selection = new EnrollmentSelection("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
-        using var cancellation = new CancellationTokenSource();
-        await using (var transaction = await data.BeginAsync(cancellation.Token))
-        {
-            await data.AddAsync("A1", selection, "usuario-prueba", "127.0.0.1", cancellation.Token);
-            Assert.Contains("EXEC dbo.spCre_MovInscAdministrativo_Postgrado", context.Sql);
-            var parameters = context.Parameters.Cast<SqlParameter>().ToDictionary(item => item.ParameterName);
-            Assert.Equal(19, parameters.Count);
-            foreach (var (name, value, size) in new (string, object, int)[] {
-                ("student", "A1", 20), ("period", "2024A", 20), ("course", "MBA00101", 30), ("section", "1", 2),
-                ("action", "AGREGA", 10), ("pc", "127.0.0.1", 100), ("extra", "NO", 2), ("mention", "NA", 2),
-                ("type", "0", 2), ("grade", "", 5), ("situation", "PENDIENTE", 10), ("notes", "", 1000),
-                ("user", "usuario-prueba", 30), ("elective", DBNull.Value, 10),
-                ("selectableType", DBNull.Value, 1), ("system", "SADInformes", 15) })
-            {
-                Assert.Equal(value, parameters["@" + name].Value);
-                Assert.Equal(size, parameters["@" + name].Size);
-                Assert.Equal(SqlDbType.VarChar, parameters["@" + name].SqlDbType);
-            }
-            foreach (var name in new[] { "removeAcademic", "authorized", "special" })
-            {
-                Assert.Equal(0, parameters["@" + name].Value);
-                Assert.Equal(SqlDbType.Int, parameters["@" + name].SqlDbType);
-            }
-            Assert.Equal(cancellation.Token, context.Token);
-            Assert.True(await data.IsEnrolledAsync("A1", selection, cancellation.Token));
-            Assert.Equal(("A1", "2024A", "MBA00101", "1"), context.StateArguments);
-            await transaction.CommitAsync(cancellation.Token);
-            Assert.True(context.Batch.Committed);
-        }
-        Assert.True(context.Batch.Disposed);
+        using var context = Context();
+        var procedures = new Procedures(context);
+        IMassEnrollmentData data = new MassEnrollmentData(context, procedures);
+        await data.AddAsync("A1", new MassEnrollmentSelection("MBA", "PT", "2024", "2024A", "MBA00101/1/0"),
+            "usuario-prueba", "127.0.0.1", default);
+        Assert.Equal(("A1", "2024A", "MBA00101", "1", "AGREGA", "127.0.0.1", "NO", "NA", "0",
+            0, 0, "", "PENDIENTE", "", 0, "usuario-prueba", null, null, "SADInformes", default), procedures.WriteArguments);
     }
 
     [Fact]
-    public async Task Exhausted_course_lookup_uses_authoritative_context_with_exact_period_section_and_type()
+    public void Procedure_parameter_contract_preserves_exact_names_types_sizes_and_defaults()
     {
-        using var context = new CapturingContext
+        var parameters = SadContextProcedures.BuildMovInscAdministrativoParameters(
+                "A1", "2024A", "MBA00101", "1", "AGREGA", "127.0.0.1", "NO", "NA", "0", 0, 0, "",
+                "PENDIENTE", "", 0, "usuario-prueba", null, null, "SADInformes")
+            .ToDictionary(item => item.ParameterName);
+        Assert.Equal(19, parameters.Count);
+        foreach (var (name, value, size) in new (string, object, int)[] {
+            ("student", "A1", 20), ("period", "2024A", 20), ("course", "MBA00101", 30), ("section", "1", 2),
+            ("action", "AGREGA", 10), ("pc", "127.0.0.1", 100), ("extra", "NO", 2), ("mention", "NA", 2),
+            ("type", "0", 2), ("grade", "", 5), ("situation", "PENDIENTE", 10), ("notes", "", 1000),
+            ("user", "usuario-prueba", 30), ("elective", DBNull.Value, 10),
+            ("selectableType", DBNull.Value, 1), ("system", "SADInformes", 15) })
         {
-            OfferedCourse = new() { Cod_Catedra = "ENECO660/02/0", NombreCatedra = "ENECO660/02 Economía" },
-        };
-        var data = new MassEnrollmentData(context, new SadContextProcedures(context));
-        var selection = new EnrollmentSelection("MBA", "PT", "2024", "2024A", "ENECO660/02/0");
-        Assert.Equal(new EnrollmentOption("ENECO660/02/0", "ENECO660/02 Economía"),
-            await data.FindCourseAsync(selection, default));
-        Assert.Equal(("2024A", "ENECO660", "02", "0", "MBA"), context.CourseArguments);
-        context.OfferedCourse = null;
-        Assert.Null(await data.FindCourseAsync(selection, default));
-    }
-
-    private sealed class CapturingContext() : SadContext(new DbContextOptionsBuilder<SadContext>().Options)
-    {
-        public string Sql = "";
-        public object[] Parameters = [];
-        public CancellationToken Token;
-        public (string, string, string, string) StateArguments;
-        public readonly FakeTransaction Batch = new();
-        public SpRecEnrollmentCoursesResult? OfferedCourse;
-        public (string, string, string, string, string) CourseArguments;
-        public override Task<SpRecEnrollmentCoursesResult?> FindMassEnrollmentCourseAsync(
-            string period, string course, string section, string courseType, string studentType, CancellationToken ct)
-        {
-            CourseArguments = (period, course, section, courseType, studentType);
-            return Task.FromResult(OfferedCourse);
+            Assert.Equal(value, parameters["@" + name].Value);
+            Assert.Equal(size, parameters["@" + name].Size);
+            Assert.Equal(SqlDbType.VarChar, parameters["@" + name].SqlDbType);
         }
-        public override Task<int> ExecuteSqlRawAsync(string sql, object[] parameters, CancellationToken ct)
+        foreach (var name in new[] { "removeAcademic", "authorized", "special" })
         {
-            Sql = sql; Parameters = parameters; Token = ct;
-            return Task.FromResult(-1); // SQL row count is deliberately not enrollment evidence.
+            Assert.Equal(0, parameters["@" + name].Value);
+            Assert.Equal(SqlDbType.Int, parameters["@" + name].SqlDbType);
         }
-        public override Task<IEnrollmentTransaction> BeginEnrollmentTransactionAsync(CancellationToken ct) =>
-            Task.FromResult<IEnrollmentTransaction>(Batch);
-        public override Task<bool> IsEnrollmentConfirmedAsync(string student, string period, string course, string section, CancellationToken ct)
-        {
-            StateArguments = (student, period, course, section);
-            return Task.FromResult(true);
-        }
-    }
-
-    private sealed class FakeTransaction : IEnrollmentTransaction
-    {
-        public bool Committed;
-        public bool Disposed;
-        public Task CommitAsync(CancellationToken ct) { Committed = true; return Task.CompletedTask; }
-        public ValueTask DisposeAsync() { Disposed = true; return ValueTask.CompletedTask; }
     }
 
     private sealed class Procedures(SadContext context) : SadContextProcedures(context)
@@ -126,6 +79,8 @@ public sealed class MassEnrollmentDataTests
         public (string?, string?) TypeArguments;
         public (string, string, string) CourseArguments;
         public (string, string, string, string) CandidateArguments;
+        public (string, string, string, string, string, string, string, string, string, int, int, string,
+            string, string, int, string, string?, string?, string, CancellationToken) WriteArguments;
         public override Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(string? incluirTodos, string? usuario,
             OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
         {
@@ -149,6 +104,19 @@ public sealed class MassEnrollmentDataTests
         {
             CandidateArguments = (type, modality, cohort, course);
             return Task.FromResult(new List<SpRecEnrollmentCandidatesResult> { Candidate("NO"), Candidate("SI") });
+        }
+        public override Task<int> SpCre_MovInscAdministrativo_PostgradoAsync(
+            string codAlumno, string periodo, string codCatedra, string codSeccion, string accion, string pc,
+            string extracurricular, string mencionCurso, string tipoCatedra, int eliminaAcademico,
+            int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
+            string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa,
+            CancellationToken ct)
+        {
+            WriteArguments = (codAlumno, periodo, codCatedra, codSeccion, accion, pc, extracurricular,
+                mencionCurso, tipoCatedra, eliminaAcademico, autorizadoPorAlumno, nota, situacion,
+                observacionesNota, registroEspecial, usuario, calificadorElectivo, tipoCatedraSeleccionable,
+                sistemaProcesa, ct);
+            return Task.FromResult(-1);
         }
         private static SpRecEnrollmentCandidatesResult Candidate(string state) => new()
         {

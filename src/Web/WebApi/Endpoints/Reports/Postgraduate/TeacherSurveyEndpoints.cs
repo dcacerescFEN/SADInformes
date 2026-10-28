@@ -1,5 +1,6 @@
 using Application.Common.Mediator;
-using Application.Reports.Postgraduate.TeacherSurvey.Queries;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurvey;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurveyFilters;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
 using WebApi.Extension;

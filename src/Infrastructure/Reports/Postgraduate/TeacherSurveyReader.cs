@@ -1,5 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.TeacherSurvey;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurvey;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurveyFilters;
 
 namespace Infrastructure.Reports.Postgraduate;
 
@@ -9,7 +11,7 @@ namespace Infrastructure.Reports.Postgraduate;
 /// </summary>
 public sealed class TeacherSurveyReader(ISadContextProcedures procedures) : ITeacherSurveyReader
 {
-    public async Task<TeacherSurveyFilters> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
+    public async Task<TeacherSurveyFiltersDTO> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
     {
         var periods = await procedures.SpRec_PeriodosAcademicosProgramacionAsync(
             "20040", 0, "NO", "POSTGRADO", cancellationToken: cancellationToken) ?? [];
@@ -18,23 +20,23 @@ public sealed class TeacherSurveyReader(ISadContextProcedures procedures) : ITea
         var modalities = await procedures.SpRec_TiposAlumnosModalidadesAsync(
             string.IsNullOrWhiteSpace(studentType) ? "%" : studentType, cancellationToken: cancellationToken) ?? [];
 
-        return new TeacherSurveyFilters(
+        return new TeacherSurveyFiltersDTO(
             periods.Where(row => !string.IsNullOrWhiteSpace(row.Periodo))
-                .Select(row => new TeacherSurveyOption(row.Periodo, row.PeriodoLargo?.Trim() ?? row.Periodo))
+                .Select(row => new TeacherSurveyOptionDTO(row.Periodo, row.PeriodoLargo?.Trim() ?? row.Periodo))
                 .ToArray(),
             types.Where(row => !string.IsNullOrWhiteSpace(row.Tipo))
-                .Select(row => new TeacherSurveyOption(row.Tipo, row.Nombre?.Trim() ?? row.Tipo))
+                .Select(row => new TeacherSurveyOptionDTO(row.Tipo, row.Nombre?.Trim() ?? row.Tipo))
                 .ToArray(),
             modalities.Select(row => row.Modalidad?.Trim()).Where(value => !string.IsNullOrEmpty(value))
                 .Distinct(StringComparer.OrdinalIgnoreCase).Cast<string>().ToArray());
     }
 
-    public async Task<IReadOnlyList<TeacherSurveyRow>> GetRowsAsync(
+    public async Task<IReadOnlyList<TeacherSurveyDTO>> GetRowsAsync(
         string period, string studentType, string modality, CancellationToken cancellationToken)
     {
         var rows = await procedures.SpRec_Encuesta_DocenteXCursoAsync(
             period, studentType, modality, cancellationToken: cancellationToken) ?? [];
-        return rows.Select(row => new TeacherSurveyRow(
+        return rows.Select(row => new TeacherSurveyDTO(
             Period: row.Periodo?.Trim() ?? string.Empty,
             Course: row.Curso?.Trim() ?? string.Empty,
             Name: row.Catedra?.Trim() ?? string.Empty,

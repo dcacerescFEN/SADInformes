@@ -64,7 +64,7 @@ un usuario del realm y que el administrador haya registrado estas URLs.
 `GET /api/config/site` requiere un Bearer de SADInformes y la política
 `REPORT_ACCESS` (permiso de entrada o rol administrativo REPORT) y devuelve únicamente
 `{ success: true, message: null, data: { ... } }`, con los 18 campos de
-`SiteConfigDto` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
+`SiteConfigDTO` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
 ambiente **DEV**; también exige aplicación y ambiente activos.
 
 Configurar `ConnectionStrings__AppConfig` en el entorno del proceso WebApi, fuera
@@ -199,7 +199,7 @@ de SADAlumnos.
 registra automáticamente los handlers de esa capa mediante Scrutor 7.0.0.
 `AddWebApiServices` reúne autenticación y documentación de API.
 
-`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDto>`: success, message y data,
+`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDTO>`: success, message y data,
 sin el anterior objeto raíz menu. Se adaptó el consumidor Angular en conjunto.
 Los fallos de AppConfig siguen respondiendo 503 sin detalles privados.
 `/api/config/keycloak` sigue público, lee IConfiguration directamente como NewSAD

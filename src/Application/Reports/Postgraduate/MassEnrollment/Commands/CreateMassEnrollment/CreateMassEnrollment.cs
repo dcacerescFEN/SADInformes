@@ -3,15 +3,15 @@ using Application.Common.Mediator;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
 using Domain.Common;
 
-namespace Application.Reports.Postgraduate.MassEnrollment.Commands.EnrollMassEnrollment;
+namespace Application.Reports.Postgraduate.MassEnrollment.Commands.CreateMassEnrollment;
 
-public sealed record EnrollMassEnrollment(EnrollmentRequest Enrollment, string User, string Pc)
-    : IRequest<ApiResponse<EnrollmentResult>>;
+public sealed record CreateMassEnrollment(MassEnrollmentRequestDTO Enrollment, string User, string Pc)
+    : IRequest<ApiResponse<MassEnrollmentResultDTO>>;
 
-public sealed class EnrollMassEnrollmentHandler(IMassEnrollmentData data, IApiResponseService responses)
-    : IRequestHandler<EnrollMassEnrollment, ApiResponse<EnrollmentResult>>
+public sealed class CreateMassEnrollmentHandler(IMassEnrollmentData data, IApiResponseService responses)
+    : IRequestHandler<CreateMassEnrollment, ApiResponse<MassEnrollmentResultDTO>>
 {
-    public async Task<ApiResponse<EnrollmentResult>> Handle(EnrollMassEnrollment request, CancellationToken ct)
+    public async Task<ApiResponse<MassEnrollmentResultDTO>> Handle(CreateMassEnrollment request, CancellationToken ct)
     {
         var user = request.User;
         var pc = request.Pc;
@@ -45,6 +45,6 @@ public sealed class EnrollMassEnrollmentHandler(IMassEnrollmentData data, IApiRe
                 throw new InvalidOperationException("Enrollment postcondition failed.");
         }
         await transaction.CommitAsync(ct);
-        return responses.Success(new EnrollmentResult(students.Length));
+        return responses.Success(new MassEnrollmentResultDTO(students.Length));
     }
 }

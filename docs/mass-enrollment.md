@@ -77,21 +77,25 @@ tener resultado incierto: actualizar el listado antes de cualquier reintento.
 
 ## Organización del backend
 
-Cada request y handler sigue el patrón de AcademicPeriods de SADAdministracion:
+Cada request y handler vive en su carpeta de acción:
 
-- `Commands/EnrollMassEnrollment/EnrollMassEnrollment.cs`.
+- `Commands/CreateMassEnrollment/CreateMassEnrollment.cs`.
 - `Queries/GetMassEnrollmentFilters/GetMassEnrollmentFilters.cs`.
 - `Queries/GetMassEnrollmentCandidates/GetMassEnrollmentCandidates.cs`.
-- `Common/` contiene contratos y validación compartida, no un servicio de orquestación.
 
-El endpoint despacha requests con `IRequestDispatcher`. La ejecución SQL está
-centralizada en `SadContext` y el archivo principal `SadContextProcedures.cs`:
-el SP de escritura tiene un método tipado con sus 19 parámetros. No hay archivos
-`SadContextProcedures.MassEnrollment.cs` ni `ISadContextProcedures.MassEnrollment.cs`.
-El adaptador de datos solo mapea resultados y delega a esos contextos; no ejecuta
-SQL directamente. La transacción y la comprobación de inscripción permanecen en
-`SadContext`. Las consultas puntuales de curso e inscripción usan LINQ; las llamadas
-a SP siguen en el método tipado de `SadContextProcedures`. Se conservan permisos y auditoría.
+Los DTO son `sealed record` y cada uno tiene su archivo dentro de la carpeta de la
+acción: `MassEnrollmentRequestDTO`, `MassEnrollmentResultDTO`,
+`MassEnrollmentFiltersDTO`, `MassEnrollmentOptionDTO`,
+`MassEnrollmentCandidateDTO` y `MassEnrollmentCandidatesDTO`.
+`Common/` conserva solo contratos compartidos y reglas, no un servicio de orquestación.
+
+El endpoint despacha con `IRequestDispatcher`. `SadContext` es únicamente la
+definición de la base: `DbSet` y mapeos de tabla. `MassEnrollmentData` ejecuta las
+consultas LINQ, crea la transacción Serializable y comprueba la postcondición;
+`SadContextProcedures` conserva la ejecución tipada de los SP, incluido el contrato
+de 19 parámetros. No hay helpers de consulta en `SadContext` ni archivos
+`SadContextProcedures.MassEnrollment.cs`/`ISadContextProcedures.MassEnrollment.cs`.
+Se conservan permisos y auditoría.
 
 ## Persistencia y reglas heredadas
 

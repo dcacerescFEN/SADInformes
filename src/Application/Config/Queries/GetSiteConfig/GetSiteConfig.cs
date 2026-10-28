@@ -1,20 +1,19 @@
 using Application.Common.Interfaces;
 using Application.Common.Mediator;
-using Application.Common.Models;
 using Application.Navigation;
 using Domain.Common;
 
 namespace Application.Config.Queries.GetSiteConfig;
 
-public sealed record GetSiteConfig : IRequest<ApiResponse<SiteConfigDto>>;
+public sealed record GetSiteConfig : IRequest<ApiResponse<SiteConfigDTO>>;
 
 public sealed class GetSiteConfigHandler(ISiteMenuProvider provider, IApiResponseService responses)
-    : IRequestHandler<GetSiteConfig, ApiResponse<SiteConfigDto>>
+    : IRequestHandler<GetSiteConfig, ApiResponse<SiteConfigDTO>>
 {
-    public async Task<ApiResponse<SiteConfigDto>> Handle(GetSiteConfig request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<SiteConfigDTO>> Handle(GetSiteConfig request, CancellationToken cancellationToken)
     {
         var menu = await provider.GetMenuAsync(cancellationToken);
-        return responses.Success(new SiteConfigDto
+        return responses.Success(new SiteConfigDTO
         {
             StudentsMenuUrl = menu["studentsMenuUrl"]!,
             TeachersMenuUrl = menu["teachersMenuUrl"]!,

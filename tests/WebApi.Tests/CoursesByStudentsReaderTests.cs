@@ -1,4 +1,6 @@
 using Application.Reports.Postgraduate.CoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudentsFilters;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Infrastructure.Data;
@@ -27,7 +29,7 @@ public sealed class CoursesByStudentsReaderTests
         Assert.Equal(new[] { "PT" }, selected.Modalities);
         var rows = await reader.GetRowsAsync("2023A", "MBA", "PT", default);
         Assert.Equal(("2023A", "MBA", "PT"), procedures.ReportArguments);
-        Assert.Equal(new CoursesByStudentsRow("2024B", "MBA101/1", "", "A001", "", "2023A"), Assert.Single(rows));
+        Assert.Equal(new CoursesByStudentsDTO("2024B", "MBA101/1", "", "A001", "", "2023A"), Assert.Single(rows));
     }
 
     private sealed class CatalogueProcedures(SadContext context) : SadContextProcedures(context)

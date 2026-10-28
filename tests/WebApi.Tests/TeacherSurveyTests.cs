@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Application.Reports.Postgraduate.TeacherSurvey;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurvey;
+using Application.Reports.Postgraduate.TeacherSurvey.Queries.GetTeacherSurveyFilters;
 
 namespace WebApi.Tests;
 
@@ -146,24 +148,24 @@ public sealed class TeacherSurveyTests
         public string? LastModality { get; private set; }
         public string? LastFilterType { get; private set; }
 
-        public Task<TeacherSurveyFilters> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
+        public Task<TeacherSurveyFiltersDTO> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
         {
-            if (Failure is not null) return Task.FromException<TeacherSurveyFilters>(Failure);
+            if (Failure is not null) return Task.FromException<TeacherSurveyFiltersDTO>(Failure);
             LastFilterType = studentType;
-            return Task.FromResult(new TeacherSurveyFilters(
+            return Task.FromResult(new TeacherSurveyFiltersDTO(
                 [new("2024A", "2024 - Primer Semestre")],
                 [new("MGP", "Magíster en Gestión Pública"), new("MBA", "MBA")],
                 ["PT", "FT"]));
         }
 
-        public Task<IReadOnlyList<TeacherSurveyRow>> GetRowsAsync(
+        public Task<IReadOnlyList<TeacherSurveyDTO>> GetRowsAsync(
             string period, string studentType, string modality, CancellationToken cancellationToken)
         {
-            if (Failure is not null) return Task.FromException<IReadOnlyList<TeacherSurveyRow>>(Failure);
+            if (Failure is not null) return Task.FromException<IReadOnlyList<TeacherSurveyDTO>>(Failure);
             LastPeriod = period;
             LastType = studentType;
             LastModality = modality;
-            return Task.FromResult<IReadOnlyList<TeacherSurveyRow>>(
+            return Task.FromResult<IReadOnlyList<TeacherSurveyDTO>>(
             [
                 new(period, "MBA101/1", "Gestión (MBA101)", "12345678-9", "Profesora Prueba", "Ayudante Uno",
                     4.5, 4, 4, 4, "comentario A", 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,

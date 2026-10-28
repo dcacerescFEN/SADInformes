@@ -1,6 +1,6 @@
 using Application.Common.Mediator;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
-using Application.Reports.Postgraduate.MassEnrollment.Commands.EnrollMassEnrollment;
+using Application.Reports.Postgraduate.MassEnrollment.Commands.CreateMassEnrollment;
 using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
 using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
 using Domain.Constants;
@@ -36,11 +36,11 @@ public sealed class MassEnrollmentEndpoints : IEndpoint
             Selection(studentType, modality, cohort, period, course), User(context)), ct)));
 
     private static Task<IResult> Enroll(HttpContext context, IRequestDispatcher sender,
-        EnrollmentRequest request, CancellationToken ct) =>
-        Execute(async () => Results.Ok(await sender.Send(new EnrollMassEnrollment(request,
+        MassEnrollmentRequestDTO request, CancellationToken ct) =>
+        Execute(async () => Results.Ok(await sender.Send(new CreateMassEnrollment(request,
             User(context), context.Connection.RemoteIpAddress?.ToString() ?? "desconocida"), ct)));
 
-    private static EnrollmentSelection Selection(string? type, string? modality, string? cohort, string? period, string? course) =>
+    private static MassEnrollmentSelection Selection(string? type, string? modality, string? cohort, string? period, string? course) =>
         new(type ?? "", modality ?? "", cohort ?? "", period ?? "", course ?? "");
 
     private static string User(HttpContext context) => context.User.Identity?.Name ?? "";

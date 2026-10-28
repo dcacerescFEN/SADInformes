@@ -1,9 +1,12 @@
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
+
 namespace Application.Reports.Postgraduate.MassEnrollment.Common;
 
 internal static class MassEnrollmentRules
 {
-    internal static async Task<bool> ValidateAvailableAsync(IMassEnrollmentData data, EnrollmentSelection selection, string user,
-        CancellationToken ct, bool requireVacancies = true)
+    internal static async Task<bool> ValidateAvailableAsync(IMassEnrollmentData data, MassEnrollmentSelection selection,
+        string user, CancellationToken ct, bool requireVacancies = true)
     {
         ValidateIdentity(user);
         Validate(selection, required: true);
@@ -21,7 +24,7 @@ internal static class MassEnrollmentRules
         if (course is null || course.Value != selection.Course)
             throw new ArgumentException("Los filtros seleccionados no están disponibles.");
         if (requireVacancies)
-            throw new EnrollmentConflictException(MassEnrollmentReport.NoVacanciesMessage);
+            throw new EnrollmentConflictException(MassEnrollmentCandidatesDTO.NoVacanciesMessage);
         return false;
     }
 
@@ -32,7 +35,7 @@ internal static class MassEnrollmentRules
             throw new ArgumentException("No se pudo identificar al usuario para la inscripción.");
     }
 
-    internal static void Validate(EnrollmentSelection selection, bool required)
+    internal static void Validate(MassEnrollmentSelection selection, bool required)
     {
         foreach (var (value, limit) in new[] {
             (selection.StudentType, 30), (selection.Modality, 30), (selection.Cohort, 4),

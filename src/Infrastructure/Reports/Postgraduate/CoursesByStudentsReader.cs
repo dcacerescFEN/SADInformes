@@ -1,5 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.CoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudentsFilters;
 
 namespace Infrastructure.Reports.Postgraduate;
 
@@ -9,7 +11,7 @@ namespace Infrastructure.Reports.Postgraduate;
 /// </summary>
 public sealed class CoursesByStudentsReader(ISadContextProcedures procedures) : ICoursesByStudentsReader
 {
-    public async Task<CoursesByStudentsFilters> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
+    public async Task<CoursesByStudentsFiltersDTO> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
     {
         var periods = await procedures.SpRec_PeriodosAcademicosProgramacionAsync(
             "20040", 0, "NO", "POSTGRADO", cancellationToken: cancellationToken) ?? [];
@@ -19,23 +21,23 @@ public sealed class CoursesByStudentsReader(ISadContextProcedures procedures) : 
             ? []
             : await procedures.SpRec_TiposAlumnosModalidadesAsync(studentType, cancellationToken: cancellationToken) ?? [];
 
-        return new CoursesByStudentsFilters(
+        return new CoursesByStudentsFiltersDTO(
             periods.Where(row => !string.IsNullOrWhiteSpace(row.Periodo))
-                .Select(row => new CoursesByStudentsOption(row.Periodo, row.PeriodoLargo?.Trim() ?? row.Periodo))
+                .Select(row => new CoursesByStudentsOptionDTO(row.Periodo, row.PeriodoLargo?.Trim() ?? row.Periodo))
                 .ToArray(),
             types.Where(row => !string.IsNullOrWhiteSpace(row.Tipo))
-                .Select(row => new CoursesByStudentsOption(row.Tipo, row.Nombre?.Trim() ?? row.Tipo))
+                .Select(row => new CoursesByStudentsOptionDTO(row.Tipo, row.Nombre?.Trim() ?? row.Tipo))
                 .ToArray(),
             modalities.Select(row => row.Modalidad?.Trim()).Where(value => !string.IsNullOrEmpty(value))
                 .Distinct(StringComparer.OrdinalIgnoreCase).Cast<string>().ToArray());
     }
 
-    public async Task<IReadOnlyList<CoursesByStudentsRow>> GetRowsAsync(
+    public async Task<IReadOnlyList<CoursesByStudentsDTO>> GetRowsAsync(
         string period, string studentType, string modality, CancellationToken cancellationToken)
     {
         var rows = await procedures.SpRec_AlumnosXPeriodoXTipo_AlumnoXModalidadAsync(
             period, studentType, modality, cancellationToken: cancellationToken) ?? [];
-        return rows.Select(row => new CoursesByStudentsRow(
+        return rows.Select(row => new CoursesByStudentsDTO(
             Period: row.Periodo?.Trim() ?? string.Empty,
             Course: row.Curso?.Trim() ?? string.Empty,
             Name: row.Catedra?.Trim() ?? string.Empty,

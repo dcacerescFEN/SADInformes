@@ -21,7 +21,6 @@ using Configuration = Domain.Entities.AppConfig.Configuration;
 using WebApi.Authentication;
 using Application.Common.Mediator;
 using Application.Config.Queries.GetSiteConfig;
-using Application.Common.Models;
 using Domain.Common;
 
 namespace WebApi.Tests;
@@ -102,10 +101,10 @@ public sealed class AuthenticationTests : IDisposable
         public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             Requests.Add(request.GetType());
-            object response = new ApiResponse<SiteConfigDto>
+            object response = new ApiResponse<SiteConfigDTO>
             {
                 Success = true,
-                Data = new SiteConfigDto { ReportsMenuClientId = "from-dispatcher" },
+                Data = new SiteConfigDTO { ReportsMenuClientId = "from-dispatcher" },
             };
             return Task.FromResult((TResponse)response);
         }

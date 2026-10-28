@@ -2,6 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Reports.Postgraduate.MassEnrollment.Common;
+using Application.Reports.Postgraduate.MassEnrollment.Commands.CreateMassEnrollment;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentCandidates;
+using Application.Reports.Postgraduate.MassEnrollment.Queries.GetMassEnrollmentFilters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +19,7 @@ public sealed class MassEnrollmentTests
     private const string Query = "?studentType=MBA&modality=PT&cohort=2024&period=2024A&course=MBA00101/1/0";
     private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT";
     private const string Manage = "PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT";
-    private static readonly EnrollmentSelection Selection = new("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
+    private static readonly MassEnrollmentSelection Selection = new("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(FakeEnrollmentData data)
     {
@@ -78,7 +81,7 @@ public sealed class MassEnrollmentTests
         using var anonymous = factory.CreateClient();
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + Query)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + "/filters")).StatusCode);
-        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         foreach (var role in new[] { "PERMISSION_REPORT_ACCESS", "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY" })
         {
             using var denied = Client(factory, tokens, role);
@@ -86,7 +89,7 @@ public sealed class MassEnrollmentTests
             Assert.Equal(HttpStatusCode.Forbidden, (await denied.GetAsync(Route + "/filters")).StatusCode);
         }
         using var reader = Client(factory, tokens, View);
-        Assert.Equal(HttpStatusCode.Forbidden, (await reader.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await reader.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         Assert.Equal(0, data.Writes);
     }
 
@@ -118,7 +121,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + Query);
-        var response = await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, codes.Split(',', StringSplitOptions.RemoveEmptyEntries), confirmed));
+        var response = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, codes.Split(',', StringSplitOptions.RemoveEmptyEntries), confirmed));
         Assert.Equal(expected, response.StatusCode);
         Assert.Equal(before, await client.GetStringAsync(Route + Query));
         Assert.Equal(0, data.Writes);
@@ -131,7 +134,7 @@ public sealed class MassEnrollmentTests
         var (factory, tokens) = Create(data);
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
-        var request = new EnrollmentRequest(Selection, ["A1", "A2"], true);
+        var request = new MassEnrollmentRequestDTO(Selection, ["A1", "A2"], true);
         var response = await client.PostAsJsonAsync(Route, request);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -156,7 +159,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + Query);
-        var response = await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1", "A2"], true));
+        var response = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1", "A2"], true));
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         Assert.DoesNotContain("private-sql-detail", await response.Content.ReadAsStringAsync());
         Assert.Equal(before, await client.GetStringAsync(Route + Query));
@@ -171,7 +174,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         Assert.Equal(HttpStatusCode.Conflict,
-            (await client.PostAsJsonAsync(Route, new EnrollmentRequest(Selection, ["A1"], true))).StatusCode);
+            (await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         Assert.Equal(0, data.Writes);
     }
 
@@ -183,7 +186,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, Manage);
         var response = await client.PostAsJsonAsync(
-            Route, new EnrollmentRequest(Selection, ["A1"], true));
+            Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true));
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(0, data.Writes);
     }
@@ -199,7 +202,7 @@ public sealed class MassEnrollmentTests
         using var client = Client(factory, tokens, View, Manage);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(Route + query)).StatusCode);
         Assert.Equal(HttpStatusCode.OK,
-            (await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1"], true))).StatusCode);
+            (await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A1"], true))).StatusCode);
         using var filters = JsonDocument.Parse(await client.GetStringAsync(Route + "/filters" + query));
         Assert.Equal(0, filters.RootElement.GetProperty("data").GetProperty("courses").GetArrayLength());
 
@@ -215,7 +218,7 @@ public sealed class MassEnrollmentTests
         Assert.False(result.GetProperty("rows")[1].GetProperty("enrolled").GetBoolean());
         Assert.Equal(snapshot, await client.GetStringAsync(Route + query));
 
-        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A2"], true));
+        var rejected = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A2"], true));
         Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
         Assert.Contains("El curso ya no tiene vacantes.", await rejected.Content.ReadAsStringAsync());
         Assert.Equal(1, data.Writes);
@@ -232,7 +235,7 @@ public sealed class MassEnrollmentTests
         using var f = factory; using var t = tokens;
         using var client = Client(factory, tokens, View, Manage);
         var before = await client.GetStringAsync(Route + query);
-        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1", "A2"], true));
+        var rejected = await client.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(selection, ["A1", "A2"], true));
         Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
         Assert.Equal(0, data.Writes);
         Assert.Equal(before, await client.GetStringAsync(Route + query));
@@ -282,7 +285,7 @@ public sealed class MassEnrollmentTests
         public string Course { get; init; } = "MBA00101/1/0";
         public bool ExhaustAfterFirst { get; init; }
         public bool NoVacancies { get; init; }
-        public IReadOnlyList<EnrollmentOption> StudentTypes { get; init; } = [new("MBA", "MBA")];
+        public IReadOnlyList<MassEnrollmentOptionDTO> StudentTypes { get; init; } = [new("MBA", "MBA")];
         public IReadOnlyList<string> Modalities { get; init; } = ["PT"];
         public int CandidateReads { get; private set; }
         public bool FailSecond { get; init; }
@@ -293,29 +296,29 @@ public sealed class MassEnrollmentTests
         public string? AuditPc { get; private set; }
         public string? CatalogueUser { get; private set; }
 
-        public Task<MassEnrollmentFilters> GetFiltersAsync(EnrollmentSelection selection, string user, CancellationToken ct)
+        public Task<MassEnrollmentFiltersDTO> GetFiltersAsync(MassEnrollmentSelection selection, string user, CancellationToken ct)
         {
             CatalogueUser = user;
-            return Task.FromResult(new MassEnrollmentFilters(StudentTypes, Modalities, ["2024"],
+            return Task.FromResult(new MassEnrollmentFiltersDTO(StudentTypes, Modalities, ["2024"],
                 [new("2024A", "Primer semestre")], NoVacancies || (ExhaustAfterFirst && Writes > 0) ? [] : [new(Course, "Curso Uno")]));
         }
 
-        public Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct) =>
-            Task.FromResult<EnrollmentOption?>(selection.Course == Course && selection.StudentType == "MBA"
+        public Task<MassEnrollmentOptionDTO?> FindCourseAsync(MassEnrollmentSelection selection, CancellationToken ct) =>
+            Task.FromResult<MassEnrollmentOptionDTO?>(selection.Course == Course && selection.StudentType == "MBA"
                 ? new(Course, "Curso Uno") : null);
 
-        public Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct)
+        public Task<IReadOnlyList<MassEnrollmentCandidateDTO>> GetCandidatesAsync(MassEnrollmentSelection selection, CancellationToken ct)
         {
             CandidateReads++;
-            return Task.FromResult<IReadOnlyList<MassEnrollmentRow>>(
-                new[] { "A1", "A2", "A3" }.Select((id, i) => new MassEnrollmentRow(id,
+            return Task.FromResult<IReadOnlyList<MassEnrollmentCandidateDTO>>(
+                new[] { "A1", "A2", "A3" }.Select((id, i) => new MassEnrollmentCandidateDTO(id,
                     i == 0 ? "Alumno Uno" : id, "12345678-9", "2024A", "REGULAR", "", "D1", enrolled.Contains(id))).ToArray());
         }
 
-        public Task<bool> IsEnrolledAsync(string student, EnrollmentSelection selection, CancellationToken ct) =>
+        public Task<bool> IsEnrolledAsync(string student, MassEnrollmentSelection selection, CancellationToken ct) =>
             Task.FromResult(enrolled.Contains(student) || StaleStudent == student);
 
-        public Task AddAsync(string student, EnrollmentSelection selection, string user, string pc, CancellationToken ct)
+        public Task AddAsync(string student, MassEnrollmentSelection selection, string user, string pc, CancellationToken ct)
         {
             AuditUser = user; AuditPc = pc;
             if (student == "A2" && FailSecond) throw new InvalidOperationException("private-sql-detail");

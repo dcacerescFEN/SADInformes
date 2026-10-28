@@ -9,7 +9,7 @@ const read = path => readFileSync(resolve(root, path), 'utf8');
 
 test('MassEnrollment follows AcademicPeriods command/query folders and dispatcher', () => {
   for (const request of [
-    'Commands/EnrollMassEnrollment/EnrollMassEnrollment.cs',
+    'Commands/CreateMassEnrollment/CreateMassEnrollment.cs',
     'Queries/GetMassEnrollmentFilters/GetMassEnrollmentFilters.cs',
     'Queries/GetMassEnrollmentCandidates/GetMassEnrollmentCandidates.cs',
   ]) {
@@ -24,7 +24,7 @@ test('MassEnrollment follows AcademicPeriods command/query folders and dispatche
   assert.equal(existsSync(resolve(root, 'src/Application/Reports/Postgraduate/MassEnrollment/MassEnrollmentService.cs')), false);
 });
 
-test('MassEnrollment SQL is consolidated into SadContext and main procedures', () => {
+test('MassEnrollment SP execution lives in the main procedures file', () => {
   for (const partial of [
     'src/Infrastructure/Data/SadContextProcedures.MassEnrollment.cs',
     'src/Application/Common/Interfaces/ISadContextProcedures.MassEnrollment.cs',
@@ -35,8 +35,9 @@ test('MassEnrollment SQL is consolidated into SadContext and main procedures', (
   assert.match(procedures, /SpRec_Alumnos_insc_masiva_catedra_dispAsync/);
   const data = read('src/Infrastructure/Reports/Postgraduate/MassEnrollmentData.cs');
   assert.match(data, /procedures.SpCre_MovInscAdministrativo_PostgradoAsync/);
-  assert.doesNotMatch(data, /ExecuteSqlRawAsync|SqlQueryAsync|SqlParameter|SELECT CAST|EXEC dbo/);
-  assert.match(read('src/Infrastructure/Data/SadContext.cs'), /ExecuteSqlRawAsync/);
+  assert.doesNotMatch(data, /SqlQueryAsync|SqlParameter|SELECT |EXEC dbo/);
+  assert.doesNotMatch(read('src/Infrastructure/Data/SadContext.cs'), /FindMassEnrollment|IsEnrollment|ExecuteSqlRaw|BeginTransaction/);
+  assert.match(read('src/Infrastructure/Data/SadContextProcedures.cs'), /BuildMovInscAdministrativoParameters/);
 });
 
 test('Custom enrollment queries use LINQ over MappingDB table mappings, not ad-hoc SQL', () => {
@@ -45,7 +46,11 @@ test('Custom enrollment queries use LINQ over MappingDB table mappings, not ad-h
     assert.ok(context.includes('DbSet<' + entity + '>'), entity);
     assert.ok(existsSync(resolve(root, 'src/Domain/Entities/Sad/Tables/dbo/' + entity + '.cs')), entity);
   }
-  assert.doesNotMatch(context, /SELECT CAST|SELECT DISTINCT|this.SqlQueryAsync/);
-  assert.match(context, /AsNoTracking/);
-  assert.match(context, /AnyAsync/);
+  assert.doesNotMatch(context, /AsNoTracking|AnyAsync|FirstOrDefaultAsync|SELECT |ExecuteSqlRaw|BeginTransaction/);
+  const data = read('src/Infrastructure/Reports/Postgraduate/MassEnrollmentData.cs');
+  assert.match(data, /AsNoTracking/);
+  assert.match(data, /AnyAsync/);
+  assert.match(data, /FindCourseAsync/);
+  assert.match(data, /IsEnrolledAsync/);
+  assert.match(data, /Database.BeginTransactionAsync/);
 });

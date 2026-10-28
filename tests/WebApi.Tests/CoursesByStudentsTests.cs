@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Application.Reports.Postgraduate.CoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudentsFilters;
 
 namespace WebApi.Tests;
 
@@ -147,24 +149,24 @@ public sealed class CoursesByStudentsTests
         public string? LastModality { get; private set; }
         public string? LastFilterType { get; private set; }
 
-        public Task<CoursesByStudentsFilters> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
+        public Task<CoursesByStudentsFiltersDTO> GetFiltersAsync(string? studentType, CancellationToken cancellationToken)
         {
-            if (Failure is not null) return Task.FromException<CoursesByStudentsFilters>(Failure);
+            if (Failure is not null) return Task.FromException<CoursesByStudentsFiltersDTO>(Failure);
             LastFilterType = studentType;
-            return Task.FromResult(new CoursesByStudentsFilters(
+            return Task.FromResult(new CoursesByStudentsFiltersDTO(
                 [new("2024A", "2024 - Primer Semestre")],
                 [new("MGP", "Magíster en Gestión Pública"), new("MBA", "MBA")],
                 ["PT", "FT"]));
         }
 
-        public Task<IReadOnlyList<CoursesByStudentsRow>> GetRowsAsync(
+        public Task<IReadOnlyList<CoursesByStudentsDTO>> GetRowsAsync(
             string period, string studentType, string modality, CancellationToken cancellationToken)
         {
-            if (Failure is not null) return Task.FromException<IReadOnlyList<CoursesByStudentsRow>>(Failure);
+            if (Failure is not null) return Task.FromException<IReadOnlyList<CoursesByStudentsDTO>>(Failure);
             LastPeriod = period;
             LastType = studentType;
             LastModality = modality;
-            return Task.FromResult<IReadOnlyList<CoursesByStudentsRow>>(
+            return Task.FromResult<IReadOnlyList<CoursesByStudentsDTO>>(
             [
                 new("2024B", "MBA101/1", "Gestión (MBA101)", "A001", "Alumno Prueba", "2023A"),
             ]);

@@ -1,5 +1,6 @@
 using Application.Common.Mediator;
-using Application.Reports.Postgraduate.CoursesByStudents.Queries;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudents;
+using Application.Reports.Postgraduate.CoursesByStudents.Queries.GetCoursesByStudentsFilters;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
 using WebApi.Extension;

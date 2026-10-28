@@ -1,5 +1,7 @@
+using Application.Reports.Postgraduate.MassEnrollment.Common;
 using Domain.Entities.Sad.Tables.dbo;
 using Infrastructure.Data;
+using Infrastructure.Reports.Postgraduate;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -9,6 +11,9 @@ public sealed class MassEnrollmentContextTests
 {
     private static SadContext Context() => new(new DbContextOptionsBuilder<SadContext>()
         .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+    private static MassEnrollmentData Data(SadContext context) => new(context, new SadContextProcedures(context));
+    private static MassEnrollmentSelection Selection(string period, string course, string section, string type, string studentType) =>
+        new(studentType, "PT", "2024", period, course + "/" + section + "/" + type);
 
     private static async Task<SadContext> Seed(
         string period = "2024A", string? courseStudentType = "MBA", string? courseModality = "PT",
@@ -37,13 +42,14 @@ public sealed class MassEnrollmentContextTests
     }
 
     [Fact]
-    public async Task Linq_lookup_keeps_an_exhausted_course_readable_in_its_own_scope()
+    public async Task Data_gateway_keeps_an_exhausted_course_readable_in_its_own_scope()
     {
         await using var context = await Seed();
-        var result = await context.FindMassEnrollmentCourseAsync("2024A", "ENECO660", "02", "0", "MBA", default);
+        var result = await Data(context).FindCourseAsync(
+            Selection("2024A", "ENECO660", "02", "0", "MBA"), default);
         Assert.NotNull(result);
-        Assert.Equal("ENECO660/02/0", result.Cod_Catedra);
-        Assert.Equal("ENECO660/02/Economía", result.NombreCatedra);
+        Assert.Equal("ENECO660/02/0", result.Value);
+        Assert.Equal("ENECO660/02/Economía", result.Text);
     }
 
     [Theory]
@@ -51,7 +57,7 @@ public sealed class MassEnrollmentContextTests
     [InlineData("2026E", "ENECO660", "02", "0", "MBA", "MGP", null)]
     [InlineData("2026E", "ENECO660", "02", "0", "MBA", null, null)]
     [InlineData("2026E", "ENECO660", "02", "0", "MBA", "MBA", "FT")]
-    public async Task Linq_lookup_uses_the_type_keyed_offering_not_the_course_type_or_modality(
+    public async Task Offering_identity_uses_the_type_keyed_vacancy_not_course_type_or_modality(
         string period, string course, string section, string type, string studentType,
         string? courseStudentType, string? courseModality)
     {
@@ -65,15 +71,15 @@ public sealed class MassEnrollmentContextTests
         context.PlanesFormacionCatedras.Add(new PlanesFormacionCatedra {
             Decreto = "D1", CodPlanFormacion = "GRAL", CodCatedra = course, TipoCatedra = type,
         });
-        // Capacity belongs to the requested student type; Cursos may describe another/blank scope.
         context.VacantesCursos.Add(new VacantesCurso {
             Periodo = period, CodCatedra = course, CodSeccion = section,
             TipoAlumno = studentType, VacOfrecidas = 1,
         });
         await context.SaveChangesAsync();
-        var result = await context.FindMassEnrollmentCourseAsync(period, course, section, type, studentType, default);
+        var result = await Data(context).FindCourseAsync(
+            Selection(period, course, section, type, studentType), default);
         Assert.NotNull(result);
-        Assert.Equal(course + "/" + section + "/" + type, result.Cod_Catedra);
+        Assert.Equal(course + "/" + section + "/" + type, result.Value);
     }
 
     [Fact]
@@ -105,10 +111,10 @@ public sealed class MassEnrollmentContextTests
             select course).FirstOrDefaultAsync();
         Assert.Null(former);
 
-        var corrected = await context.FindMassEnrollmentCourseAsync(
-            "2026E", "ENECO600", "02", "1", "MBA", default);
+        var corrected = await Data(context).FindCourseAsync(
+            Selection("2026E", "ENECO600", "02", "1", "MBA"), default);
         Assert.NotNull(corrected);
-        Assert.Equal("ENECO600/02/1", corrected.Cod_Catedra);
+        Assert.Equal("ENECO600/02/1", corrected.Value);
     }
 
     [Theory]
@@ -117,39 +123,44 @@ public sealed class MassEnrollmentContextTests
     [InlineData("2024A", "OTHER", "02", "0", "MBA")]
     [InlineData("2024A", "ENECO660", "01", "0", "MBA")]
     [InlineData("2024A", "ENECO660", "02", "1", "MBA")]
-    public async Task Linq_lookup_rejects_wrong_student_type_or_course_identity(
+    public async Task Lookup_rejects_wrong_student_type_or_course_identity(
         string period, string course, string section, string type, string studentType)
     {
         await using var context = await Seed();
-        Assert.Null(await context.FindMassEnrollmentCourseAsync(period, course, section, type, studentType, default));
+        Assert.Null(await Data(context).FindCourseAsync(
+            Selection(period, course, section, type, studentType), default));
     }
 
     [Fact]
-    public async Task Linq_lookup_rejects_deleted_and_unoffered_courses()
+    public async Task Lookup_rejects_deleted_and_unoffered_courses()
     {
         await using var context = await Seed();
+        var data = Data(context);
+        var selection = Selection("2024A", "ENECO660", "02", "0", "MBA");
         var course = await context.Cursos.SingleAsync();
         course.Eliminado = true;
         await context.SaveChangesAsync();
-        Assert.Null(await context.FindMassEnrollmentCourseAsync("2024A", "ENECO660", "02", "0", "MBA", default));
+        Assert.Null(await data.FindCourseAsync(selection, default));
         course.Eliminado = false;
         (await context.VacantesCursos.SingleAsync()).VacOfrecidas = 0;
         await context.SaveChangesAsync();
-        Assert.Null(await context.FindMassEnrollmentCourseAsync("2024A", "ENECO660", "02", "0", "MBA", default));
+        Assert.Null(await data.FindCourseAsync(selection, default));
     }
 
     [Fact]
-    public async Task Linq_postcondition_requires_both_CURSADA_row_and_accepted_add()
+    public async Task Postcondition_requires_both_CURSADA_row_and_accepted_add()
     {
         await using var context = await Seed();
-        Assert.False(await context.IsEnrollmentConfirmedAsync("A1", "2024A", "ENECO660", "02", default));
+        var data = Data(context);
+        var selection = Selection("2024A", "ENECO660", "02", "0", "MBA");
+        Assert.False(await data.IsEnrolledAsync("A1", selection, default));
         context.AlumnosCatedras.Add(new AlumnosCatedra {
             CodAlumno = "A1", Periodo = "2024A", CodCatedra = "ENECO660", CodSeccion = "02", Categoria = "CURSADA",
         });
         await context.SaveChangesAsync();
-        Assert.True(await context.IsEnrollmentConfirmedAsync("A1", "2024A", "ENECO660", "02", default));
+        Assert.True(await data.IsEnrolledAsync("A1", selection, default));
         (await context.MovimientosInscripcions.SingleAsync()).Estado = "ELIMINADA";
         await context.SaveChangesAsync();
-        Assert.False(await context.IsEnrollmentConfirmedAsync("A1", "2024A", "ENECO660", "02", default));
+        Assert.False(await data.IsEnrolledAsync("A1", selection, default));
     }
 }

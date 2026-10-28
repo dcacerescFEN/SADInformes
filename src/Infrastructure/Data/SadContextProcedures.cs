@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
@@ -158,7 +159,7 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
         string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa,
         CancellationToken ct) =>
-        context.ExecuteSqlRawAsync(
+        context.Database.ExecuteSqlRawAsync(
             """
             EXEC dbo.spCre_MovInscAdministrativo_Postgrado
               @Cod_Alumno=@student, @Periodo=@period, @Cod_Catedra=@course, @Cod_Seccion=@section,
@@ -167,13 +168,25 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
               @ObservacionesNota=@notes, @RegistroEspecial=@special, @Usuario=@user, @CalificadorElectivo=@elective,
               @TipoCatedraSeleccionable=@selectableType, @SistemaProcesa=@system
             """,
-            [Text("student", codAlumno, 20), Text("period", periodo, 20), Text("course", codCatedra, 30),
-             Text("section", codSeccion, 2), Text("action", accion, 10), Text("pc", pc, 100),
-             Text("extra", extracurricular, 2), Text("mention", mencionCurso, 2), Text("type", tipoCatedra, 2),
-             Integer("removeAcademic", eliminaAcademico), Integer("authorized", autorizadoPorAlumno),
-             Text("grade", nota, 5), Text("situation", situacion, 10), Text("notes", observacionesNota, 1000),
-             Integer("special", registroEspecial), Text("user", usuario, 30), Text("elective", calificadorElectivo, 10),
-             Text("selectableType", tipoCatedraSeleccionable, 1), Text("system", sistemaProcesa, 15)], ct);
+            BuildMovInscAdministrativoParameters(codAlumno, periodo, codCatedra, codSeccion, accion, pc,
+                extracurricular, mencionCurso, tipoCatedra, eliminaAcademico, autorizadoPorAlumno, nota,
+                situacion, observacionesNota, registroEspecial, usuario, calificadorElectivo,
+                tipoCatedraSeleccionable, sistemaProcesa),
+            ct);
+
+    /// <summary>Exact parameter contract of the administrative enrollment procedure.</summary>
+    public static SqlParameter[] BuildMovInscAdministrativoParameters(
+        string codAlumno, string periodo, string codCatedra, string codSeccion, string accion, string pc,
+        string extracurricular, string mencionCurso, string tipoCatedra, int eliminaAcademico,
+        int autorizadoPorAlumno, string nota, string situacion, string observacionesNota, int registroEspecial,
+        string usuario, string? calificadorElectivo, string? tipoCatedraSeleccionable, string sistemaProcesa) =>
+        [Text("student", codAlumno, 20), Text("period", periodo, 20), Text("course", codCatedra, 30),
+         Text("section", codSeccion, 2), Text("action", accion, 10), Text("pc", pc, 100),
+         Text("extra", extracurricular, 2), Text("mention", mencionCurso, 2), Text("type", tipoCatedra, 2),
+         Integer("removeAcademic", eliminaAcademico), Integer("authorized", autorizadoPorAlumno),
+         Text("grade", nota, 5), Text("situation", situacion, 10), Text("notes", observacionesNota, 1000),
+         Integer("special", registroEspecial), Text("user", usuario, 30), Text("elective", calificadorElectivo, 10),
+         Text("selectableType", tipoCatedraSeleccionable, 1), Text("system", sistemaProcesa, 15)];
 
     private static SqlParameter Text(string name, string? value, int size) =>
         new("@" + name, SqlDbType.VarChar, size) { Value = value ?? (object)DBNull.Value };
