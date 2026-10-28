@@ -37,6 +37,8 @@ public sealed class EnrollMassEnrollmentHandler(IMassEnrollmentData data, IApiRe
         }
         foreach (var student in students.Order(StringComparer.Ordinal))
         {
+            // Each preceding add may have consumed the final vacancy in this transaction.
+            await MassEnrollmentRules.ValidateAvailableAsync(data, selection, user, ct);
             await data.AddAsync(student, selection, user, pc, ct);
             // The legacy SP has silent no-op paths; an affected-row count is not proof.
             if (!await data.IsEnrolledAsync(student, selection, ct))

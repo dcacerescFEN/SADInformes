@@ -38,3 +38,14 @@ test('MassEnrollment SQL is consolidated into SadContext and main procedures', (
   assert.doesNotMatch(data, /ExecuteSqlRawAsync|SqlQueryAsync|SqlParameter|SELECT CAST|EXEC dbo/);
   assert.match(read('src/Infrastructure/Data/SadContext.cs'), /ExecuteSqlRawAsync/);
 });
+
+test('Custom enrollment queries use LINQ over MappingDB table mappings, not ad-hoc SQL', () => {
+  const context = read('src/Infrastructure/Data/SadContext.cs');
+  for (const entity of ['Catedra', 'Curso', 'PlanesFormacionCatedra', 'VacantesCurso', 'AlumnosCatedra', 'MovimientosInscripcion']) {
+    assert.ok(context.includes('DbSet<' + entity + '>'), entity);
+    assert.ok(existsSync(resolve(root, 'src/Domain/Entities/Sad/Tables/dbo/' + entity + '.cs')), entity);
+  }
+  assert.doesNotMatch(context, /SELECT CAST|SELECT DISTINCT|this.SqlQueryAsync/);
+  assert.match(context, /AsNoTracking/);
+  assert.match(context, /AnyAsync/);
+});

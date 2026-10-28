@@ -32,6 +32,14 @@ public sealed class MassEnrollmentData(ISadContext context, ISadContextProcedure
         return new(studentTypes, modalities, cohorts, periods, courses);
     }
 
+    public async Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct)
+    {
+        var parts = selection.Course.Split('/');
+        var course = await context.FindMassEnrollmentCourseAsync(selection.Period, parts[0], parts[1], parts[2],
+            selection.StudentType, selection.Modality, ct);
+        return course is null ? null : new EnrollmentOption(course.Cod_Catedra.Trim(), course.NombreCatedra?.Trim() ?? course.Cod_Catedra);
+    }
+
     public async Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct)
     {
         var rows = await procedures.SpRec_Alumnos_insc_masiva_catedra_dispAsync(

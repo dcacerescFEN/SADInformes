@@ -2,7 +2,8 @@ namespace Application.Reports.Postgraduate.MassEnrollment.Common;
 
 internal static class MassEnrollmentRules
 {
-    internal static async Task ValidateAvailableAsync(IMassEnrollmentData data, EnrollmentSelection selection, string user, CancellationToken ct)
+    internal static async Task<bool> ValidateAvailableAsync(IMassEnrollmentData data, EnrollmentSelection selection, string user,
+        CancellationToken ct, bool requireVacancies = true)
     {
         ValidateIdentity(user);
         Validate(selection, required: true);
@@ -10,9 +11,18 @@ internal static class MassEnrollmentRules
         if (!filters.StudentTypes.Any(item => item.Value == selection.StudentType)
             || !filters.Modalities.Contains(selection.Modality)
             || !filters.Cohorts.Contains(selection.Cohort)
-            || !filters.Periods.Any(item => item.Value == selection.Period)
-            || !filters.Courses.Any(item => item.Value == selection.Course))
+            || !filters.Periods.Any(item => item.Value == selection.Period))
             throw new ArgumentException("Los filtros seleccionados no están disponibles.");
+        if (filters.Courses.Any(item => item.Value == selection.Course)) return true;
+
+        // Absence from the available catalogue is not proof that a course exists.
+        // Only an authoritative offered-course lookup permits a read-only listing.
+        var course = await data.FindCourseAsync(selection, ct);
+        if (course is null || course.Value != selection.Course)
+            throw new ArgumentException("Los filtros seleccionados no están disponibles.");
+        if (requireVacancies)
+            throw new EnrollmentConflictException(MassEnrollmentReport.NoVacanciesMessage);
+        return false;
     }
 
     internal static void ValidateIdentity(string user)

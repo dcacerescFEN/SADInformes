@@ -7,7 +7,11 @@ public sealed record MassEnrollmentFilters(
     IReadOnlyList<string> Cohorts, IReadOnlyList<EnrollmentOption> Periods, IReadOnlyList<EnrollmentOption> Courses);
 public sealed record MassEnrollmentRow(string StudentCode, string Name, string Rut, string EntrySemester,
     string Situation, string Reason, string Decree, bool Enrolled, string EntryType = "");
-public sealed record MassEnrollmentReport(IReadOnlyList<MassEnrollmentRow> Rows, int Total);
+public sealed record MassEnrollmentReport(IReadOnlyList<MassEnrollmentRow> Rows, int Total, bool CanEnroll = true)
+{
+    public const string NoVacanciesMessage = "El curso ya no tiene vacantes.";
+    public string? AvailabilityMessage => CanEnroll ? null : NoVacanciesMessage;
+}
 public sealed record EnrollmentRequest(EnrollmentSelection? Selection, string[]? StudentCodes, bool Confirmed);
 public sealed record EnrollmentResult(int Enrolled);
 
@@ -15,6 +19,7 @@ public sealed record EnrollmentResult(int Enrolled);
 public interface IMassEnrollmentData
 {
     Task<MassEnrollmentFilters> GetFiltersAsync(EnrollmentSelection selection, string user, CancellationToken ct);
+    Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct);
     Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct);
     Task<IEnrollmentTransaction> BeginAsync(CancellationToken ct);
     Task<bool> IsEnrolledAsync(string student, EnrollmentSelection selection, CancellationToken ct);

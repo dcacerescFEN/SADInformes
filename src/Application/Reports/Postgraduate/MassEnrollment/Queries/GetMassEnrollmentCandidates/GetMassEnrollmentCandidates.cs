@@ -13,8 +13,9 @@ public sealed class GetMassEnrollmentCandidatesHandler(IMassEnrollmentData data,
 {
     public async Task<ApiResponse<MassEnrollmentReport>> Handle(GetMassEnrollmentCandidates request, CancellationToken ct)
     {
-        await MassEnrollmentRules.ValidateAvailableAsync(data, request.Selection, request.User, ct);
+        var canEnroll = await MassEnrollmentRules.ValidateAvailableAsync(data, request.Selection, request.User, ct,
+            requireVacancies: false);
         var rows = await data.GetCandidatesAsync(request.Selection, ct);
-        return responses.Success(new MassEnrollmentReport(rows, rows.Count));
+        return responses.Success(new MassEnrollmentReport(rows, rows.Count, canEnroll));
     }
 }

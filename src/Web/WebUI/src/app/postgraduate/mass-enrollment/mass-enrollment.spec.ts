@@ -5,10 +5,10 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { MassEnrollment } from './mass-enrollment';
 
 const BASE = '/api/reports/postgraduate/mass-enrollment';
-const selection = { studentType: 'MBA', modality: 'PT', cohort: '2024', period: '2024A', course: 'MBA00101/1/0' };
+const selection = { studentType: 'MBA', modality: 'PT', cohort: '2024', period: '2024A', course: 'ENECO660/02/0' };
 const filters = { success: true, data: {
   studentTypes: [{ value: 'MBA', text: 'MBA' }], modalities: ['PT'], cohorts: ['2024'],
-  periods: [{ value: '2024A', text: 'Primer semestre' }], courses: [{ value: 'MBA00101/1/0', text: 'Curso Uno' }],
+  periods: [{ value: '2024A', text: 'Primer semestre' }], courses: [{ value: 'ENECO660/02/0', text: 'ENECO660/02 Economía' }],
 } };
 const row = (code: string, enrolled = false) => ({
   studentCode: code, name: code === 'A1' ? '<img src=x onerror=alert(1)>' : 'Alumno Dos',
@@ -23,16 +23,17 @@ describe('Inscripción masiva', () => {
   async function settle() {
     await fixture.whenStable();
     fixture.detectChanges();
-    // The catalogue refresh resolves before its enrollment continuation updates the notice.
+    // Wait for the enrollment continuation to render after its awaited HTTP response.
     await fixture.whenStable();
     fixture.detectChanges();
   }
   const button = (action: string) => root.querySelector<HTMLButtonElement>('[data-action="' + action + '"]')!;
-  async function list() {
+  async function list(canEnroll = true) {
     root.querySelector('form')!.dispatchEvent(new Event('submit'));
     await settle();
     http.expectOne(req => req.method === 'GET' && req.url === BASE).flush({
-      success: true, data: { rows: [row('A1'), row('A2', true)], total: 2 },
+      success: true, data: { rows: [row('A1'), row('A2', true)], total: 2, canEnroll,
+        availabilityMessage: canEnroll ? null : 'El curso ya no tiene vacantes.' },
     });
     await settle();
   }
@@ -99,10 +100,8 @@ describe('Inscripción masiva', () => {
     expect(button('enroll').disabled).toBe(true);
     request.flush({ success: true, data: { enrolled: 1 } });
     await settle();
-    http.expectOne(req => req.url === BASE + '/filters').flush(filters);
-    await settle();
     http.expectOne(req => req.method === 'GET' && req.url === BASE)
-      .flush({ success: true, data: { rows: [row('A1', true), row('A2', true)], total: 2 } });
+      .flush({ success: true, data: { rows: [row('A1', true), row('A2', true)], total: 2, canEnroll: true, availabilityMessage: null } });
     await settle();
     expect(root.textContent).toContain('Alumnos inscritos: 1');
     expect(button('enroll').disabled).toBe(true);
@@ -149,7 +148,7 @@ describe('Inscripción masiva', () => {
     older.flush({ success: true, data: { ...filters.data, modalities: ['STALE'] } }); await settle();
     expect(fixture.componentInstance.form.controls.modality.value).toBe('PT');
   });
-  it('does not turn confirmed enrollment into a list error when the last vacancy is consumed', async () => {
+  it('keeps ENECO660/02 visible and disables enrollment after its single vacancy is consumed', async () => {
     await list();
     root.querySelector<HTMLInputElement>('tbody input')!.click();
     await settle();
@@ -157,18 +156,31 @@ describe('Inscripción masiva', () => {
     await settle();
     http.expectOne(req => req.method === 'POST').flush({ success: true, data: { enrolled: 1 } });
     await settle();
-    http.expectOne(req => req.url === BASE + '/filters').flush({
-      success: true, data: { ...filters.data, courses: [{ value: 'OTHER/1/0', text: 'Otro curso' }] },
+    const refresh = http.expectOne(req => req.method === 'GET' && req.url === BASE);
+    expect(refresh.request.params.get('course')).toBe('ENECO660/02/0');
+    refresh.flush({
+      success: true, data: { rows: [row('A1', true), row('A2')], total: 2,
+        canEnroll: false, availabilityMessage: 'El curso ya no tiene vacantes.' },
     });
     await settle();
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(fixture.componentInstance.form.controls.course.value).toBe('ENECO660/02/0');
+    expect(root.textContent).toContain('ENECO660/02');
     expect(root.textContent).toContain('Alumnos inscritos: 1');
+    expect(root.textContent).toContain('El curso ya no tiene vacantes.');
     expect(root.textContent).not.toContain('No se pudo cargar el listado de alumnos.');
-    expect(root.textContent).toContain('El curso ya no está disponible');
-    expect(fixture.componentInstance.form.controls.course.value).toBe('');
-    expect(root.querySelectorAll('tbody input')).toHaveLength(0);
     expect(button('enroll').disabled).toBe(true);
-    http.expectNone(req => req.url === BASE && req.method === 'GET');
+    expect(root.querySelector<HTMLInputElement>('[data-action="select-all"]')!.disabled).toBe(true);
+    for (const checkbox of root.querySelectorAll<HTMLInputElement>('tbody input')) {
+      expect(checkbox.disabled).toBe(true);
+      expect(checkbox.checked).toBe(false);
+      checkbox.click();
+    }
+    button('enroll').click(); await settle();
+    http.expectNone(req => req.method === 'POST');
+    http.expectNone(req => req.url === BASE + '/filters');
   });
+
   it('locks the selection while SweetAlert confirmation is pending and cancels without a write', async () => {
     let resolve!: (value: { isConfirmed: boolean; isDenied: boolean; isDismissed: boolean }) => void;
     vi.mocked(Swal.fire).mockImplementation(() => new Promise(done => { resolve = done; }));
@@ -187,21 +199,19 @@ describe('Inscripción masiva', () => {
     expect(fixture.componentInstance.form.enabled).toBe(true);
   });
 
-  it('retains confirmed success if catalogue refresh fails and prevents a blind retry', async () => {
-    await list();
-    root.querySelector<HTMLInputElement>('tbody input')!.click(); await settle();
-    button('enroll').click(); await settle();
-    http.expectOne(req => req.method === 'POST').flush({ success: true, data: { enrolled: 1 } });
-    await settle();
-    http.expectOne(req => req.url === BASE + '/filters').flush({ detail: 'private' },
-      { status: 503, statusText: 'Unavailable' });
-    await settle();
-    expect(root.textContent).toContain('Alumnos inscritos: 1');
-    expect(root.textContent).toContain('La inscripción fue confirmada');
-    expect(root.textContent).not.toContain('No se pudo confirmar la inscripción.');
-    expect(root.textContent).not.toContain('private');
-    expect(button('enroll').disabled).toBe(true);
-    http.expectNone(req => req.url === BASE && req.method === 'GET');
+  it('manually reloads exhausted-course students and reenables enrollment only when the server reports vacancies', async () => {
+    await list(false);
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(root.textContent).toContain('El curso ya no tiene vacantes.');
+    expect(root.querySelector<HTMLInputElement>('tbody input')!.disabled).toBe(true);
+    await list(false);
+    expect(fixture.componentInstance.form.controls.course.value).toBe('ENECO660/02/0');
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(root.querySelector<HTMLInputElement>('[data-action="select-all"]')!.disabled).toBe(true);
+    await list(true);
+    expect(root.textContent).not.toContain('El curso ya no tiene vacantes.');
+    expect(root.querySelector<HTMLInputElement>('tbody input')!.disabled).toBe(false);
+    http.expectNone(req => req.method === 'POST');
   });
 
   it('retains confirmed success if the refreshed list fails', async () => {
@@ -210,7 +220,6 @@ describe('Inscripción masiva', () => {
     button('enroll').click(); await settle();
     http.expectOne(req => req.method === 'POST').flush({ success: true, data: { enrolled: 1 } });
     await settle();
-    http.expectOne(req => req.url === BASE + '/filters').flush(filters); await settle();
     http.expectOne(req => req.url === BASE && req.method === 'GET').flush({ detail: 'private' },
       { status: 503, statusText: 'Unavailable' });
     await settle();

@@ -68,6 +68,22 @@ public sealed class MassEnrollmentDataTests
         Assert.True(context.Batch.Disposed);
     }
 
+    [Fact]
+    public async Task Exhausted_course_lookup_uses_authoritative_context_with_exact_period_section_and_type()
+    {
+        using var context = new CapturingContext
+        {
+            OfferedCourse = new() { Cod_Catedra = "ENECO660/02/0", NombreCatedra = "ENECO660/02 Economía" },
+        };
+        var data = new MassEnrollmentData(context, new SadContextProcedures(context));
+        var selection = new EnrollmentSelection("MBA", "PT", "2024", "2024A", "ENECO660/02/0");
+        Assert.Equal(new EnrollmentOption("ENECO660/02/0", "ENECO660/02 Economía"),
+            await data.FindCourseAsync(selection, default));
+        Assert.Equal(("2024A", "ENECO660", "02", "0", "MBA", "PT"), context.CourseArguments);
+        context.OfferedCourse = null;
+        Assert.Null(await data.FindCourseAsync(selection, default));
+    }
+
     private sealed class CapturingContext() : SadContext(new DbContextOptionsBuilder<SadContext>().Options)
     {
         public string Sql = "";
@@ -75,6 +91,14 @@ public sealed class MassEnrollmentDataTests
         public CancellationToken Token;
         public (string, string, string, string) StateArguments;
         public readonly FakeTransaction Batch = new();
+        public SpRecEnrollmentCoursesResult? OfferedCourse;
+        public (string, string, string, string, string, string) CourseArguments;
+        public override Task<SpRecEnrollmentCoursesResult?> FindMassEnrollmentCourseAsync(
+            string period, string course, string section, string courseType, string studentType, string modality, CancellationToken ct)
+        {
+            CourseArguments = (period, course, section, courseType, studentType, modality);
+            return Task.FromResult(OfferedCourse);
+        }
         public override Task<int> ExecuteSqlRawAsync(string sql, object[] parameters, CancellationToken ct)
         {
             Sql = sql; Parameters = parameters; Token = ct;

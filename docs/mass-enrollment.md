@@ -12,10 +12,11 @@ datos académicos y auditorías.
 3. Presionar **Inscribir** y confirmar en SweetAlert2 (el mismo patrón de
    `NotificationService` de SADAlumnos): `Desea inscribir a los alumnos seleccionados?`.
    Cancelar no envía la inscripción; mientras se confirma, la selección queda bloqueada.
-4. La pantalla informa la cantidad confirmada y refresca primero los filtros.
-   Si el curso conserva disponibilidad, actualiza el listado. Si se agotó el último
-   cupo y desapareció del catálogo, conserva la confirmación y limpia la selección
-   sin consultar filtros inválidos ni elegir otro curso automáticamente.
+4. La pantalla informa la cantidad confirmada y vuelve a consultar el listado del
+   mismo curso. Si se agotó el último cupo (por ejemplo, ENECO660/02 con una vacante),
+   conserva el curso y los alumnos visibles, muestra **El curso ya no tiene vacantes.**
+   y deshabilita Inscribir y todas las casillas. **Actualizar** sigue consultando la
+   lista aunque el curso ya no aparezca en `spRec_CursosxPeriodo`; no elige otro curso.
    Un fallo de recarga posterior no convierte la inscripción confirmada en fallida.
    Si falla la inscripción, actualizar antes de reintentar; no hay reintentos automáticos.
 
@@ -48,7 +49,10 @@ Base: `/api/reports/postgraduate/mass-enrollment`.
 
 - `GET /filters`: parámetros opcionales `studentType`, `modality`, `cohort`,
   `period`, `course`. Devuelve `studentTypes, modalities, cohorts, periods, courses`.
-- `GET /`: exige los cinco filtros concretos. Devuelve `{ rows, total }`.
+- `GET /`: exige los cinco filtros concretos. Devuelve `{ rows, total, canEnroll, availabilityMessage }`.
+  Un curso ofrecido válido sin cupos devuelve 200 con el listado y `canEnroll=false`,
+  aunque no esté en el catálogo de cursos disponibles. Un curso inexistente, eliminado,
+  no ofrecido o ajeno al período/sección/tipo de cátedra no habilita esta lectura.
 - `POST /`: recibe la selección mostrada y los códigos elegidos:
 
 ```json
@@ -67,7 +71,7 @@ Base: `/api/reports/postgraduate/mass-enrollment`.
 
 Las respuestas exitosas usan `{ success, message, data }`. El POST devuelve
 `data.enrolled`. Filtros inválidos, IDs duplicados o falta de confirmación dan 400;
-selección ajena al listado o ya inscrita, 409. Sin sesión, 401; sin permiso, 403.
+selección ajena al listado, ya inscrita o sin vacantes, 409. Sin sesión, 401; sin permiso, 403.
 Errores de almacenamiento dan 503 sin detalles SQL. Un error al confirmar puede
 tener resultado incierto: actualizar el listado antes de cualquier reintento.
 
@@ -86,7 +90,8 @@ el SP de escritura tiene un método tipado con sus 19 parámetros. No hay archiv
 `SadContextProcedures.MassEnrollment.cs` ni `ISadContextProcedures.MassEnrollment.cs`.
 El adaptador de datos solo mapea resultados y delega a esos contextos; no ejecuta
 SQL directamente. La transacción y la comprobación de inscripción permanecen en
-`SadContext`, sin cambiar permisos, auditoría ni contrato HTTP.
+`SadContext`. Las consultas puntuales de curso e inscripción usan LINQ; las llamadas
+a SP siguen en el método tipado de `SadContextProcedures`. Se conservan permisos y auditoría.
 
 ## Persistencia y reglas heredadas
 
@@ -96,7 +101,20 @@ Se reutilizan `spRec_TiposAlumno`, `spRec_TiposAlumnosModalidades`, `spRec_Años
 `spCre_MovInscAdministrativo_Postgrado`. Conexión: `ConnectionStrings:Sad`.
 No se alteran procedimientos ni tablas.
 
+La consulta valida el alcance del usuario y la identidad real del curso ofrecido
+sin exigir cupos; el agotamiento solo deshabilita la escritura. La búsqueda puntual
+usa LINQ sobre los `DbSet` de `SadContext`, con las entidades y metadatos existentes
+extraídos de `MappingDB/Models`: Catedras, Cursos, PlanesFormacion_Catedras,
+Vacantes_Cursos, Alumnos_Catedras y Movimientos_Inscripcion. Requiere que el curso
+corresponda al tipo de alumno y modalidad seleccionados, además de período, sección
+y tipo de cátedra. No usa SELECT SQL directo, no modifica el SP ni crea partials.
+
 Antes de escribir se revalidan catálogos, curso y todos los alumnos seleccionados.
+La postcondición exige una fila CURSADA y un movimiento AGREGA/ACEPTADA mediante
+LINQ dentro de la transacción Serializable; no depende de SQL ad-hoc o hints de bloqueo.
+La disponibilidad se revalida también antes de cada alta del lote; si queda sin cupos,
+el POST responde 409 con `El curso ya no tiene vacantes.` y revierte el lote completo.
+No basta con que la interfaz tenga el botón deshabilitado.
 El lote usa una transacción exterior Serializable y `XACT_ABORT ON`; contiene las
 transacciones anidadas y auditorías del SP. Antes del commit se comprueban tanto
 la inscripción CURSADA de la sección elegida como el movimiento aceptado. Un fallo
@@ -111,7 +129,8 @@ Filas repetidas del mismo alumno se agrupan; si alguna indica SI, no es seleccio
 ## Verificación antes de habilitar uso real
 
 Las pruebas HTTP usan un gateway aislado con rollback simulado; las pruebas de
-mapeo usan procedimientos dobles. Angular verifica el DOM y la confirmación sin
+mapeo usan procedimientos dobles. Las consultas LINQ se ejecutan además sobre un
+contexto EF InMemory aislado para verificar las relaciones y el alcance tipo/modalidad. Angular verifica el DOM y la confirmación sin
 enviar inscripciones a SAD. Esto no prueba el motor SQL Server ni las auditorías
 reales de los procedimientos institucionales.
 

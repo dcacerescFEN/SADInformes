@@ -188,9 +188,104 @@ public sealed class MassEnrollmentTests
         Assert.Equal(0, data.Writes);
     }
 
+    [Fact]
+    public async Task ENECO660_02_last_vacancy_keeps_students_readable_and_rejects_more_enrollments()
+    {
+        var data = new FakeEnrollmentData { Course = "ENECO660/02/0", ExhaustAfterFirst = true };
+        var selection = Selection with { Course = data.Course };
+        var query = Query.Replace("MBA00101/1/0", data.Course);
+        var (factory, tokens) = Create(data);
+        using var f = factory; using var t = tokens;
+        using var client = Client(factory, tokens, View, Manage);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(Route + query)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,
+            (await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1"], true))).StatusCode);
+        using var filters = JsonDocument.Parse(await client.GetStringAsync(Route + "/filters" + query));
+        Assert.Equal(0, filters.RootElement.GetProperty("data").GetProperty("courses").GetArrayLength());
+
+        var response = await client.GetAsync(Route + query);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var snapshot = await response.Content.ReadAsStringAsync();
+        using var report = JsonDocument.Parse(snapshot);
+        var result = report.RootElement.GetProperty("data");
+        Assert.Equal(3, result.GetProperty("total").GetInt32());
+        Assert.False(result.GetProperty("canEnroll").GetBoolean());
+        Assert.Equal("El curso ya no tiene vacantes.", result.GetProperty("availabilityMessage").GetString());
+        Assert.True(result.GetProperty("rows")[0].GetProperty("enrolled").GetBoolean());
+        Assert.False(result.GetProperty("rows")[1].GetProperty("enrolled").GetBoolean());
+        Assert.Equal(snapshot, await client.GetStringAsync(Route + query));
+
+        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A2"], true));
+        Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
+        Assert.Contains("El curso ya no tiene vacantes.", await rejected.Content.ReadAsStringAsync());
+        Assert.Equal(1, data.Writes);
+        Assert.Equal(snapshot, await client.GetStringAsync(Route + query));
+    }
+
+    [Fact]
+    public async Task A_batch_cannot_consume_more_than_the_single_remaining_vacancy()
+    {
+        var data = new FakeEnrollmentData { Course = "ENECO660/02/0", ExhaustAfterFirst = true };
+        var selection = Selection with { Course = data.Course };
+        var query = Query.Replace("MBA00101/1/0", data.Course);
+        var (factory, tokens) = Create(data);
+        using var f = factory; using var t = tokens;
+        using var client = Client(factory, tokens, View, Manage);
+        var before = await client.GetStringAsync(Route + query);
+        var rejected = await client.PostAsJsonAsync(Route, new EnrollmentRequest(selection, ["A1", "A2"], true));
+        Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
+        Assert.Equal(0, data.Writes);
+        Assert.Equal(before, await client.GetStringAsync(Route + query));
+    }
+
+    [Fact]
+    public async Task Exhausted_course_read_still_validates_course_identity_and_other_filters()
+    {
+        var data = new FakeEnrollmentData { NoVacancies = true };
+        var (factory, tokens) = Create(data);
+        using var f = factory; using var t = tokens;
+        using var client = Client(factory, tokens, View, Manage);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.GetAsync(Route + Query.Replace("MBA00101/1/0", "forged/02/0"))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.GetAsync(Route + Query.Replace("studentType=MBA", "studentType=MGP"))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.GetAsync(Route + Query.Replace("period=2024A", "period=2025A"))).StatusCode);
+        Assert.Equal(0, data.Writes);
+    }
+
+    [Theory]
+    [InlineData("studentType=MBA", "studentType=MGP")]
+    [InlineData("modality=PT", "modality=FT")]
+    public async Task Exhausted_course_from_another_valid_student_scope_is_rejected(string original, string otherScope)
+    {
+        var data = new FakeEnrollmentData
+        {
+            NoVacancies = true,
+            StudentTypes = [new("MBA", "MBA"), new("MGP", "MGP")],
+            Modalities = ["PT", "FT"],
+        };
+        var (factory, tokens) = Create(data);
+        using var f = factory; using var t = tokens;
+        using var client = Client(factory, tokens, View);
+        var response = await client.GetAsync(Route + Query.Replace(original, otherScope));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Los filtros seleccionados no están disponibles.", body);
+        Assert.DoesNotContain("Alumno Uno", body);
+        Assert.Equal(0, data.CandidateReads);
+        Assert.Equal(0, data.Writes);
+    }
+
     private sealed class FakeEnrollmentData : IMassEnrollmentData
     {
         private HashSet<string> enrolled = ["A3"];
+        public string Course { get; init; } = "MBA00101/1/0";
+        public bool ExhaustAfterFirst { get; init; }
+        public bool NoVacancies { get; init; }
+        public IReadOnlyList<EnrollmentOption> StudentTypes { get; init; } = [new("MBA", "MBA")];
+        public IReadOnlyList<string> Modalities { get; init; } = ["PT"];
+        public int CandidateReads { get; private set; }
         public bool FailSecond { get; init; }
         public bool SkipSecond { get; init; }
         public string? StaleStudent { get; init; }
@@ -202,14 +297,21 @@ public sealed class MassEnrollmentTests
         public Task<MassEnrollmentFilters> GetFiltersAsync(EnrollmentSelection selection, string user, CancellationToken ct)
         {
             CatalogueUser = user;
-            return Task.FromResult(new MassEnrollmentFilters([new("MBA", "MBA")], ["PT"], ["2024"],
-                [new("2024A", "Primer semestre")], [new("MBA00101/1/0", "Curso Uno")]));
+            return Task.FromResult(new MassEnrollmentFilters(StudentTypes, Modalities, ["2024"],
+                [new("2024A", "Primer semestre")], NoVacancies || (ExhaustAfterFirst && Writes > 0) ? [] : [new(Course, "Curso Uno")]));
         }
 
-        public Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct) =>
-            Task.FromResult<IReadOnlyList<MassEnrollmentRow>>(
+        public Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct) =>
+            Task.FromResult<EnrollmentOption?>(selection.Course == Course && selection.StudentType == "MBA" && selection.Modality == "PT"
+                ? new(Course, "Curso Uno") : null);
+
+        public Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct)
+        {
+            CandidateReads++;
+            return Task.FromResult<IReadOnlyList<MassEnrollmentRow>>(
                 new[] { "A1", "A2", "A3" }.Select((id, i) => new MassEnrollmentRow(id,
                     i == 0 ? "Alumno Uno" : id, "12345678-9", "2024A", "REGULAR", "", "D1", enrolled.Contains(id))).ToArray());
+        }
 
         public Task<bool> IsEnrolledAsync(string student, EnrollmentSelection selection, CancellationToken ct) =>
             Task.FromResult(enrolled.Contains(student) || StaleStudent == student);

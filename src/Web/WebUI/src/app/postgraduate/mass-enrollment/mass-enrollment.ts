@@ -13,6 +13,7 @@ interface Row {
   studentCode: string; name: string; rut: string; entrySemester: string; entryType: string;
   situation: string; reason: string; decree: string; enrolled: boolean;
 }
+interface Report { rows: Row[]; total: number; canEnroll: boolean; availabilityMessage: string | null; }
 interface Envelope<T> { success: boolean; data: T; }
 const BASE = '/api/reports/postgraduate/mass-enrollment';
 const EMPTY: Filters = { studentTypes: [], modalities: [], cohorts: [], periods: [], courses: [] };
@@ -31,7 +32,7 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
             <p class="page-subtitle mb-0">Inscripción administrativa por tipo de alumno, modalidad, cohorte, período y curso.</p>
           </div>
           <button class="btn btn-create" type="button" data-action="enroll"
-            [disabled]="selected().size === 0 || busy()" (click)="enroll()">
+            [disabled]="!canEnroll() || selected().size === 0 || busy()" (click)="enroll()">
             <i class="bi bi-person-plus me-2" aria-hidden="true"></i>Inscribir
           </button>
         </div>
@@ -87,6 +88,7 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
       </div>
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (notice()) { <div class="alert alert-success" role="status">{{ notice() }}</div> }
+      @if (availabilityMessage()) { <div class="alert alert-warning" role="status">{{ availabilityMessage() }}</div> }
       @if (busy()) { <p role="status">{{ saving() ? 'Inscribiendo…' : 'Cargando…' }}</p> }
       @if (rows().length > 0) {
         <div class="form-section">
@@ -108,7 +110,7 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                     <td>{{ row.entrySemester }}</td><td>{{ row.entryType }}</td><td>{{ row.situation }}</td>
                     <td>{{ row.reason }}</td><td>{{ row.enrolled ? 'SI' : 'NO' }}</td>
                     <td><input type="checkbox" class="form-check-input"
-                      [attr.aria-label]="'Inscribir ' + row.studentCode" [disabled]="row.enrolled || busy()"
+                      [attr.aria-label]="'Inscribir ' + row.studentCode" [disabled]="!canEnroll() || row.enrolled || busy()"
                       [checked]="selected().has(row.studentCode)" (change)="toggle(row)" /></td>
                     <td>{{ row.decree }}</td>
                   </tr>
@@ -134,11 +136,13 @@ export class MassEnrollment {
   protected readonly selected = signal<Set<string>>(new Set());
   protected readonly error = signal('');
   protected readonly notice = signal('');
+  protected readonly canEnroll = signal(false);
+  protected readonly availabilityMessage = signal('');
   protected readonly saving = signal(false);
   private readonly filtering = signal(false);
   private readonly loading = signal(false);
   protected readonly busy = computed(() => this.saving() || this.filtering() || this.loading());
-  protected readonly eligibleCount = computed(() => this.rows().filter(row => !row.enrolled).length);
+  protected readonly eligibleCount = computed(() => this.canEnroll() ? this.rows().filter(row => !row.enrolled).length : 0);
   protected readonly allSelected = computed(() => this.eligibleCount() > 0 && this.selected().size === this.eligibleCount());
   private filterRevision = 0;
   private candidateRevision = 0;
@@ -158,21 +162,23 @@ export class MassEnrollment {
     void this.loadFilters();
   }
 
-  private invalidate(preserveNotice = false): void {
+  private invalidate(): void {
     this.candidateRevision++;
     this.loadedSelection = null;
     this.rows.set([]);
     this.selected.set(new Set());
-    if (!preserveNotice) this.notice.set('');
+    this.notice.set('');
+    this.canEnroll.set(false);
+    this.availabilityMessage.set('');
   }
 
   private params(selection: Selection): HttpParams {
     return new HttpParams({ fromObject: selection as unknown as Record<string, string> });
   }
 
-  private async loadFilters(preserveNotice = false, preserveCourse = false): Promise<boolean> {
+  private async loadFilters(): Promise<boolean> {
     const revision = ++this.filterRevision;
-    this.invalidate(preserveNotice);
+    this.invalidate();
     this.filtering.set(true);
     this.error.set('');
     try {
@@ -188,17 +194,13 @@ export class MassEnrollment {
       this.form.setValue({
         studentType: option(current.studentType, filters.studentTypes), modality: text(current.modality, filters.modalities),
         cohort: text(current.cohort, filters.cohorts), period: option(current.period, filters.periods),
-        course: preserveCourse && !filters.courses.some(item => item.value === current.course)
-          ? '' : option(current.course, filters.courses),
+        course: option(current.course, filters.courses),
       }, { emitEvent: false });
       return true;
     } catch {
       if (revision === this.filterRevision) {
         this.filters.set(EMPTY);
-        if (preserveCourse) this.form.controls.course.setValue('', { emitEvent: false });
-        this.error.set(preserveNotice
-          ? 'La inscripción fue confirmada, pero no se pudieron actualizar los filtros. Actualice antes de consultar.'
-          : 'No se pudieron cargar los filtros de inscripción.');
+        this.error.set('No se pudieron cargar los filtros de inscripción.');
       }
       return false;
     } finally { if (revision === this.filterRevision) this.filtering.set(false); }
@@ -213,6 +215,8 @@ export class MassEnrollment {
 
   private async loadRows(): Promise<void> {
     const selection = this.form.getRawValue();
+    this.canEnroll.set(false);
+    this.availabilityMessage.set('');
     this.selected.set(new Set());
     this.loadedSelection = null;
     this.error.set('');
@@ -224,11 +228,15 @@ export class MassEnrollment {
     const revision = ++this.candidateRevision;
     this.loading.set(true);
     try {
-      const response = await firstValueFrom(this.http.get<Envelope<{ rows: Row[]; total: number }>>(BASE,
+      const response = await firstValueFrom(this.http.get<Envelope<Report>>(BASE,
         { params: this.params(selection) }));
       if (revision !== this.candidateRevision) return;
       if (response.success !== true) throw new Error('contract');
+      if (typeof response.data.canEnroll !== 'boolean') throw new Error('contract');
       this.rows.set(response.data.rows);
+      this.canEnroll.set(response.data.canEnroll);
+      this.availabilityMessage.set(response.data.canEnroll ? ''
+        : response.data.availabilityMessage ?? 'El curso ya no tiene vacantes.');
       this.loadedSelection = selection;
       if (response.data.rows.length === 0) this.error.set('Sin datos para los filtros seleccionados.');
     } catch {
@@ -240,19 +248,19 @@ export class MassEnrollment {
   }
 
   protected toggle(row: Row): void {
-    if (row.enrolled || this.busy()) return;
+    if (!this.canEnroll() || row.enrolled || this.busy()) return;
     const selected = new Set(this.selected());
     if (selected.has(row.studentCode)) selected.delete(row.studentCode); else selected.add(row.studentCode);
     this.selected.set(selected);
   }
 
   protected selectAll(checked: boolean): void {
-    if (this.busy()) return;
+    if (!this.canEnroll() || this.busy()) return;
     this.selected.set(new Set(checked ? this.rows().filter(row => !row.enrolled).map(row => row.studentCode) : []));
   }
 
   protected async enroll(): Promise<void> {
-    if (this.busy() || !this.loadedSelection || this.selected().size === 0) return;
+    if (!this.canEnroll() || this.busy() || !this.loadedSelection || this.selected().size === 0) return;
     const selection = this.loadedSelection;
     const studentCodes = [...this.selected()];
     const revision = this.candidateRevision;
@@ -262,7 +270,7 @@ export class MassEnrollment {
     try {
       const confirmation = await this.notifications.confirm('Confirmar inscripción',
         'Desea inscribir a los alumnos seleccionados?', 'Sí, inscribir', 'Cancelar');
-      if (!confirmation.isConfirmed || this.destroyRef.destroyed || revision !== this.candidateRevision) return;
+      if (!confirmation.isConfirmed || this.destroyRef.destroyed || revision !== this.candidateRevision || !this.canEnroll()) return;
       this.error.set('');
       this.notice.set('');
       const response = await firstValueFrom(this.http.post<Envelope<{ enrolled: number }>>(BASE, {
@@ -271,17 +279,9 @@ export class MassEnrollment {
       if (response.success !== true) throw new Error('contract');
       const success = 'Alumnos inscritos: ' + response.data.enrolled;
       this.notice.set(success);
-      // A confirmed enrollment can consume the last vacancy and remove the course.
-      // Refresh catalogues first; never query stale filters or switch course silently.
-      if (await this.loadFilters(true, true)) {
-        const current = this.form.getRawValue();
-        if (Object.keys(selection).every(key => selection[key as keyof Selection] === current[key as keyof Selection]))
-          await this.loadRows();
-        else {
-          this.form.controls.course.setValue('', { emitEvent: false });
-          this.notice.set(success + '. El curso ya no está disponible para inscripción. Actualice los filtros para continuar.');
-        }
-      }
+      // Listing remains valid after the last vacancy is used. Its authoritative
+      // availability disables writes without discarding the selected course or students.
+      await this.loadRows();
     } catch {
       this.invalidate();
       this.error.set('No se pudo confirmar la inscripción. Actualice el listado antes de reintentar.');
