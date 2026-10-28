@@ -69,6 +69,26 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('cursos vs alumnos abre la pantalla funcional en lugar de la ficha pendiente', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/cursos-por-alumnos');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    const requests = http.match(request =>
+      request.url.startsWith('/api/reports/postgraduate/courses-by-students/filters'));
+    expect(requests.map(request => request.request.url))
+      .toEqual(['/api/reports/postgraduate/courses-by-students/filters']);
+    requests[0].flush({
+      success: true, message: null,
+      data: { periods: [], studentTypes: [], modalities: [] },
+    });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Cursos vs. alumnos');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
+    http.verify();
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
