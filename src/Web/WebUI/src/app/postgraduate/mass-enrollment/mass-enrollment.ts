@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { firstValueFrom } from 'rxjs';
+import { NotificationService } from '../../core/services/notification-service';
 
 interface Option { value: string; text: string; }
 interface Selection { studentType: string; modality: string; cohort: string; period: string; course: string; }
@@ -123,6 +124,8 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
 })
 export class MassEnrollment {
   private readonly http = inject(HttpClient);
+  private readonly notifications = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
   readonly form = inject(FormBuilder).nonNullable.group({
     studentType: '', modality: '', cohort: '', period: '', course: '',
   });
@@ -155,27 +158,27 @@ export class MassEnrollment {
     void this.loadFilters();
   }
 
-  private invalidate(): void {
+  private invalidate(preserveNotice = false): void {
     this.candidateRevision++;
     this.loadedSelection = null;
     this.rows.set([]);
     this.selected.set(new Set());
-    this.notice.set('');
+    if (!preserveNotice) this.notice.set('');
   }
 
   private params(selection: Selection): HttpParams {
     return new HttpParams({ fromObject: selection as unknown as Record<string, string> });
   }
 
-  private async loadFilters(): Promise<void> {
+  private async loadFilters(preserveNotice = false, preserveCourse = false): Promise<boolean> {
     const revision = ++this.filterRevision;
-    this.invalidate();
+    this.invalidate(preserveNotice);
     this.filtering.set(true);
     this.error.set('');
     try {
       const response = await firstValueFrom(this.http.get<Envelope<Filters>>(BASE + '/filters',
         { params: this.params(this.form.getRawValue()) }));
-      if (revision !== this.filterRevision) return;
+      if (revision !== this.filterRevision) return false;
       if (response.success !== true) throw new Error('contract');
       const filters = response.data;
       this.filters.set(filters);
@@ -185,19 +188,26 @@ export class MassEnrollment {
       this.form.setValue({
         studentType: option(current.studentType, filters.studentTypes), modality: text(current.modality, filters.modalities),
         cohort: text(current.cohort, filters.cohorts), period: option(current.period, filters.periods),
-        course: option(current.course, filters.courses),
+        course: preserveCourse && !filters.courses.some(item => item.value === current.course)
+          ? '' : option(current.course, filters.courses),
       }, { emitEvent: false });
+      return true;
     } catch {
       if (revision === this.filterRevision) {
         this.filters.set(EMPTY);
-        this.error.set('No se pudieron cargar los filtros de inscripción.');
+        if (preserveCourse) this.form.controls.course.setValue('', { emitEvent: false });
+        this.error.set(preserveNotice
+          ? 'La inscripción fue confirmada, pero no se pudieron actualizar los filtros. Actualice antes de consultar.'
+          : 'No se pudieron cargar los filtros de inscripción.');
       }
+      return false;
     } finally { if (revision === this.filterRevision) this.filtering.set(false); }
   }
 
   protected async show(): Promise<void> {
     if (this.busy()) return;
     this.notice.set('');
+    if (!this.form.controls.course.value && !await this.loadFilters()) return;
     await this.loadRows();
   }
 
@@ -243,18 +253,35 @@ export class MassEnrollment {
 
   protected async enroll(): Promise<void> {
     if (this.busy() || !this.loadedSelection || this.selected().size === 0) return;
-    if (!window.confirm('Desea inscribir a los alumnos seleccionados?')) return;
+    const selection = this.loadedSelection;
+    const studentCodes = [...this.selected()];
+    const revision = this.candidateRevision;
+    // Freeze the consent target before awaiting the asynchronous dialog.
     this.saving.set(true);
     this.form.disable({ emitEvent: false });
-    this.error.set('');
-    this.notice.set('');
     try {
+      const confirmation = await this.notifications.confirm('Confirmar inscripción',
+        'Desea inscribir a los alumnos seleccionados?', 'Sí, inscribir', 'Cancelar');
+      if (!confirmation.isConfirmed || this.destroyRef.destroyed || revision !== this.candidateRevision) return;
+      this.error.set('');
+      this.notice.set('');
       const response = await firstValueFrom(this.http.post<Envelope<{ enrolled: number }>>(BASE, {
-        selection: this.loadedSelection, studentCodes: [...this.selected()], confirmed: true,
+        selection, studentCodes, confirmed: true,
       }));
       if (response.success !== true) throw new Error('contract');
-      this.notice.set('Alumnos inscritos: ' + response.data.enrolled);
-      await this.loadRows();
+      const success = 'Alumnos inscritos: ' + response.data.enrolled;
+      this.notice.set(success);
+      // A confirmed enrollment can consume the last vacancy and remove the course.
+      // Refresh catalogues first; never query stale filters or switch course silently.
+      if (await this.loadFilters(true, true)) {
+        const current = this.form.getRawValue();
+        if (Object.keys(selection).every(key => selection[key as keyof Selection] === current[key as keyof Selection]))
+          await this.loadRows();
+        else {
+          this.form.controls.course.setValue('', { emitEvent: false });
+          this.notice.set(success + '. El curso ya no está disponible para inscripción. Actualice los filtros para continuar.');
+        }
+      }
     } catch {
       this.invalidate();
       this.error.set('No se pudo confirmar la inscripción. Actualice el listado antes de reintentar.');

@@ -9,10 +9,15 @@ datos académicos y auditorías.
 1. Elegir tipo alumno, modalidad, cohorte, período y curso/sección.
 2. Presionar **Actualizar** y seleccionar alumnos no inscritos, individualmente
    o con **Inscribir** en la cabecera de la tabla.
-3. Presionar **Inscribir** y confirmar
-   `Desea inscribir a los alumnos seleccionados?`.
-4. La pantalla informa la cantidad confirmada y actualiza el listado.
-   Si falla la operación, actualizar antes de reintentar; no hay reintentos automáticos.
+3. Presionar **Inscribir** y confirmar en SweetAlert2 (el mismo patrón de
+   `NotificationService` de SADAlumnos): `Desea inscribir a los alumnos seleccionados?`.
+   Cancelar no envía la inscripción; mientras se confirma, la selección queda bloqueada.
+4. La pantalla informa la cantidad confirmada y refresca primero los filtros.
+   Si el curso conserva disponibilidad, actualiza el listado. Si se agotó el último
+   cupo y desapareció del catálogo, conserva la confirmación y limpia la selección
+   sin consultar filtros inválidos ni elegir otro curso automáticamente.
+   Un fallo de recarga posterior no convierte la inscripción confirmada en fallida.
+   Si falla la inscripción, actualizar antes de reintentar; no hay reintentos automáticos.
 
 Los filtros no ofrecen Todos. Cambiar filtros descarta el listado y la selección
 anteriores. La tabla conserva foto, nombre, código, Rut, ingreso, situación, motivo,
