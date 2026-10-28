@@ -79,7 +79,7 @@ public sealed class MassEnrollmentDataTests
         var selection = new EnrollmentSelection("MBA", "PT", "2024", "2024A", "ENECO660/02/0");
         Assert.Equal(new EnrollmentOption("ENECO660/02/0", "ENECO660/02 Economía"),
             await data.FindCourseAsync(selection, default));
-        Assert.Equal(("2024A", "ENECO660", "02", "0", "MBA", "PT"), context.CourseArguments);
+        Assert.Equal(("2024A", "ENECO660", "02", "0", "MBA"), context.CourseArguments);
         context.OfferedCourse = null;
         Assert.Null(await data.FindCourseAsync(selection, default));
     }
@@ -92,11 +92,11 @@ public sealed class MassEnrollmentDataTests
         public (string, string, string, string) StateArguments;
         public readonly FakeTransaction Batch = new();
         public SpRecEnrollmentCoursesResult? OfferedCourse;
-        public (string, string, string, string, string, string) CourseArguments;
+        public (string, string, string, string, string) CourseArguments;
         public override Task<SpRecEnrollmentCoursesResult?> FindMassEnrollmentCourseAsync(
-            string period, string course, string section, string courseType, string studentType, string modality, CancellationToken ct)
+            string period, string course, string section, string courseType, string studentType, CancellationToken ct)
         {
-            CourseArguments = (period, course, section, courseType, studentType, modality);
+            CourseArguments = (period, course, section, courseType, studentType);
             return Task.FromResult(OfferedCourse);
         }
         public override Task<int> ExecuteSqlRawAsync(string sql, object[] parameters, CancellationToken ct)

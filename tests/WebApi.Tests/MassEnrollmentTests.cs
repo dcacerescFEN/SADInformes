@@ -256,7 +256,6 @@ public sealed class MassEnrollmentTests
 
     [Theory]
     [InlineData("studentType=MBA", "studentType=MGP")]
-    [InlineData("modality=PT", "modality=FT")]
     public async Task Exhausted_course_from_another_valid_student_scope_is_rejected(string original, string otherScope)
     {
         var data = new FakeEnrollmentData
@@ -302,7 +301,7 @@ public sealed class MassEnrollmentTests
         }
 
         public Task<EnrollmentOption?> FindCourseAsync(EnrollmentSelection selection, CancellationToken ct) =>
-            Task.FromResult<EnrollmentOption?>(selection.Course == Course && selection.StudentType == "MBA" && selection.Modality == "PT"
+            Task.FromResult<EnrollmentOption?>(selection.Course == Course && selection.StudentType == "MBA"
                 ? new(Course, "Curso Uno") : null);
 
         public Task<IReadOnlyList<MassEnrollmentRow>> GetCandidatesAsync(EnrollmentSelection selection, CancellationToken ct)

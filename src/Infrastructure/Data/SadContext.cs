@@ -52,7 +52,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
 
     public virtual Task<SpRecEnrollmentCoursesResult?> FindMassEnrollmentCourseAsync(
         string period, string course, string section, string courseType,
-        string studentType, string modality, CancellationToken ct) =>
+        string studentType, CancellationToken ct) =>
         (from subject in Catedras.AsNoTracking()
          join offeredCourse in Cursos.AsNoTracking() on subject.CodCatedra equals offeredCourse.CodCatedra
          join plan in PlanesFormacionCatedras.AsNoTracking()
@@ -63,7 +63,8 @@ public partial class SadContext(DbContextOptions<SadContext> options)
              equals new { vacancies.Periodo, vacancies.CodCatedra, vacancies.CodSeccion }
          where offeredCourse.Periodo == period && subject.CodCatedra == course
              && offeredCourse.CodSeccion == section && !offeredCourse.Eliminado
-             && offeredCourse.TipoAlumnoPostgrado == studentType && offeredCourse.ModalidadPostgrado == modality
+             // The legacy available-course SP leaves the course type/modality unfiltered;
+             // capacity is keyed by the selected student type in Vacantes_Cursos.
              && vacancies.TipoAlumno == studentType && vacancies.VacOfrecidas > 0
              && plan.TipoCatedra == courseType && plan.CodPlanFormacion == "GRAL"
              && (plan.TipoCatedra == "0" || plan.TipoCatedra == "1" || plan.TipoCatedra == "2" || plan.TipoCatedra == "3")
@@ -72,7 +73,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
              Cod_Catedra = subject.CodCatedra + "/" + offeredCourse.CodSeccion + "/" + plan.TipoCatedra,
              NombreCatedra = subject.NomCatedra == null ? null
                  : subject.CodCatedra + "/" + offeredCourse.CodSeccion + "/" + subject.NomCatedra,
-         }).Distinct().SingleOrDefaultAsync(ct);
+         }).Distinct().FirstOrDefaultAsync(ct);
 
     public DbSet<Catedra> Catedras => Set<Catedra>();
     public DbSet<Curso> Cursos => Set<Curso>();

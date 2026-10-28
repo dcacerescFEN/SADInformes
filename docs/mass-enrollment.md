@@ -105,9 +105,12 @@ La consulta valida el alcance del usuario y la identidad real del curso ofrecido
 sin exigir cupos; el agotamiento solo deshabilita la escritura. La búsqueda puntual
 usa LINQ sobre los `DbSet` de `SadContext`, con las entidades y metadatos existentes
 extraídos de `MappingDB/Models`: Catedras, Cursos, PlanesFormacion_Catedras,
-Vacantes_Cursos, Alumnos_Catedras y Movimientos_Inscripcion. Requiere que el curso
-corresponda al tipo de alumno y modalidad seleccionados, además de período, sección
-y tipo de cátedra. No usa SELECT SQL directo, no modifica el SP ni crea partials.
+Vacantes_Cursos, Alumnos_Catedras y Movimientos_Inscripcion. La identidad del curso se define por período, cátedra, sección, tipo de cátedra
+activo, plan GRAL y una fila de `Vacantes_Cursos` del tipo de alumno seleccionado.
+La modalidad y `Cursos.Tipo_AlumnoPostgrado`/`ModalidadPostgrado` no identifican la
+oferta: el SP heredado de cursos disponibles no las filtra y la capacidad se keyea
+por tipo en `Vacantes_Cursos`. Así, un curso ofrecido con tipo/modalidad de curso
+distintos o nulos sigue siendo legible para el tipo de alumno que tiene vacante. No usa SELECT SQL directo, no modifica el SP ni crea partials.
 
 Antes de escribir se revalidan catálogos, curso y todos los alumnos seleccionados.
 La postcondición exige una fila CURSADA y un movimiento AGREGA/ACEPTADA mediante

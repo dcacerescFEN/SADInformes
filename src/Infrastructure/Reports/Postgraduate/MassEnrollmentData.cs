@@ -36,7 +36,7 @@ public sealed class MassEnrollmentData(ISadContext context, ISadContextProcedure
     {
         var parts = selection.Course.Split('/');
         var course = await context.FindMassEnrollmentCourseAsync(selection.Period, parts[0], parts[1], parts[2],
-            selection.StudentType, selection.Modality, ct);
+            selection.StudentType, ct);
         return course is null ? null : new EnrollmentOption(course.Cod_Catedra.Trim(), course.NombreCatedra?.Trim() ?? course.Cod_Catedra);
     }
 
