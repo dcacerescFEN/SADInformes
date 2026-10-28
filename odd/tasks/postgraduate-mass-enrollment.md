@@ -26,8 +26,8 @@ T6 [S3,S4] DONE (available checks): Verify corrections, update docs and record c
 T8 [S5,S6,S3,S4] DONE: Keep exhausted-course candidates readable and selected; use MappingDB-derived LINQ mappings scoped to type/modality; expose availability and disable enrollment; preserve CQRS/transaction guards. Route: inline, Risk items 1,2,4. Commit: 7d59daa.
 T9 [S5,S6,S4] DONE (available proof): Run focused/full checks, independent verification and record same-branch fix with updated docs. Route: parent + verifier. Evidence: 124 .NET / 133 Angular / 22 Node, build pass; targeted mvsc0biz-9-47b0 cleared blocker and verified S5/S6. Commit: 7d59daa plus closing evidence. Real SQLServer/browser and native review unavailable.
 
-T10 [S7,S5,S6,S3,S4] DONE: Align exhausted-course lookup with authoritative offering semantics for period2026E/courseENECO660/section02/studentTypeMBA; retain wrong-type protection. Route: inline, Risk items1,2. Commit: pending.
-T11 [S7,S5,S6,S4] IN_PROGRESS: Focused/full/independent regression recheck and same-branch commit. Route: parent + verifier. Commit: pending.
+T10 [S7,S5,S6,S3,S4] DONE: Align exhausted-course lookup with authoritative offering semantics for period2026E/courseENECO600/section02/courseType1/studentTypeMBA/modalityANTOFAGASTA; retain wrong-type protection. Route: inline, Risk items1,2. Commit: 3037442.
+T11 [S7,S5,S6,S4] DONE (available proof): Focused/full/independent regression recheck and same-branch commit. Route: parent + verifier. Evidence: 36/36 focused, 127 .NET / 133 Angular / 22 Node, build pass; mvsdsdee-a-arhz S7 PASS. Commit: 3037442 plus closing evidence. Real SQLServer/browser/native proof unavailable.
 
 ## Log
 L1. Ahora migrar el informe InscripcionMasiva
@@ -71,3 +71,4 @@ L38. Production change: look up offering by period/course/section/active/GRAL/ty
 
 L39. Focused GREEN36/36 and full seam GREEN: .NET127/127, Node22/22, Angular suite+build exit0, diffcheckclean; warnings unchanged (NuGet, bundle762.79kB, SweetAlertCommonJS). Targeted independent recheck mvsdsdee-a-arhz: S7 PASS, user's exact2026E ENECO600/02/1 MBA/ANTOFAGASTA resolves through the real gateway when MBA vacancy exists; another valid type without its own vacancy row still rejected; noSQL/BBDD/MappingDB changes, LINQ/mappings/transaction/postcondition/permissions intact; cause pinned behaviorally and earlier compile-only attempt disclosed. Advisories: corrected ENECO660/ENECO600 doc typo; modality mismatch pinned at catalogue-validation level; postcondition uses LINQ without SQL lock hints under Serializable (predates this batch).
 L40. No candidate-caused blocker remains in available proof. Real SQLServer2026E/vacancy timing and browser proof unavailable; native assessment unavailable. Next: commit same branch and close.
+L41. Committed 3037442 on feat/postgraduate-mass-enrollment-complete (117 additions/34 deletions). No push/PR/merge/restart/DB write/migration. Available automated proof and independent targeted recheck complete; remaining missing proof is real 2026E SAD SQL Server data/vacancy timing and browser validation, plus unavailable native review.
