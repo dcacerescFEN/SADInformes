@@ -41,6 +41,8 @@ roles ni asignaciones**.
 | --- | --- | --- |
 | `ver Postgrado` + `informes acreditación` (Encuesta docente por curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` | Implementado |
 | `ver Postgrado` + `informes acreditación` (Cursos vs alumnos) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSES_BY_STUDENT` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Inscripción masiva: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT` | Implementado |
+| Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` | Implementado; exige también el permiso de consulta |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `Admin firma Postgrado` | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_SIGNATURE` (propuesto) | Pendiente; además requiere `UPLOAD` para imágenes |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |

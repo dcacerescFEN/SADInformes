@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace Infrastructure.Data;
 
 /// <summary>
-/// Contexto de solo lectura del SAD. La cadena de conexión se toma de
+/// Contexto del SAD: consultas de informes y transacciones de inscripción administrativa.
+/// La cadena de conexión se toma de
 /// <c>ConnectionStrings:Sad</c> y nunca se versiona.
 /// </summary>
 public partial class SadContext(DbContextOptions<SadContext> options)

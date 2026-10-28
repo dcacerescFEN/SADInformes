@@ -1,4 +1,5 @@
 using Application.Navigation;
+using Application.Reports.Postgraduate.MassEnrollment;
 using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.TeacherSurvey;
 using Application.Reports.Postgraduate.CoursesByStudents;
@@ -25,6 +26,8 @@ public static class ConfigureServices
                 sql => sql.CommandTimeout(60)));
         services.AddScoped<ISadContext>(provider => provider.GetRequiredService<SadContext>());
         services.AddScoped<ISadContextProcedures, SadContextProcedures>();
+        services.AddScoped<MassEnrollmentService>();
+        services.AddScoped<IMassEnrollmentData, MassEnrollmentData>();
         services.AddScoped<ITeacherSurveyReader, TeacherSurveyReader>();
         services.AddScoped<ICoursesByStudentsReader, CoursesByStudentsReader>();
         services.AddScoped<ConfigurationInitialiser>();

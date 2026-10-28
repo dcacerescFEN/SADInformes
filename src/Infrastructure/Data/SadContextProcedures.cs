@@ -10,7 +10,7 @@ namespace Infrastructure.Data;
 /// Implementación de los procedimientos del SAD con parámetros tipados, siguiendo
 /// la forma del contexto generado de SADAlumnos y SADAdministracion.
 /// </summary>
-public class SadContextProcedures(SadContext context) : ISadContextProcedures
+public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
     public virtual async Task<List<SpRecAlumnosXPeriodoXTipoAlumnoXModalidadResult>?> SpRec_AlumnosXPeriodoXTipo_AlumnoXModalidadAsync(
         string? periodo, string? tipo_Alumno, string? modalidad,

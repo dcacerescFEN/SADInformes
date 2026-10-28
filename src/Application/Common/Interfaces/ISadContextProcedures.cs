@@ -4,7 +4,7 @@ using Domain.Entities.Sad.Sp;
 namespace Application.Common.Interfaces;
 
 /// <summary>Procedimientos del SAD consumidos por los informes, al estilo de SADAlumnos.</summary>
-public interface ISadContextProcedures
+public partial interface ISadContextProcedures
 {
     Task<List<SpRecAlumnosXPeriodoXTipoAlumnoXModalidadResult>?> SpRec_AlumnosXPeriodoXTipo_AlumnoXModalidadAsync(
         string? periodo, string? tipo_Alumno, string? modalidad,
