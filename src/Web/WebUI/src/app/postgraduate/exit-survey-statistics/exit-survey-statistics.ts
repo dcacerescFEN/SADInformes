@@ -8,6 +8,7 @@ import { LikertMatrix, LikertRow, LikertTotals } from './likert-matrix';
 import { MultiScaleMatrix, ScaleData } from './multi-scale-matrix';
 import { TeacherRanking, TeacherRankingData } from './teacher-ranking';
 import { Insatisfaction, InsatisfactionRow, TeacherDetail } from './insatisfaction';
+import { SummaryMatrix, SummaryRow } from './summary-matrix';
 
 interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: Option[]; }
@@ -42,7 +43,7 @@ const TABS: readonly Tab[] = [
 
 @Component({
   selector: 'app-exit-survey-statistics',
-  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix, TeacherRanking, Insatisfaction],
+  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix, TeacherRanking, Insatisfaction, SummaryMatrix],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="container-fluid px-0 py-4">
@@ -149,6 +150,12 @@ const TABS: readonly Tab[] = [
                 [detailLoading]="detailLoading()" [detailError]="detailError()" (showDetail)="loadDetail($event)" />
             }
           </div>
+        } @else if (isSummaryTab()) {
+          <div class="mt-3" role="tabpanel" data-panel>
+            @if (summaryLoading()) { <p role="status">Cargando resumen…</p> }
+            @if (summaryError()) { <div class="alert alert-warning" role="alert">{{ summaryError() }}</div> }
+            @if (!summaryLoading() && !summaryError()) { <app-summary-matrix [rows]="summaryRows()" /> }
+          </div>
         } @else {
           <div class="alert alert-info mt-3" role="tabpanel" data-panel>
             <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
@@ -172,7 +179,7 @@ export class ExitSurveyStatistics {
   private readonly filtering = signal(false);
   protected readonly loaded = signal(false);
   protected readonly error = signal('');
-  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading() || this.teacherLoading() || this.insatisfactionLoading());
+  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading() || this.teacherLoading() || this.insatisfactionLoading() || this.summaryLoading());
   protected readonly likertData = signal<{ section: string; title: string; rows: LikertRow[]; totals: LikertTotals } | null>(null);
   protected readonly likertLoading = signal(false);
   protected readonly likertError = signal('');
@@ -188,6 +195,10 @@ export class ExitSurveyStatistics {
   protected readonly teacherDetail = signal<TeacherDetail | null>(null);
   protected readonly detailLoading = signal(false);
   protected readonly detailError = signal('');
+  protected readonly summaryRows = signal<SummaryRow[]>([]);
+  protected readonly summaryLoading = signal(false);
+  protected readonly summaryError = signal('');
+  protected readonly isSummaryTab = computed(() => this.activeTab() === 'resumen');
   protected readonly isLikertTab = computed(() => LIKERT_TABS.has(this.activeTab()));
   protected readonly isRatingTab = computed(() => RATING_TABS.has(this.activeTab()));
   protected readonly isTeachersTab = computed(() => this.activeTab() === 'ranking');
@@ -199,15 +210,17 @@ export class ExitSurveyStatistics {
   private teacherRevision = 0;
   private insatisfactionRevision = 0;
   private detailRevision = 0;
+  private summaryRevision = 0;
   private sampleSubscription?: Subscription;
   private likertSubscription?: Subscription;
   private ratingSubscription?: Subscription;
   private teacherSubscription?: Subscription;
   private insatisfactionSubscription?: Subscription;
   private detailSubscription?: Subscription;
+  private summarySubscription?: Subscription;
 
   constructor() {
-    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); this.teacherSubscription?.unsubscribe(); this.insatisfactionSubscription?.unsubscribe(); this.detailSubscription?.unsubscribe(); });
+    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); this.teacherSubscription?.unsubscribe(); this.insatisfactionSubscription?.unsubscribe(); this.detailSubscription?.unsubscribe(); this.summarySubscription?.unsubscribe(); });
     this.form.controls.studentType.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => void this.reloadForType());
     for (const control of ['period', 'modality'] as const) {
       this.form.controls[control].valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSample());
@@ -253,7 +266,7 @@ export class ExitSurveyStatistics {
     const selection = this.form.getRawValue();
     if (!selection.period || !selection.studentType || !selection.modality) return;
     this.sampleSubscription?.unsubscribe();
-    this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail();
+    this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary();
     const revision = ++this.sampleRevision;
     this.loading.set(true); this.error.set(''); this.likertData.set(null); this.likertError.set('');
     this.sampleSubscription = this.http.get<{ success: boolean; data: { rows: Row[]; totals: Totals } }>(BASE + '/sample', { params: selection })
@@ -279,8 +292,9 @@ export class ExitSurveyStatistics {
     if (LIKERT_TABS.has(id)) { this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadLikert(); }
     else if (RATING_TABS.has(id)) { this.cancelLikert(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadRating(); }
     else if (id === 'ranking') { this.cancelLikert(); this.cancelRating(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadTeachers(); }
-    else if (id === 'insatisfaccion') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelDetail(); this.loadInsatisfaction(); }
-    else { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); }
+    else if (id === 'insatisfaccion') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelDetail(); this.cancelSummary(); this.loadInsatisfaction(); }
+    else if (id === 'resumen') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadSummary(); }
+    else { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); }
   }
 
   private loadActiveSection(): void {
@@ -288,6 +302,7 @@ export class ExitSurveyStatistics {
     else if (RATING_TABS.has(this.activeTab())) this.loadRating();
     else if (this.activeTab() === 'ranking') this.loadTeachers();
     else if (this.activeTab() === 'insatisfaccion') this.loadInsatisfaction();
+    else if (this.activeTab() === 'resumen') this.loadSummary();
   }
 
   private cancelLikert(): void { this.likertRevision++; this.likertSubscription?.unsubscribe(); this.likertLoading.set(false); this.likertData.set(null); this.likertError.set(''); }
@@ -295,6 +310,28 @@ export class ExitSurveyStatistics {
   private cancelTeachers(): void { this.teacherRevision++; this.teacherSubscription?.unsubscribe(); this.teacherLoading.set(false); this.teacherData.set(null); this.teacherError.set(''); }
   private cancelInsatisfaction(): void { this.insatisfactionRevision++; this.insatisfactionSubscription?.unsubscribe(); this.insatisfactionLoading.set(false); this.insatisfactionRows.set([]); this.insatisfactionError.set(''); }
   private cancelDetail(): void { this.detailRevision++; this.detailSubscription?.unsubscribe(); this.detailLoading.set(false); this.teacherDetail.set(null); this.detailError.set(''); }
+  private cancelSummary(): void { this.summaryRevision++; this.summarySubscription?.unsubscribe(); this.summaryLoading.set(false); this.summaryRows.set([]); this.summaryError.set(''); }
+
+  private loadSummary(): void {
+    const selection = this.form.getRawValue();
+    if (!selection.period || !selection.studentType || !selection.modality) return;
+    this.summarySubscription?.unsubscribe();
+    const revision = ++this.summaryRevision;
+    this.summaryLoading.set(true); this.summaryError.set(''); this.summaryRows.set([]);
+    this.summarySubscription = this.http.get<{ success: boolean; data: { rows: SummaryRow[] } }>(BASE + '/summary', { params: { ...selection } })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (revision !== this.summaryRevision) return;
+          this.summaryLoading.set(false);
+          if (response.success !== true) { this.summaryError.set('No se pudo cargar el resumen.'); return; }
+          this.summaryRows.set(response.data.rows);
+        },
+        error: () => {
+          if (revision !== this.summaryRevision) return;
+          this.summaryLoading.set(false); this.summaryRows.set([]); this.summaryError.set('No se pudo cargar el resumen.');
+        },
+      });
+  }
 
   private loadTeachers(): void {
     const selection = this.form.getRawValue();

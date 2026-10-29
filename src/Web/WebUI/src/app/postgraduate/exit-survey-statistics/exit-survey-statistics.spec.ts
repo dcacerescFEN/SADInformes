@@ -44,8 +44,8 @@ describe('Exit survey statistics shell', () => {
   it('switches placeholder tab and shows empty state without fabricating totals', async () => {
     const fixture=await ready({success:true,data:{rows:[],totals:{sample:0,inProgress:0,answered:0}}},{success:true,data:{section:'malla',title:'Malla Curricular',rows:[],totals:{alternative1:0,alternative2:0,alternative3:0,alternative4:0,alternative5:0}}});
     const body:HTMLElement=fixture.nativeElement; expect(body.textContent).toContain('Sin Datos');
-    (body.querySelector('[data-tab="resumen"]') as HTMLButtonElement).click(); fixture.detectChanges();
-    expect(fixture.componentInstance.activeTab()).toBe('resumen'); expect(body.querySelector('[data-panel]')?.textContent).toContain('pendiente de migración');
+    (body.querySelector('[data-tab="graficos"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    expect(fixture.componentInstance.activeTab()).toBe('graficos'); expect(body.querySelector('[data-panel]')?.textContent).toContain('pendiente de migración');
     fixture.destroy();
   });
   it('cancels an older sample when filters change before it resolves', async () => {
@@ -100,6 +100,17 @@ describe('Exit survey statistics shell', () => {
     detail.flush({success:true,data:{professor:'Profesor Insatisfecho',motives:['Motivo uno','Motivo dos']}});
     await fixture.whenStable(); fixture.detectChanges();
     expect(body.querySelector('[data-teacher-detail]')?.textContent).toContain('Motivo uno'); expect(body.textContent).toContain('Ver motivos');
+    fixture.destroy();
+  });
+
+  it('loads the summary with N2 percentages and weighted dimension', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="resumen"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/summary').flush({success:true,data:{rows:[{section:'malla',title:'Malla Curricular',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,total:5,dimension:3}]}});
+    await fixture.whenStable(); fixture.detectChanges();
+    const body:HTMLElement=fixture.nativeElement;
+    expect(body.textContent).toContain('Dimensiones'); expect(body.textContent).toContain('Malla Curricular'); expect(body.textContent).toContain('20,00%'); expect(body.textContent).toContain('3,00');
+    expect(body.querySelector('[data-panel]')?.textContent).not.toContain('pendiente de migración');
     fixture.destroy();
   });
 

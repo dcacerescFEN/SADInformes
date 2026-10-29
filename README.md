@@ -1,6 +1,6 @@
 # SADInformes
 
-Estadísticas encuesta de salida (P1-P4): [shell, matrices y docentes/detalle](docs/exit-survey-statistics.md).
+Estadísticas encuesta de salida (P1-P5): [shell, matrices, docentes y Resumen](docs/exit-survey-statistics.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 

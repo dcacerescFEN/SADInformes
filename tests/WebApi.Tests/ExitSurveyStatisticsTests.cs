@@ -5,6 +5,7 @@ using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurve
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsCatedrasArea;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsLikert;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSkills;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSummary;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
@@ -144,6 +145,28 @@ public sealed class ExitSurveyStatisticsTests
         Assert.Equal(new ExitSurveySkillTotalsDTO(1, 2, 3, 4, 5, 6, 7), result.Data.Totals);
     }
 
+    [Fact]
+    public async Task Summary_computes_footer_percentages_and_weighted_dimension_for_seven_sections()
+    {
+        var procedures = new Procedures();
+        var result = await new GetExitSurveyStatisticsSummaryHandler(procedures, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsSummary("2024A", "MBA", "PT"), default);
+        Assert.Equal(7, result.Data.Rows.Length);
+        Assert.Equal(new[] { "Malla Curricular", "Cuerpo Académico", "Funcionamiento", "Infraestructura y recursos", "Servicios", "Vinculación Medio", "Networking" }, result.Data.Rows.Select(row => row.Title));
+        var row = result.Data.Rows[0];
+        Assert.Equal((5, 7, 9, 11, 13, 45), (row.Alternative1, row.Alternative2, row.Alternative3, row.Alternative4, row.Alternative5, row.Total));
+        Assert.Equal(155d / 45d, row.Dimension!.Value, 10);
+        Assert.Equal(7, procedures.LikertCalls.Count);
+    }
+
+    [Fact]
+    public async Task Summary_keeps_zero_totals_and_does_not_invent_a_dimension()
+    {
+        var result = await new GetExitSurveyStatisticsSummaryHandler(new Procedures { EmptyLikert = true }, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsSummary("2024A", "MBA", "PT"), default);
+        Assert.All(result.Data.Rows, row => { Assert.Equal(0, row.Total); Assert.Null(row.Dimension); });
+    }
+
     private static (WebApplicationFactory<Program>, TokenFactory) Create(Procedures procedures)
     {
         var tokens = new TokenFactory();
@@ -169,7 +192,7 @@ public sealed class ExitSurveyStatisticsTests
     {
         var (factory, tokens) = Create(new Procedures()); using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
         if (role is not null) client.SetBearer(tokens.CreateToken("SADInformes", role));
-        foreach (var suffix in new[] { "/filters", "/sample" + Query, "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos", "/catedras-area?period=2024A&studentType=Todos&modality=Todos", "/skills?period=2024A&studentType=Todos&modality=Todos" })
+        foreach (var suffix in new[] { "/filters", "/sample" + Query, "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos", "/catedras-area?period=2024A&studentType=Todos&modality=Todos", "/skills?period=2024A&studentType=Todos&modality=Todos", "/summary?period=2024A&studentType=Todos&modality=Todos" })
             Assert.Equal(status, (int)(await client.GetAsync(Route + suffix)).StatusCode);
     }
 
@@ -190,6 +213,7 @@ public sealed class ExitSurveyStatisticsTests
         Assert.Equal(2, json.RootElement.GetProperty("data").GetProperty("rows")[0].GetProperty("inProgress").GetInt32());
         using var likert = await client.GetAsync(Route + "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, likert.StatusCode);
         Assert.True(likert.Headers.CacheControl!.NoStore); Assert.Contains("Malla Curricular", await likert.Content.ReadAsStringAsync());
+        using var summary = await client.GetAsync(Route + "/summary?period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, summary.StatusCode); Assert.Contains("dimension", await summary.Content.ReadAsStringAsync());
         using var q8 = await client.GetAsync(Route + "/catedras-area?period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, q8.StatusCode); Assert.Contains("Cátedra Uno", await q8.Content.ReadAsStringAsync());
         using var q11 = await client.GetAsync(Route + "/skills?period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, q11.StatusCode); Assert.Contains("Habilidad", await q11.Content.ReadAsStringAsync());
     }

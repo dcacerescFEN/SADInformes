@@ -6,6 +6,7 @@ using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurve
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsTeacherDetail;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsTeachers;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSkills;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSummary;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
@@ -28,6 +29,7 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         group.MapGet("/teachers", Teachers).WithSummary("Ranking docente teórico, práctico y formativo (Q9)");
         group.MapGet("/insatisfaction", Insatisfaction).WithSummary("Profesores con insatisfacción (Q10)");
         group.MapGet("/insatisfaction/detail", InsatisfactionDetail).WithSummary("Motivos de insatisfacción de un profesor");
+        group.MapGet("/summary", Summary).WithSummary("Resumen porcentual y dimensional Q1-Q7");
     }
 
     private static Task<IResult> Filters(HttpContext context, IRequestDispatcher sender, string? studentType, CancellationToken ct) =>
@@ -67,6 +69,11 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         string? period, string? studentType, string? modality, string? professor, CancellationToken ct) =>
         Execute(context, async () => Results.Ok(await sender.Send(
             new GetExitSurveyStatisticsTeacherDetail(period, studentType, modality, professor), ct)));
+
+    private static Task<IResult> Summary(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsSummary(period, studentType, modality), ct)));
 
     private static async Task<IResult> Execute(HttpContext context, Func<Task<IResult>> operation)
     {

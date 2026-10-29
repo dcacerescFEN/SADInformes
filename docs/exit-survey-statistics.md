@@ -87,6 +87,27 @@ tercer bloque. La UI no puede corregir datos que el procedimiento devuelve mal;
 se muestran los motivos recibidos y se deja constancia para una futura corrección
 de base de datos. Los rankings Q9 mantienen las frecuencias del SP.
 
+## P5 entregado
+
+La tab **Resumen** compone Q1-Q7 y muestra una fila por dimensión con:
+
+- porcentaje de cada alternativa sobre la suma de footers de esa dimensión,
+  formateado con dos decimales es-CL y `%`;
+- **Evaluación Dimensión** = `(1·a1 + 2·a2 + 3·a3 + 4·a4 + 5·a5) / total`,
+  con dos decimales.
+
+La fórmula reproduce el cálculo del ASCX legado. Si el total de una dimensión es
+cero, la fila queda sin porcentajes ni dimensión; si todas están en cero se
+muestra **No existen datos disponibles.** No se inventan promedios.
+
+| Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
+| --- | --- |
+| `GET /summary?period=2024A&studentType=Todos&modality=Todos` | Siete dimensiones con conteos, total y dimensión ponderada |
+| Error | Filtros inválidos 400; almacenamiento 503 saneado |
+
+El endpoint ejecuta las siete consultas Q1-Q7 por el mismo camino tipado ya usado
+en las matrices; no duplica SQL ni recalcula el promedio de cada pregunta.
+
 ## API P1
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -111,11 +132,11 @@ modifican SP, funciones, vistas o tablas.
 ## Verificación P1
 
 14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 8 pruebas de componente, 12 de navegación y pruebas backend (incluyendo ADO.NET
-para Q1/Q7/Q8/Q11/Q9/Q10/DetalleProfesor) cubren carga automática, cambio
-dependiente de modalidad, tabs, muestra vacía, matrices, porcentajes, promedio,
-ranking docente corregido, drilldown de insatisfacción, cancelación de respuestas
-obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
+no-store y errores saneados. 9 pruebas de componente, 12 de navegación y 29 pruebas backend Resumen (31 en el
+conjunto de estadísticas, incluyendo ADO.NET para Q1/Q7/Q8/Q11/Q9/Q10/DetalleProfesor)
+cubren carga automática, cambio dependiente de modalidad, tabs, muestra vacía,
+matrices, porcentajes, promedio, ranking docente corregido, drilldown de
+insatisfacción, resumen N2/dimensión, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
 build de producción correcto. Las cinco fallas Angular son las ya conocidas de
 tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
 No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni
