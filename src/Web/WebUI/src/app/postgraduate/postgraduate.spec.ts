@@ -136,6 +136,18 @@ describe('Navegación visual de Postgrado', () => {
     expect(harness.routeNativeElement?.querySelectorAll('ng-select[data-filter]')).toHaveLength(5);
   });
 
+  it('opens student requests using its existing slug and four SSRS filters', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/solicitudes-alumnos');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/student-requests/filters')
+      .flush({ success: true, data: { studentTypes: [], modalities: [], cohorts: [], states: [] } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim()).toBe('Solicitudes alumno');
+    expect(harness.routeNativeElement?.querySelectorAll('ng-select[data-filter]')).toHaveLength(4);
+    expect(harness.routeNativeElement?.textContent).not.toContain('Pendiente de migración');
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');

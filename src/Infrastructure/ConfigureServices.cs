@@ -3,6 +3,8 @@ using Application.Common.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Configuration;
 using Infrastructure.Services;
+using Infrastructure.Reporting;
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,20 @@ public static class ConfigureServices
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<PostgraduateSettings>();
+        services.AddSingleton<ReportingSettings>();
+        services.AddScoped<IReportRenderer, SsrsReportRenderer>();
+        services.AddHttpClient(SsrsReportRenderer.ClientName, client => client.Timeout = Timeout.InfiniteTimeSpan)
+            .ConfigurePrimaryHttpMessageHandler(provider =>
+            {
+                var settings = provider.GetRequiredService<ReportingSettings>();
+                return new HttpClientHandler
+                {
+                    Credentials = new NetworkCredential(settings.Username, settings.Password, settings.Domain),
+                    PreAuthenticate = true,
+                    AllowAutoRedirect = false,
+                    UseCookies = false,
+                };
+            });
         services.AddSingleton<Application.Common.Interfaces.IPostgraduateSettings>(
             provider => provider.GetRequiredService<PostgraduateSettings>());
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();

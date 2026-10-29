@@ -29,7 +29,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('cursos-profesores', 'Cursos profesores Postgrado',
     'Cursos y evaluación de profesores por período y departamento.', 'CursosProfesoresPostgrado.aspx', true),
   entry('solicitudes-alumnos', 'Solicitudes alumno',
-    'Informe de solicitudes de alumnos por programa, modalidad, ingreso y estado.', 'SolicitudesAlumnosPostgrado.aspx'),
+    'Informe de solicitudes de alumnos por programa, modalidad, ingreso y estado.', 'SolicitudesAlumnosPostgrado.aspx', true),
   entry('mantenedores', 'Mantenedores',
     'Acceso a mantenedores de constancias, coordinadores, directores y NCE.', 'Mantenedores.aspx'),
   entry('actualizacion-datos-sad-vti', 'Actualización datos SAD–VTI',
