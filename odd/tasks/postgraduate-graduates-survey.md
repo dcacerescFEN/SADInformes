@@ -43,7 +43,7 @@ T2 [S1] DONE (P2 Likert Q1-Q7): typed Q1-Q7 wrappers, generic section query, end
 T3 [S1] DONE (P3 Q8/Q11 verified): typed Q8/Q11 contracts, queries, endpoints and configurable matrix; docs, focused and full suites observed. Route: inline. Commit: withheld.
 T4 [S1] DONE (P4 verified): Q9/Q10/detail typed queries, endpoints, corrected Q9 UI and inline motives panel; focused and full suites observed. Route: inline. Commit: withheld.
 T5 [S1] DONE (P5 verified): summary query/endpoint and N2 weighted matrix; focused and full suites observed. Route: inline. Commit: withheld.
-T6 [S1] PENDING: P6 charts. Route: inline + verifier if UI shared surfaces change. Commit: withheld.
+T6 [S1] DONE (P6 verified): Q17 section, CSS/SVG chart component and eight-option selector; focused and full suites observed. Route: inline. Commit: withheld.
 T7 [S1] PENDING: P7 hardening/docs/verification. Route: inline + independent verifier. Commit: withheld.
 
 ## Log
@@ -75,3 +75,7 @@ L15. P4 closed with available proof: full .NET 325/325, Node 38/38, Angular 191/
 L16. P5 implemented: /summary reuses Q1-Q7 typed paths; backend sums alternatives, computes total and weighted dimension; Angular SummaryMatrix formats N2 percentages/dimension and no-data/zero states. Focused: 29 backend (including summary), 9 component GREEN. No commits. Full suites/build pending.
 
 L17. P5 closed with available proof: full .NET 327/327, Node 38/38, Angular 192/197 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused summary: 29 backend and 9 component GREEN. No commits/staging. P6 is next (CSS/SVG charts).
+
+L18. P6 implemented: Q17 mapped into Likert sections; SurveyChart uses CSS stacked bars and no new library; charts selector covers Q1-Q7+Q17 with loading/error/no-data. Focused: 40 backend, 11 component GREEN. No commits. Full suites/build pending.
+
+L19. P6 closed with available proof: full .NET 329/329, Node 38/38, Angular 194/199 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused: 40 backend, 11 component GREEN. Q17 and eight CSS chart options implemented; no chart dependency/export. No commits/staging. P7 is next (final hardening).

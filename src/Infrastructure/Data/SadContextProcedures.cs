@@ -133,6 +133,9 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         ExecuteLikertAsync("Q5", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
     public virtual Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ6Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
         ExecuteLikertAsync("Q6", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
+    public virtual Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ17Async(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        ExecuteLikertAsync("Q17", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
     public virtual Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ7Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
         ExecuteLikertAsync("Q7", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
 
@@ -148,6 +151,7 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
             "Q5" => "spRec_EncuestaGraduadosEstadisticasQ5",
             "Q6" => "spRec_EncuestaGraduadosEstadisticasQ6",
             "Q7" => "spRec_EncuestaGraduadosEstadisticasQ7",
+            "Q17" => "spRec_EncuestaGraduadosEstadisticasQ17",
             _ => throw new ArgumentOutOfRangeException(nameof(question)),
         };
         var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };

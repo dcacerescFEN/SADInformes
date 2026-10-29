@@ -53,6 +53,7 @@ internal sealed record LikertRow(string Question, string Description, int A1, in
 internal static class LikertSections
 {
     internal static readonly string[] Ids = ["malla", "cuerpo-academico", "funcionamiento", "infraestructura", "servicios", "vinculacion-medio", "networking"];
+    internal static readonly string[] ChartIds = [.. Ids, "evaluacion-general"];
     internal static string Title(string id) => id switch
     {
         "malla" => "Malla Curricular",
@@ -62,9 +63,10 @@ internal static class LikertSections
         "servicios" => "Servicios",
         "vinculacion-medio" => "Vinculación Medio",
         "networking" => "Networking",
+        "evaluacion-general" => "Evaluación general",
         _ => throw new ArgumentException("La sección Likert no es válida."),
     };
-    internal static string Required(string? id) => id is not null && Ids.Contains(id, StringComparer.Ordinal)
+    internal static string Required(string? id) => id is not null && ChartIds.Contains(id, StringComparer.Ordinal)
         ? id : throw new ArgumentException("La sección Likert no es válida.");
 
     internal static async Task<LikertRow[]> ReadAsync(ISadContextProcedures p, string section,
@@ -79,6 +81,7 @@ internal static class LikertSections
             "servicios" => await p.spRec_EncuestaGraduadosEstadisticasQ5Async(period, type, modality, cancellationToken: ct),
             "vinculacion-medio" => await p.spRec_EncuestaGraduadosEstadisticasQ6Async(period, type, modality, cancellationToken: ct),
             "networking" => await p.spRec_EncuestaGraduadosEstadisticasQ7Async(period, type, modality, cancellationToken: ct),
+            "evaluacion-general" => await p.spRec_EncuestaGraduadosEstadisticasQ17Async(period, type, modality, cancellationToken: ct),
             _ => throw new ArgumentException("La sección Likert no es válida."),
         };
         return (rows ?? []).Select(row => new LikertRow(row.Pregunta?.Trim() ?? "", row.Descripcion?.Trim() ?? "",

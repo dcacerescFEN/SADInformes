@@ -85,6 +85,7 @@ public sealed class ExitSurveyStatisticsTests
     [InlineData("servicios", "Q5", "Servicios")]
     [InlineData("vinculacion-medio", "Q6", "Vinculación Medio")]
     [InlineData("networking", "Q7", "Networking")]
+    [InlineData("evaluacion-general", "Q17", "Evaluación general")]
     public async Task Likert_maps_each_section_to_its_canonical_question_and_totals_alternatives(string section, string question, string title)
     {
         var procedures = new Procedures();
@@ -271,6 +272,7 @@ public sealed class ExitSurveyStatisticsTests
         public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ5Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q5", periodo, tipo_Alumno, modalidad);
         public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ6Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q6", periodo, tipo_Alumno, modalidad);
         public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ7Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q7", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ17Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q17", periodo, tipo_Alumno, modalidad);
         private Task<List<SpRecEncuestaGraduadosLikertResult>?> RecordLikert(string question, string? period, string? type, string? modality)
         {
             Period = period; Type = type; Modality = modality;

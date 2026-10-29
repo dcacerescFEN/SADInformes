@@ -41,11 +41,9 @@ describe('Exit survey statistics shell', () => {
     http.expectOne(r=>r.url===BASE+'/likert').flush(likert); await fixture.whenStable(); fixture.detectChanges();
     fixture.destroy();
   });
-  it('switches placeholder tab and shows empty state without fabricating totals', async () => {
+  it('shows empty sample without fabricating totals', async () => {
     const fixture=await ready({success:true,data:{rows:[],totals:{sample:0,inProgress:0,answered:0}}},{success:true,data:{section:'malla',title:'Malla Curricular',rows:[],totals:{alternative1:0,alternative2:0,alternative3:0,alternative4:0,alternative5:0}}});
     const body:HTMLElement=fixture.nativeElement; expect(body.textContent).toContain('Sin Datos');
-    (body.querySelector('[data-tab="graficos"]') as HTMLButtonElement).click(); fixture.detectChanges();
-    expect(fixture.componentInstance.activeTab()).toBe('graficos'); expect(body.querySelector('[data-panel]')?.textContent).toContain('pendiente de migración');
     fixture.destroy();
   });
   it('cancels an older sample when filters change before it resolves', async () => {
@@ -100,6 +98,31 @@ describe('Exit survey statistics shell', () => {
     detail.flush({success:true,data:{professor:'Profesor Insatisfecho',motives:['Motivo uno','Motivo dos']}});
     await fixture.whenStable(); fixture.detectChanges();
     expect(body.querySelector('[data-teacher-detail]')?.textContent).toContain('Motivo uno'); expect(body.textContent).toContain('Ver motivos');
+    fixture.destroy();
+  });
+
+  it('loads Q17 as a Likert general-evaluation section', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="evaluacion-general"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    const request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('evaluacion-general');
+    request.flush({success:true,data:{section:'evaluacion-general',title:'Evaluación general',rows:[{question:'Q17',description:'Evaluación general',alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5,average:3,total:15}],totals:{alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5}}});
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Evaluación general'); expect(fixture.nativeElement.querySelector('[data-panel]')?.textContent).not.toContain('pendiente');
+    fixture.destroy();
+  });
+
+  it('loads the eight CSS chart options and switches charts', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="graficos"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    let request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('malla');
+    request.flush(likert); await fixture.whenStable(); fixture.detectChanges();
+    const body:HTMLElement=fixture.nativeElement;
+    expect(body.querySelectorAll('[data-chart]')).toHaveLength(8); expect(body.querySelectorAll('.survey-chart__segment')).toHaveLength(5);
+    expect(body.textContent).toContain('Muy en desacuerdo'); expect(body.textContent).toContain('Pregunta A');
+    (body.querySelector('[data-chart="evaluacion-general"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('evaluacion-general');
+    request.flush({success:true,data:{section:'evaluacion-general',title:'Evaluación general',rows:[{question:'Q17',description:'Evaluación general',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,average:3,total:5}],totals:{alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1}}});
+    await fixture.whenStable(); fixture.detectChanges(); expect(body.textContent).toContain('Evaluación general');
     fixture.destroy();
   });
 

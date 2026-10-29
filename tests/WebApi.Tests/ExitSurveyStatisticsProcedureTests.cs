@@ -135,6 +135,20 @@ public sealed class ExitSurveyStatisticsProcedureTests
         Assert.Equal(ParameterDirection.Output, parameters["returnValue"].Direction);
     }
 
+    [Fact]
+    public async Task Q17_wrapper_uses_general_evaluation_procedure()
+    {
+        var capture = new ReaderCapture();
+        await using var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseSqlServer("Server=unused.invalid;Database=isolated;Integrated Security=true")
+            .AddInterceptors(new NoNetwork(), capture).Options);
+        var output = new OutputParameter<int>();
+        var rows = await new SadContextProcedures(context).spRec_EncuestaGraduadosEstadisticasQ17Async("2024A", "MBA", "PT", output);
+        Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduadosEstadisticasQ17]", capture.Text);
+        Assert.Equal(9, output.Value);
+        Assert.Equal("Pregunta A", Assert.Single(rows!).Descripcion);
+    }
+
     private sealed class NoNetwork : DbConnectionInterceptor
     {
         public override ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection,

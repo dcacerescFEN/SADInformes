@@ -108,6 +108,24 @@ muestra **No existen datos disponibles.** No se inventan promedios.
 El endpoint ejecuta las siete consultas Q1-Q7 por el mismo camino tipado ya usado
 en las matrices; no duplica SQL ni recalcula el promedio de cada pregunta.
 
+## P6 entregado
+
+Q17 **Evaluación general** comparte la matriz Likert de cinco alternativas y se
+expone por la sección `evaluacion-general`.
+
+La tab **Gráficos** ofrece ocho opciones: Malla Curricular, Cuerpo Académico,
+Funcionamiento, Infraestructura y recursos, Servicios, Vinculación Medio,
+Networking y Evaluación general. Cada gráfico usa los datos de la sección Likert
+correspondiente y se dibuja con CSS nativo:
+
+- barras apiladas por alternativa con los colores del legado;
+- leyenda Muy en desacuerdo → Muy de acuerdo;
+- porcentaje por segmento y dimensión promedio a la derecha;
+- selector de gráfico, estados de carga/error y “No existen datos disponibles”.
+
+No se agregan Chart.js, Highcharts ni otra dependencia. No hay exportación de
+imágenes porque la decisión de alcance fue solo pantalla.
+
 ## API P1
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -132,11 +150,11 @@ modifican SP, funciones, vistas o tablas.
 ## Verificación P1
 
 14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 9 pruebas de componente, 12 de navegación y 29 pruebas backend Resumen (31 en el
-conjunto de estadísticas, incluyendo ADO.NET para Q1/Q7/Q8/Q11/Q9/Q10/DetalleProfesor)
-cubren carga automática, cambio dependiente de modalidad, tabs, muestra vacía,
-matrices, porcentajes, promedio, ranking docente corregido, drilldown de
-insatisfacción, resumen N2/dimensión, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
+no-store y errores saneados. 11 pruebas de componente, 12 de navegación y 40 pruebas backend (incluyendo ADO.NET
+para Q1/Q7/Q8/Q11/Q17/Q9/Q10/DetalleProfesor) cubren carga automática, cambio
+dependiente de modalidad, tabs, muestra vacía, matrices, porcentajes, promedio,
+ranking docente corregido, drilldown de insatisfacción, resumen N2/dimensión,
+Q17, ocho gráficos CSS, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
 build de producción correcto. Las cinco fallas Angular son las ya conocidas de
 tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
 No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni

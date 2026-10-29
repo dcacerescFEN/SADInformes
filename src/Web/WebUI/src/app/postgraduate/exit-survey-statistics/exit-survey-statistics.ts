@@ -9,6 +9,7 @@ import { MultiScaleMatrix, ScaleData } from './multi-scale-matrix';
 import { TeacherRanking, TeacherRankingData } from './teacher-ranking';
 import { Insatisfaction, InsatisfactionRow, TeacherDetail } from './insatisfaction';
 import { SummaryMatrix, SummaryRow } from './summary-matrix';
+import { SurveyChart, ChartData, ChartRow } from './survey-chart';
 
 interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: Option[]; }
@@ -16,10 +17,17 @@ interface Row { type: string; modality: string | null; sample: number; inProgres
 interface Totals { sample: number; inProgress: number; answered: number; }
 interface Tab { id: string; label: string; group: string; }
 const BASE = '/api/reports/postgraduate/exit-survey-statistics';
-const LIKERT_TABS = new Set(['malla', 'cuerpo-academico', 'funcionamiento', 'infraestructura', 'servicios', 'vinculacion-medio', 'networking']);
+const LIKERT_TABS = new Set(['malla', 'cuerpo-academico', 'funcionamiento', 'infraestructura', 'servicios', 'vinculacion-medio', 'networking', 'evaluacion-general']);
 const RATING_TABS = new Set(['catedras-area', 'habilidades']);
 const CATEDRA_LABELS = ['Muy Malo', 'Malo', 'Regular', 'Bueno', 'Muy Bueno'];
 const SKILL_LABELS = ['Malo', 'Deficiente', 'Insuficiente', 'Suficiente', 'Bueno', 'Muy Bueno', 'Sobresaliente'];
+const LIKERT_LABELS = ['Muy en desacuerdo', 'En desacuerdo', 'Ni de acuerdo ni en desacuerdo', 'De acuerdo', 'Muy de acuerdo'];
+const CHART_OPTIONS = [
+  { id: 'malla', label: 'Malla Curricular' }, { id: 'cuerpo-academico', label: 'Cuerpo Académico' },
+  { id: 'funcionamiento', label: 'Funcionamiento' }, { id: 'infraestructura', label: 'Infraestructura y recursos' },
+  { id: 'servicios', label: 'Servicios' }, { id: 'vinculacion-medio', label: 'Vinculación Medio' },
+  { id: 'networking', label: 'Networking' }, { id: 'evaluacion-general', label: 'Evaluación general' },
+] as const;
 interface CatedraRow { code: string; description: string; alternative1: number; alternative2: number; alternative3: number; alternative4: number; alternative5: number; average: number | null; total: number; }
 interface CatedraTotals { alternative1: number; alternative2: number; alternative3: number; alternative4: number; alternative5: number; }
 interface SkillRow { question: string; description: string; alternative1: number; alternative2: number; alternative3: number; alternative4: number; alternative5: number; alternative6: number; alternative7: number; average: number | null; total: number; }
@@ -43,7 +51,7 @@ const TABS: readonly Tab[] = [
 
 @Component({
   selector: 'app-exit-survey-statistics',
-  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix, TeacherRanking, Insatisfaction, SummaryMatrix],
+  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix, TeacherRanking, Insatisfaction, SummaryMatrix, SurveyChart],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="container-fluid px-0 py-4">
@@ -156,6 +164,19 @@ const TABS: readonly Tab[] = [
             @if (summaryError()) { <div class="alert alert-warning" role="alert">{{ summaryError() }}</div> }
             @if (!summaryLoading() && !summaryError()) { <app-summary-matrix [rows]="summaryRows()" /> }
           </div>
+        } @else if (isChartsTab()) {
+          <div class="mt-3" role="tabpanel" data-panel>
+            <div class="d-flex flex-wrap gap-2 mb-3" role="tablist" aria-label="Gráficos de la encuesta">
+              @for (chart of chartOptions; track chart.id) {
+                <button type="button" class="btn btn-sm" [attr.data-chart]="chart.id"
+                  [class.btn-primary]="selectedChart() === chart.id" [class.btn-outline-primary]="selectedChart() !== chart.id"
+                  (click)="selectChart(chart.id)">{{ chart.label }}</button>
+              }
+            </div>
+            @if (chartLoading()) { <p role="status">Cargando gráfico…</p> }
+            @if (chartError()) { <div class="alert alert-warning" role="alert">{{ chartError() }}</div> }
+            @if (chartData(); as data) { <h3 class="h5">{{ data.title }}</h3><app-survey-chart [data]="data" /> }
+          </div>
         } @else {
           <div class="alert alert-info mt-3" role="tabpanel" data-panel>
             <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
@@ -179,7 +200,7 @@ export class ExitSurveyStatistics {
   private readonly filtering = signal(false);
   protected readonly loaded = signal(false);
   protected readonly error = signal('');
-  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading() || this.teacherLoading() || this.insatisfactionLoading() || this.summaryLoading());
+  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading() || this.teacherLoading() || this.insatisfactionLoading() || this.summaryLoading() || this.chartLoading());
   protected readonly likertData = signal<{ section: string; title: string; rows: LikertRow[]; totals: LikertTotals } | null>(null);
   protected readonly likertLoading = signal(false);
   protected readonly likertError = signal('');
@@ -199,6 +220,12 @@ export class ExitSurveyStatistics {
   protected readonly summaryLoading = signal(false);
   protected readonly summaryError = signal('');
   protected readonly isSummaryTab = computed(() => this.activeTab() === 'resumen');
+  protected readonly isChartsTab = computed(() => this.activeTab() === 'graficos');
+  protected readonly chartOptions = CHART_OPTIONS;
+  protected readonly selectedChart = signal('malla');
+  protected readonly chartData = signal<ChartData | null>(null);
+  protected readonly chartLoading = signal(false);
+  protected readonly chartError = signal('');
   protected readonly isLikertTab = computed(() => LIKERT_TABS.has(this.activeTab()));
   protected readonly isRatingTab = computed(() => RATING_TABS.has(this.activeTab()));
   protected readonly isTeachersTab = computed(() => this.activeTab() === 'ranking');
@@ -211,6 +238,7 @@ export class ExitSurveyStatistics {
   private insatisfactionRevision = 0;
   private detailRevision = 0;
   private summaryRevision = 0;
+  private chartRevision = 0;
   private sampleSubscription?: Subscription;
   private likertSubscription?: Subscription;
   private ratingSubscription?: Subscription;
@@ -218,9 +246,10 @@ export class ExitSurveyStatistics {
   private insatisfactionSubscription?: Subscription;
   private detailSubscription?: Subscription;
   private summarySubscription?: Subscription;
+  private chartSubscription?: Subscription;
 
   constructor() {
-    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); this.teacherSubscription?.unsubscribe(); this.insatisfactionSubscription?.unsubscribe(); this.detailSubscription?.unsubscribe(); this.summarySubscription?.unsubscribe(); });
+    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); this.teacherSubscription?.unsubscribe(); this.insatisfactionSubscription?.unsubscribe(); this.detailSubscription?.unsubscribe(); this.summarySubscription?.unsubscribe(); this.chartSubscription?.unsubscribe(); });
     this.form.controls.studentType.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => void this.reloadForType());
     for (const control of ['period', 'modality'] as const) {
       this.form.controls[control].valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSample());
@@ -266,7 +295,7 @@ export class ExitSurveyStatistics {
     const selection = this.form.getRawValue();
     if (!selection.period || !selection.studentType || !selection.modality) return;
     this.sampleSubscription?.unsubscribe();
-    this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary();
+    this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); this.cancelChart();
     const revision = ++this.sampleRevision;
     this.loading.set(true); this.error.set(''); this.likertData.set(null); this.likertError.set('');
     this.sampleSubscription = this.http.get<{ success: boolean; data: { rows: Row[]; totals: Totals } }>(BASE + '/sample', { params: selection })
@@ -293,8 +322,9 @@ export class ExitSurveyStatistics {
     else if (RATING_TABS.has(id)) { this.cancelLikert(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadRating(); }
     else if (id === 'ranking') { this.cancelLikert(); this.cancelRating(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadTeachers(); }
     else if (id === 'insatisfaccion') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelDetail(); this.cancelSummary(); this.loadInsatisfaction(); }
-    else if (id === 'resumen') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadSummary(); }
-    else { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); }
+    else if (id === 'resumen') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelChart(); this.loadSummary(); }
+    else if (id === 'graficos') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); this.loadChart(); }
+    else { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); this.cancelChart(); }
   }
 
   private loadActiveSection(): void {
@@ -303,6 +333,7 @@ export class ExitSurveyStatistics {
     else if (this.activeTab() === 'ranking') this.loadTeachers();
     else if (this.activeTab() === 'insatisfaccion') this.loadInsatisfaction();
     else if (this.activeTab() === 'resumen') this.loadSummary();
+    else if (this.activeTab() === 'graficos') this.loadChart();
   }
 
   private cancelLikert(): void { this.likertRevision++; this.likertSubscription?.unsubscribe(); this.likertLoading.set(false); this.likertData.set(null); this.likertError.set(''); }
@@ -311,6 +342,37 @@ export class ExitSurveyStatistics {
   private cancelInsatisfaction(): void { this.insatisfactionRevision++; this.insatisfactionSubscription?.unsubscribe(); this.insatisfactionLoading.set(false); this.insatisfactionRows.set([]); this.insatisfactionError.set(''); }
   private cancelDetail(): void { this.detailRevision++; this.detailSubscription?.unsubscribe(); this.detailLoading.set(false); this.teacherDetail.set(null); this.detailError.set(''); }
   private cancelSummary(): void { this.summaryRevision++; this.summarySubscription?.unsubscribe(); this.summaryLoading.set(false); this.summaryRows.set([]); this.summaryError.set(''); }
+  private cancelChart(): void { this.chartRevision++; this.chartSubscription?.unsubscribe(); this.chartLoading.set(false); this.chartData.set(null); this.chartError.set(''); }
+
+  protected selectChart(id: string): void {
+    this.selectedChart.set(id);
+    if (this.activeTab() === 'graficos') this.loadChart();
+  }
+
+  private loadChart(): void {
+    const selection = this.form.getRawValue();
+    if (!selection.period || !selection.studentType || !selection.modality) return;
+    this.chartSubscription?.unsubscribe();
+    const revision = ++this.chartRevision;
+    this.chartLoading.set(true); this.chartError.set(''); this.chartData.set(null);
+    this.chartSubscription = this.http.get<{ success: boolean; data: { section: string; title: string; rows: LikertRow[] } }>(
+      BASE + '/likert', { params: { ...selection, section: this.selectedChart() } })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (revision !== this.chartRevision) return;
+          this.chartLoading.set(false);
+          if (response.success !== true) { this.chartError.set('No se pudo cargar el gráfico.'); return; }
+          const rows: ChartRow[] = response.data.rows.map(row => ({ description: row.description,
+            counts: [row.alternative1, row.alternative2, row.alternative3, row.alternative4, row.alternative5],
+            average: row.average, total: row.total }));
+          this.chartData.set({ title: response.data.title, labels: LIKERT_LABELS, rows });
+        },
+        error: () => {
+          if (revision !== this.chartRevision) return;
+          this.chartLoading.set(false); this.chartData.set(null); this.chartError.set('No se pudo cargar el gráfico.');
+        },
+      });
+  }
 
   private loadSummary(): void {
     const selection = this.form.getRawValue();
