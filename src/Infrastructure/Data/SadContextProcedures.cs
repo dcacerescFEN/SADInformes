@@ -13,6 +13,27 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecAlumnosMatriculadosPostgradoResult>?> SpRec_AlumnosMatriculadosPostgradoAsync(
+        string? modalidad, string? anio, OutputParameter<int>? returnValue = null,
+        CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int,
+        };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Modalidad", Size = 30, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Anio", Size = 5, Value = anio ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnosMatriculadosPostgradoResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosMatriculadosPostgrado] @Modalidad = @Modalidad, @Anio = @Anio",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecAlumnosCuadroDeHonorPosgradoResult>?> SpRec_AlumnosCuadroDeHonorPosgradoAsync(
         string? tipo_Alumno, string? modalidad, string? añoIngreso, string? año,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

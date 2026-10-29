@@ -43,7 +43,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('ranking-notas-ponderado', 'Ranking notas ponderado',
     'Ranking de alumnos graduados según sus notas ponderadas.', 'RankingAlumnosGraduados.aspx', true),
   entry('alumnos-matriculados', 'Alumnos matriculados MBA',
-    'Alumnos matriculados por año de ingreso y modalidad.', 'AlumnosMatriculados.aspx'),
+    'Alumnos matriculados por año de ingreso y modalidad.', 'AlumnosMatriculados.aspx', true),
   entry('profesores-vigencias', 'Profesores vigencias',
     'Informe de vigencias de profesores de Postgrado.', 'ProfesoresVigencias.aspx'),
   entry('alumnos-por-area', 'Alumnos por área',

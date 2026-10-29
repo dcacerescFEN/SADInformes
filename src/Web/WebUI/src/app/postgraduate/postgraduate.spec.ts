@@ -178,6 +178,21 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens enrolled students with the legacy export-only page and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/alumnos-matriculados');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/enrolled-students/filters')
+      .flush({ success: true, data: { modalities: [{ value: 'SUNRISE', text: 'SUNRISE' }], years: ['2026'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Alumnos Matriculados MBA');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(2);
+    expect(root.querySelector('table')).toBeNull();
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens exit survey enrollment with automatic listing and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/inscripcion-encuesta-salida');
     await harness.detectChanges();
