@@ -39,7 +39,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('inscripcion-encuesta-salida', 'Inscripción encuesta salida',
     'Selección e inscripción de alumnos en la encuesta de salida.', 'InscripcionEncuestaSalida.aspx', true),
   entry('estadisticas-encuesta-salida', 'Estadísticas encuesta salida',
-    'Resultados, dimensiones y gráficos de la encuesta de graduados.', 'EncuestaSalidaGraduados/Default.aspx'),
+    'Resultados, dimensiones y gráficos de la encuesta de graduados.', 'EncuestaSalidaGraduados/Default.aspx', true),
   entry('ranking-notas-ponderado', 'Ranking notas ponderado',
     'Ranking de alumnos graduados según sus notas ponderadas.', 'RankingAlumnosGraduados.aspx'),
   entry('alumnos-matriculados', 'Alumnos matriculados MBA',

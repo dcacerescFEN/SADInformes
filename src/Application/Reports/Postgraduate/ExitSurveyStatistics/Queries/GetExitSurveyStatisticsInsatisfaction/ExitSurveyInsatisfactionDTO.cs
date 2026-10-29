@@ -1,0 +1,2 @@
+namespace Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsInsatisfaction;
+public sealed record ExitSurveyInsatisfactionDTO(ExitSurveyInsatisfactionRowDTO[] Rows);

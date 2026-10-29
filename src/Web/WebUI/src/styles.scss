@@ -171,6 +171,66 @@ body {
 }
 
 // Tabla reutilizable de shared.
+.app-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--light-blue);
+  padding-left: 0;
+}
+.app-tabs .nav-link,
+.app-tabs .app-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--layout-muted-text);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.65rem 1.25rem;
+  margin-bottom: -2px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+.app-tabs .nav-link:hover,
+.app-tabs .app-tab:hover { color: var(--primary-blue); border-bottom-color: var(--light-blue); }
+.app-tabs .nav-link:focus-visible,
+.app-tabs .app-tab:focus-visible { outline: none; color: var(--primary-blue); }
+.app-tabs .nav-link.active,
+.app-tabs .app-tab.active,
+.app-tabs .app-tab[aria-selected='true'] {
+  color: var(--primary-blue);
+  background: transparent;
+  border-bottom-color: var(--primary-blue);
+  font-weight: 600;
+}
+.app-tabs--secondary { border-bottom-width: 1px; }
+.app-tabs--secondary .app-tab { padding: 0.5rem 1rem; font-size: 0.8rem; }
+.app-tab-content { padding-top: 1.25rem; }
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--layout-border-color);
+  background: var(--layout-surface-strong);
+  color: var(--layout-text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn-action:hover {
+  transform: translateY(-1px);
+  background: var(--table-row-hover-background);
+  border-color: var(--secondary-blue);
+}
+
 .app-table {
   margin-bottom: 0;
   color: var(--layout-text);

@@ -183,6 +183,26 @@ describe('Navegación visual de Postgrado', () => {
     expect(root.textContent).not.toContain('Pendiente de migración');
   });
 
+  it('opens exit survey statistics shell on its pending slug with 14 tabs', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-salida');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/filters')
+      .flush({ success: true, data: { periods: [{ value: '2024A', text: '2024' }], studentTypes: [{ value: 'Todos', text: 'Todos' }], modalities: [{ value: 'Todos', text: 'Todos' }] } });
+    await harness.detectChanges(); await Promise.resolve(); await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/sample')
+      .flush({ success: true, data: { rows: [], totals: { sample: 0, inProgress: 0, answered: 0 } } });
+    await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/likert')
+      .flush({ success: true, data: { section: 'malla', title: 'Malla Curricular', rows: [], totals: { alternative1: 0, alternative2: 0, alternative3: 0, alternative4: 0, alternative5: 0 } } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta de Salida');
+    expect(root.querySelectorAll('[data-top]')).toHaveLength(5); expect(root.querySelectorAll('[data-tab]')).toHaveLength(8);
+    expect(root.textContent).toContain('Sin Datos');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');

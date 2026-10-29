@@ -1,6 +1,7 @@
 # SADInformes
 
 Inscripción encuesta de salida: [escritura transaccional y filtros](docs/exit-survey-enrollment.md).
+Estadísticas encuesta de salida (P1-P7): [informe completo](docs/exit-survey-statistics.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
