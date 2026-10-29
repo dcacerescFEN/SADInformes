@@ -6,6 +6,12 @@ namespace Application.Common.Interfaces;
 /// <summary>Procedimientos del SAD consumidos por los informes, al estilo de SADAlumnos.</summary>
 public partial interface ISadContextProcedures
 {
+    Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+    Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIIAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+    Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIIIAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+    Task<List<SpRecEncuestaGraduadosInsatisfaccionResult>?> spRec_EncuestaGraduadosEstadisticasInsatisfaccionAsync(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+    Task<List<SpRecEncuestaGraduadosDetalleProfResult>?> spRec_EncuestaGraduadosEstadisticasDetalleProfAsync(string? periodo, string? tipo_Alumno, string? modalidad, string? profesor, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecEncuestaGraduadosQ8Result>?> spRec_EncuestaGraduadosEstadisticasQ8Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
     Task<List<SpRecEncuestaGraduadosQ11Result>?> spRec_EncuestaGraduadosEstadisticasQ11Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 

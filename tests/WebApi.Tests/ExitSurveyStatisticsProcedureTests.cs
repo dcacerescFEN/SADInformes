@@ -74,12 +74,103 @@ public sealed class ExitSurveyStatisticsProcedureTests
         Assert.Equal(ParameterDirection.Output, parameters["returnValue"].Direction);
     }
 
+    [Theory]
+    [InlineData("Q9I")]
+    [InlineData("Q9II")]
+    [InlineData("Q9III")]
+    [InlineData("Q10")]
+    [InlineData("DETAIL")]
+    public async Task Teacher_wrappers_preserve_canonical_names_parameters_and_shapes(string kind)
+    {
+        var capture = new TeacherReaderCapture(kind);
+        await using var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseSqlServer("Server=unused.invalid;Database=isolated;Integrated Security=true")
+            .AddInterceptors(new NoNetwork(), capture).Options);
+        var output = new OutputParameter<int>();
+        var procedures = new SadContextProcedures(context);
+        switch (kind)
+        {
+            case "Q9I":
+            {
+                var rows = await procedures.spRec_EncuestaGraduadosEstadisticasProfesoresIAsync("2024A", "MBA", "PT", output);
+                Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_Estadisticas_ProfesoresI]", capture.Text);
+                Assert.Equal(("Profesor I", 5), (Assert.Single(rows!).Profesor, Assert.Single(rows!).Frecuencia));
+                break;
+            }
+            case "Q9II":
+            {
+                var row = Assert.Single(await procedures.spRec_EncuestaGraduadosEstadisticasProfesoresIIAsync("2024A", "MBA", "PT", output))!;
+                Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_Estadisticas_ProfesoresII]", capture.Text);
+                Assert.Equal("Profesor II", row.Profesor);
+                break;
+            }
+            case "Q9III":
+            {
+                var row = Assert.Single(await procedures.spRec_EncuestaGraduadosEstadisticasProfesoresIIIAsync("2024A", "MBA", "PT", output))!;
+                Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_Estadisticas_ProfesoresIII]", capture.Text);
+                Assert.Equal("Profesor III", row.Profesor);
+                break;
+            }
+            case "Q10":
+            {
+                var rows = await procedures.spRec_EncuestaGraduadosEstadisticasInsatisfaccionAsync("2024A", "MBA", "PT", output);
+                Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_EstadisticasInsatisfaccion]", capture.Text);
+                var row = Assert.Single(rows!);
+                Assert.Equal(("Profesor Insatisfecho", 3, "P9", "2024A", "MBA", "PT"),
+                    (row.Profesor, row.Cantidad, row.CodPersona, row.Periodo, row.TipoAlumno, row.Modalidad));
+                break;
+            }
+            default:
+            {
+                var rows = await procedures.spRec_EncuestaGraduadosEstadisticasDetalleProfAsync("2024A", "MBA", "PT", "P9", output);
+                Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_Estadisticas_DetallesProf]", capture.Text);
+                Assert.Equal("Motivo", Assert.Single(rows!).Motivos);
+                Assert.Equal(20, capture.Parameters.Single(parameter => parameter.ParameterName == "Profesor").Size);
+                break;
+            }
+        }
+        Assert.Equal(9, output.Value);
+        var parameters = capture.Parameters.ToDictionary(parameter => parameter.ParameterName);
+        Assert.Equal((5, 30, 10), (parameters["Periodo"].Size, parameters["Tipo_Alumno"].Size, parameters["Modalidad"].Size));
+        Assert.Equal(ParameterDirection.Output, parameters["returnValue"].Direction);
+    }
+
     private sealed class NoNetwork : DbConnectionInterceptor
     {
         public override ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection,
             ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default) =>
             ValueTask.FromResult(InterceptionResult.Suppress());
     }
+    private sealed class TeacherReaderCapture(string kind) : DbCommandInterceptor
+    {
+        public string Text { get; private set; } = "";
+        public SqlParameter[] Parameters { get; private set; } = [];
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+        {
+            Text = command.CommandText;
+            Parameters = command.Parameters.Cast<SqlParameter>().ToArray();
+            Parameters.Single(parameter => parameter.Direction == ParameterDirection.Output).Value = 9;
+            var table = new DataTable();
+            if (kind.StartsWith("Q9", StringComparison.Ordinal))
+            {
+                table.Columns.Add("Profesor", typeof(string)); table.Columns.Add("Frecuencia", typeof(int));
+                table.Rows.Add("Profesor " + kind[2..], 5);
+            }
+            else if (kind == "Q10")
+            {
+                foreach (var column in new[] { "Profesor", "Cod_Persona", "Periodo", "Tipo_Alumno", "Modalidad" }) table.Columns.Add(column, typeof(string));
+                table.Columns.Add("Cantidad", typeof(int));
+                table.Rows.Add("Profesor Insatisfecho", "P9", "2024A", "MBA", "PT", 3);
+            }
+            else
+            {
+                table.Columns.Add("Motivos", typeof(string)); table.Rows.Add("Motivo");
+            }
+            return ValueTask.FromResult(InterceptionResult<DbDataReader>.SuppressWithResult(table.CreateDataReader()));
+        }
+    }
+
     private sealed class RatingReaderCapture(bool q8) : DbCommandInterceptor
     {
         public string Text { get; private set; } = "";

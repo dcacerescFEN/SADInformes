@@ -84,6 +84,25 @@ describe('Exit survey statistics shell', () => {
     fixture.destroy();
   });
 
+  it('loads corrected Q9 roles and Q10 detail', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="ranking"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/teachers').flush({success:true,data:{theoretical:[{professor:'Teórico',frequency:5}],practical:[{professor:'Práctico',frequency:4}],formative:[{professor:'Formativo',frequency:3}]}});
+    await fixture.whenStable(); fixture.detectChanges();
+    const body:HTMLElement=fixture.nativeElement;
+    expect(body.textContent).toContain('(1) Sus conocimientos teóricos'); expect(body.textContent).toContain('Práctico'); expect(body.textContent).toContain('Formativo');
+    (body.querySelector('[data-tab="insatisfaccion"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/insatisfaction').flush({success:true,data:{rows:[{professor:'Profesor Insatisfecho',count:3,professorCode:'P9',period:'2024A',studentType:'Todos',modality:'Todos'}]}});
+    await fixture.whenStable(); fixture.detectChanges();
+    (body.querySelector('[data-detail="P9"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    const detail=http.expectOne(r=>r.url===BASE+'/insatisfaction/detail');
+    expect(detail.request.params.get('professor')).toBe('P9'); expect(detail.request.params.get('period')).toBe('2024A');
+    detail.flush({success:true,data:{professor:'Profesor Insatisfecho',motives:['Motivo uno','Motivo dos']}});
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(body.querySelector('[data-teacher-detail]')?.textContent).toContain('Motivo uno'); expect(body.textContent).toContain('Ver motivos');
+    fixture.destroy();
+  });
+
   it('ignores stale catalogs and sanitizes failures', async () => {
     const fixture=TestBed.createComponent(ExitSurveyStatistics); fixture.detectChanges();
     const stale=http.expectOne(r=>r.url===BASE+'/filters');

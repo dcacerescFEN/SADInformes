@@ -41,7 +41,7 @@ T0 [D1-D5] DONE: decisions recorded 2026-10-29. Route: user. Commit: n/a.
 T1 [S1] DONE (P1 shell focused GREEN): permission, filters, muestra with totals, tabs, route/catalogue, HTTP/UI tests. Route: inline. Commit: withheld.
 T2 [S1] DONE (P2 Likert Q1-Q7): typed Q1-Q7 wrappers, generic section query, endpoint and reusable matrix; focused backend/ADO/UI GREEN. Route: inline. Commit: withheld.
 T3 [S1] DONE (P3 Q8/Q11 verified): typed Q8/Q11 contracts, queries, endpoints and configurable matrix; docs, focused and full suites observed. Route: inline. Commit: withheld.
-T4 [S1] PENDING: P4 docentes/detalle. Route: inline. Commit: withheld.
+T4 [S1] DONE (P4 verified): Q9/Q10/detail typed queries, endpoints, corrected Q9 UI and inline motives panel; focused and full suites observed. Route: inline. Commit: withheld.
 T5 [S1] PENDING: P5 Resumen. Route: inline. Commit: withheld.
 T6 [S1] PENDING: P6 charts. Route: inline + verifier if UI shared surfaces change. Commit: withheld.
 T7 [S1] PENDING: P7 hardening/docs/verification. Route: inline + independent verifier. Commit: withheld.
@@ -67,3 +67,7 @@ L11. P2 closed with available proof: full .NET 306/306, Node 38/38, Angular 189/
 L12. P3 implemented: Q8 five-label and Q11 seven-label typed wrappers/queries/endpoints, MultiScaleMatrix with labels/conteos/porcentajes/promedio/totales and tab loading. Focused backend 31 GREEN including ADO Q8/Q11; component 7 GREEN; navigation remains 12. No commits. Full suites/build pending before closing P3.
 
 L13. P3 closed with available proof: full .NET 310/310, Node 38/38, Angular 190/195 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused Q8/Q11: 31 backend (including ADO Q8/Q11), 7 component, 12 navigation GREEN. No commits/staging. P4 is next (teachers/insatisfaction/detail); P3 did not add charts or Resumen.
+
+L14. P4 implemented: typed Q9 I/II/III, Q10 and DetalleProfesor wrappers/queries/endpoints; UI maps I=theoretical, II=practical, III=formative (correcting legacy swap) and shows an inline motives panel. SQL defects remain documented: DetalleProfesors uses Tipo_Alumno as modalidad in a UNION and repeats Q13_M2. Focused: 19 backend (HTTP/Application/ADO), 8 component GREEN. No commits. Full suites/build pending.
+
+L15. P4 closed with available proof: full .NET 325/325, Node 38/38, Angular 191/196 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused: 19 backend (HTTP/Application/ADO), 8 component GREEN. Q9 corrected labels I/II/III; Q10 inline detail; SQL defects documented without changing SP. No commits/staging. P5 is next (Resumen).

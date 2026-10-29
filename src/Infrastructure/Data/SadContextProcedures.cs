@@ -13,6 +13,78 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        ExecuteTeachersAsync("I", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
+    public virtual Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIIAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        ExecuteTeachersAsync("II", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
+    public virtual Task<List<SpRecEncuestaGraduadosProfesoresResult>?> spRec_EncuestaGraduadosEstadisticasProfesoresIIIAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        ExecuteTeachersAsync("III", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
+
+    private async Task<List<SpRecEncuestaGraduadosProfesoresResult>?> ExecuteTeachersAsync(string question,
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue, CancellationToken? cancellationToken)
+    {
+        var procedure = question switch
+        {
+            "I" => "spRec_EncuestaGraduados_Estadisticas_ProfesoresI",
+            "II" => "spRec_EncuestaGraduados_Estadisticas_ProfesoresII",
+            "III" => "spRec_EncuestaGraduados_Estadisticas_ProfesoresIII",
+            _ => throw new ArgumentOutOfRangeException(nameof(question)),
+        };
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 10, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaGraduadosProfesoresResult>(
+            $"EXEC @returnValue = [dbo].[{procedure}] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEncuestaGraduadosInsatisfaccionResult>?> spRec_EncuestaGraduadosEstadisticasInsatisfaccionAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 10, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaGraduadosInsatisfaccionResult>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_EstadisticasInsatisfaccion] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEncuestaGraduadosDetalleProfResult>?> spRec_EncuestaGraduadosEstadisticasDetalleProfAsync(
+        string? periodo, string? tipo_Alumno, string? modalidad, string? profesor, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 10, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Profesor", Size = 20, Value = profesor ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaGraduadosDetalleProfResult>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaGraduados_Estadisticas_DetallesProf] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad, @Profesor = @Profesor",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecEncuestaGraduadosQ8Result>?> spRec_EncuestaGraduadosEstadisticasQ8Async(
         string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
     {

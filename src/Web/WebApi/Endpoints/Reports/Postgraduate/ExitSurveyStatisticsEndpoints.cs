@@ -1,7 +1,10 @@
 using Application.Common.Mediator;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsFilters;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsCatedrasArea;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsInsatisfaction;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsLikert;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsTeacherDetail;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsTeachers;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSkills;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Constants;
@@ -22,6 +25,9 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         group.MapGet("/likert", Likert).WithSummary("Matriz Likert Q1-Q7 por sección");
         group.MapGet("/catedras-area", CatedrasArea).WithSummary("Evaluación de cátedras por área (Q8)");
         group.MapGet("/skills", Skills).WithSummary("Conocimientos y habilidades adquiridas (Q11)");
+        group.MapGet("/teachers", Teachers).WithSummary("Ranking docente teórico, práctico y formativo (Q9)");
+        group.MapGet("/insatisfaction", Insatisfaction).WithSummary("Profesores con insatisfacción (Q10)");
+        group.MapGet("/insatisfaction/detail", InsatisfactionDetail).WithSummary("Motivos de insatisfacción de un profesor");
     }
 
     private static Task<IResult> Filters(HttpContext context, IRequestDispatcher sender, string? studentType, CancellationToken ct) =>
@@ -46,6 +52,21 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         string? period, string? studentType, string? modality, CancellationToken ct) =>
         Execute(context, async () => Results.Ok(await sender.Send(
             new GetExitSurveyStatisticsSkills(period, studentType, modality), ct)));
+
+    private static Task<IResult> Teachers(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsTeachers(period, studentType, modality), ct)));
+
+    private static Task<IResult> Insatisfaction(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsInsatisfaction(period, studentType, modality), ct)));
+
+    private static Task<IResult> InsatisfactionDetail(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, string? professor, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsTeacherDetail(period, studentType, modality, professor), ct)));
 
     private static async Task<IResult> Execute(HttpContext context, Func<Task<IResult>> operation)
     {

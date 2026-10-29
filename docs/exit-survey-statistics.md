@@ -62,6 +62,31 @@ Los tipos de resultado conservan `Cod_Catedra` para Q8 y `Pregunta` para Q11.
 Los wrappers son métodos tipados separados con parámetros período varchar(5),
 tipo varchar(30) y modalidad varchar(10). No se modifica el SQL de los SP.
 
+## P4 entregado
+
+Q9 muestra tres rankings docentes con el mapeo visible corregido respecto del
+legado: **I** conocimientos teóricos, **II** experiencia práctico-profesional y
+**III** capacidad formativo-pedagógica. El ASPX original mostraba III bajo el
+título de práctico y II bajo el de formativo; esta migración no cambia los SP,
+solo presenta cada resultado con su título correcto.
+
+Q10 lista profesores insatisfechos y permite abrir sus motivos en un panel
+inline. El detalle conserva los cuatro filtros originales: período, tipo de
+alumno, modalidad y código de profesor.
+
+| Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
+| --- | --- |
+| `GET /teachers?period=2024A&studentType=Todos&modality=Todos` | Arreglos teórico, práctico y formativo |
+| `GET /insatisfaction?...` | Profesor, cantidad y datos para el drilldown |
+| `GET /insatisfaction/detail?period=...&studentType=...&modality=...&professor=P9` | Motivos del profesor |
+| Error | Filtros/profesor inválidos 400; almacenamiento 503 saneado |
+
+**Defectos SQL heredados documentados, sin modificar:** `DetallesProf` usa
+`@Tipo_Alumno` como modalidad en uno de sus UNION y repite `Q13_M2` en el
+tercer bloque. La UI no puede corregir datos que el procedimiento devuelve mal;
+se muestran los motivos recibidos y se deja constancia para una futura corrección
+de base de datos. Los rankings Q9 mantienen las frecuencias del SP.
+
 ## API P1
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -86,10 +111,11 @@ modifican SP, funciones, vistas o tablas.
 ## Verificación P1
 
 14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 7 pruebas de componente, 12 de navegación y 31 pruebas backend (incluyendo
-ADO.NET para parámetros/resultados Q1/Q7/Q8/Q11) cubren carga automática, cambio
-dependiente de modalidad, tabs, muestra vacía, matrices Likert/configurables,
-porcentajes, promedio, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
+no-store y errores saneados. 8 pruebas de componente, 12 de navegación y pruebas backend (incluyendo ADO.NET
+para Q1/Q7/Q8/Q11/Q9/Q10/DetalleProfesor) cubren carga automática, cambio
+dependiente de modalidad, tabs, muestra vacía, matrices, porcentajes, promedio,
+ranking docente corregido, drilldown de insatisfacción, cancelación de respuestas
+obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
 build de producción correcto. Las cinco fallas Angular son las ya conocidas de
 tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
 No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni

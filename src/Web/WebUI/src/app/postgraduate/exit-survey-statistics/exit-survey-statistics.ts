@@ -6,6 +6,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { LikertMatrix, LikertRow, LikertTotals } from './likert-matrix';
 import { MultiScaleMatrix, ScaleData } from './multi-scale-matrix';
+import { TeacherRanking, TeacherRankingData } from './teacher-ranking';
+import { Insatisfaction, InsatisfactionRow, TeacherDetail } from './insatisfaction';
 
 interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: Option[]; }
@@ -40,7 +42,7 @@ const TABS: readonly Tab[] = [
 
 @Component({
   selector: 'app-exit-survey-statistics',
-  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix],
+  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix, MultiScaleMatrix, TeacherRanking, Insatisfaction],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="container-fluid px-0 py-4">
@@ -131,6 +133,22 @@ const TABS: readonly Tab[] = [
               <p class="text-body-secondary" role="status">No existen datos disponibles.</p>
             }
           </div>
+        } @else if (isTeachersTab()) {
+          <div class="mt-3" role="tabpanel" data-panel>
+            @if (teacherLoading()) { <p role="status">Cargando sección…</p> }
+            @if (teacherError()) { <div class="alert alert-warning" role="alert">{{ teacherError() }}</div> }
+            @if (teacherData(); as data) { <app-teacher-ranking [data]="data" /> }
+            @else if (!teacherLoading() && !teacherError()) { <p class="text-body-secondary" role="status">No existen datos disponibles.</p> }
+          </div>
+        } @else if (isInsatisfactionTab()) {
+          <div class="mt-3" role="tabpanel" data-panel>
+            @if (insatisfactionLoading()) { <p role="status">Cargando sección…</p> }
+            @if (insatisfactionError()) { <div class="alert alert-warning" role="alert">{{ insatisfactionError() }}</div> }
+            @if (!insatisfactionLoading() && !insatisfactionError()) {
+              <app-insatisfaction [rows]="insatisfactionRows()" [detail]="teacherDetail()"
+                [detailLoading]="detailLoading()" [detailError]="detailError()" (showDetail)="loadDetail($event)" />
+            }
+          </div>
         } @else {
           <div class="alert alert-info mt-3" role="tabpanel" data-panel>
             <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
@@ -154,25 +172,42 @@ export class ExitSurveyStatistics {
   private readonly filtering = signal(false);
   protected readonly loaded = signal(false);
   protected readonly error = signal('');
-  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading());
+  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading() || this.ratingLoading() || this.teacherLoading() || this.insatisfactionLoading());
   protected readonly likertData = signal<{ section: string; title: string; rows: LikertRow[]; totals: LikertTotals } | null>(null);
   protected readonly likertLoading = signal(false);
   protected readonly likertError = signal('');
   protected readonly ratingData = signal<ScaleData | null>(null);
   protected readonly ratingLoading = signal(false);
   protected readonly ratingError = signal('');
+  protected readonly teacherData = signal<TeacherRankingData | null>(null);
+  protected readonly teacherLoading = signal(false);
+  protected readonly teacherError = signal('');
+  protected readonly insatisfactionRows = signal<InsatisfactionRow[]>([]);
+  protected readonly insatisfactionLoading = signal(false);
+  protected readonly insatisfactionError = signal('');
+  protected readonly teacherDetail = signal<TeacherDetail | null>(null);
+  protected readonly detailLoading = signal(false);
+  protected readonly detailError = signal('');
   protected readonly isLikertTab = computed(() => LIKERT_TABS.has(this.activeTab()));
   protected readonly isRatingTab = computed(() => RATING_TABS.has(this.activeTab()));
+  protected readonly isTeachersTab = computed(() => this.activeTab() === 'ranking');
+  protected readonly isInsatisfactionTab = computed(() => this.activeTab() === 'insatisfaccion');
   private filterRevision = 0;
   private sampleRevision = 0;
   private likertRevision = 0;
   private ratingRevision = 0;
+  private teacherRevision = 0;
+  private insatisfactionRevision = 0;
+  private detailRevision = 0;
   private sampleSubscription?: Subscription;
   private likertSubscription?: Subscription;
   private ratingSubscription?: Subscription;
+  private teacherSubscription?: Subscription;
+  private insatisfactionSubscription?: Subscription;
+  private detailSubscription?: Subscription;
 
   constructor() {
-    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); });
+    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); this.ratingSubscription?.unsubscribe(); this.teacherSubscription?.unsubscribe(); this.insatisfactionSubscription?.unsubscribe(); this.detailSubscription?.unsubscribe(); });
     this.form.controls.studentType.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => void this.reloadForType());
     for (const control of ['period', 'modality'] as const) {
       this.form.controls[control].valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSample());
@@ -218,7 +253,7 @@ export class ExitSurveyStatistics {
     const selection = this.form.getRawValue();
     if (!selection.period || !selection.studentType || !selection.modality) return;
     this.sampleSubscription?.unsubscribe();
-    this.cancelLikert(); this.cancelRating();
+    this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail();
     const revision = ++this.sampleRevision;
     this.loading.set(true); this.error.set(''); this.likertData.set(null); this.likertError.set('');
     this.sampleSubscription = this.http.get<{ success: boolean; data: { rows: Row[]; totals: Totals } }>(BASE + '/sample', { params: selection })
@@ -240,20 +275,90 @@ export class ExitSurveyStatistics {
 
   protected selectTab(id: string): void {
     this.activeTab.set(id);
-    if (!this.loading() && !this.filtering()) {
-      if (LIKERT_TABS.has(id)) { this.cancelRating(); this.loadLikert(); }
-      else if (RATING_TABS.has(id)) { this.cancelLikert(); this.loadRating(); }
-      else { this.cancelLikert(); this.cancelRating(); }
-    }
+    if (this.loading() || this.filtering()) return;
+    if (LIKERT_TABS.has(id)) { this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadLikert(); }
+    else if (RATING_TABS.has(id)) { this.cancelLikert(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadRating(); }
+    else if (id === 'ranking') { this.cancelLikert(); this.cancelRating(); this.cancelInsatisfaction(); this.cancelDetail(); this.loadTeachers(); }
+    else if (id === 'insatisfaccion') { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelDetail(); this.loadInsatisfaction(); }
+    else { this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); }
   }
 
   private loadActiveSection(): void {
     if (LIKERT_TABS.has(this.activeTab())) this.loadLikert();
     else if (RATING_TABS.has(this.activeTab())) this.loadRating();
+    else if (this.activeTab() === 'ranking') this.loadTeachers();
+    else if (this.activeTab() === 'insatisfaccion') this.loadInsatisfaction();
   }
 
   private cancelLikert(): void { this.likertRevision++; this.likertSubscription?.unsubscribe(); this.likertLoading.set(false); this.likertData.set(null); this.likertError.set(''); }
   private cancelRating(): void { this.ratingRevision++; this.ratingSubscription?.unsubscribe(); this.ratingLoading.set(false); this.ratingData.set(null); this.ratingError.set(''); }
+  private cancelTeachers(): void { this.teacherRevision++; this.teacherSubscription?.unsubscribe(); this.teacherLoading.set(false); this.teacherData.set(null); this.teacherError.set(''); }
+  private cancelInsatisfaction(): void { this.insatisfactionRevision++; this.insatisfactionSubscription?.unsubscribe(); this.insatisfactionLoading.set(false); this.insatisfactionRows.set([]); this.insatisfactionError.set(''); }
+  private cancelDetail(): void { this.detailRevision++; this.detailSubscription?.unsubscribe(); this.detailLoading.set(false); this.teacherDetail.set(null); this.detailError.set(''); }
+
+  private loadTeachers(): void {
+    const selection = this.form.getRawValue();
+    if (!selection.period || !selection.studentType || !selection.modality) return;
+    this.teacherSubscription?.unsubscribe();
+    const revision = ++this.teacherRevision;
+    this.teacherLoading.set(true); this.teacherError.set(''); this.teacherData.set(null);
+    this.teacherSubscription = this.http.get<{ success: boolean; data: TeacherRankingData }>(BASE + '/teachers', { params: { ...selection } })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (revision !== this.teacherRevision) return;
+          this.teacherLoading.set(false);
+          if (response.success !== true) { this.teacherData.set(null); this.teacherError.set('No se pudo cargar la sección.'); return; }
+          this.teacherData.set(response.data);
+        },
+        error: () => {
+          if (revision !== this.teacherRevision) return;
+          this.teacherLoading.set(false); this.teacherData.set(null); this.teacherError.set('No se pudo cargar la sección.');
+        },
+      });
+  }
+
+  private loadInsatisfaction(): void {
+    const selection = this.form.getRawValue();
+    if (!selection.period || !selection.studentType || !selection.modality) return;
+    this.insatisfactionSubscription?.unsubscribe(); this.cancelDetail();
+    const revision = ++this.insatisfactionRevision;
+    this.insatisfactionLoading.set(true); this.insatisfactionError.set(''); this.insatisfactionRows.set([]);
+    this.insatisfactionSubscription = this.http.get<{ success: boolean; data: { rows: InsatisfactionRow[] } }>(
+      BASE + '/insatisfaction', { params: { ...selection } })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (revision !== this.insatisfactionRevision) return;
+          this.insatisfactionLoading.set(false);
+          if (response.success !== true) { this.insatisfactionError.set('No se pudo cargar la sección.'); return; }
+          this.insatisfactionRows.set(response.data.rows);
+        },
+        error: () => {
+          if (revision !== this.insatisfactionRevision) return;
+          this.insatisfactionLoading.set(false); this.insatisfactionRows.set([]); this.insatisfactionError.set('No se pudo cargar la sección.');
+        },
+      });
+  }
+
+  protected loadDetail(row: InsatisfactionRow): void {
+    if (!row.professorCode) return;
+    this.detailSubscription?.unsubscribe();
+    const revision = ++this.detailRevision;
+    this.detailLoading.set(true); this.detailError.set(''); this.teacherDetail.set(null);
+    this.detailSubscription = this.http.get<{ success: boolean; data: TeacherDetail }>(BASE + '/insatisfaction/detail', {
+      params: { period: row.period, studentType: row.studentType, modality: row.modality, professor: row.professorCode },
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: response => {
+        if (revision !== this.detailRevision) return;
+        this.detailLoading.set(false);
+        if (response.success !== true) { this.detailError.set('No se pudo cargar el detalle.'); return; }
+        this.teacherDetail.set(response.data);
+      },
+      error: () => {
+        if (revision !== this.detailRevision) return;
+        this.detailLoading.set(false); this.detailError.set('No se pudo cargar el detalle.');
+      },
+    });
+  }
 
   private loadRating(): void {
     const section = this.activeTab();
