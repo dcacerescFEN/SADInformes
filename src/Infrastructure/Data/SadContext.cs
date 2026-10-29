@@ -17,6 +17,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<AudiEstadoPostgradoAlumnosGuia> AudiEstadoPostgradoAlumnosGuia => Set<AudiEstadoPostgradoAlumnosGuia>();
     public DbSet<Alumno> Alumnos => Set<Alumno>();
     public DbSet<Persona> Personas => Set<Persona>();
+    public DbSet<EncuestaSalidaGraduado> EncuestaSalidaGraduados => Set<EncuestaSalidaGraduado>();
     public DbSet<Catedra> Catedras => Set<Catedra>();
     public DbSet<Curso> Cursos => Set<Curso>();
     public DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras => Set<PlanesFormacionCatedra>();
@@ -44,6 +45,14 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<EncuestaSalidaGraduado>(entity =>
+        {
+            entity.ToTable("Encuesta_Salida_Graduados", "dbo");
+            entity.HasKey(row => new { row.Folio, row.CodAlumno });
+            entity.Property(row => row.Folio).HasColumnName("Folio").ValueGeneratedOnAdd();
+            entity.Property(row => row.CodAlumno).HasColumnName("Cod_Alumno").HasMaxLength(20).IsUnicode(false)
+                .UseCollation("Modern_Spanish_CI_AS");
+        });
         modelBuilder.Entity<AudiPostgradoAlumnosGuia>(entity =>
         {
             entity.ToTable("Audi_PostgradoAlumnosGuia", "dbo");

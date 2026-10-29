@@ -164,6 +164,25 @@ describe('Navegación visual de Postgrado', () => {
     expect(root.querySelector('iframe')).toBeNull();
   });
 
+  it('opens exit survey enrollment with automatic listing and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/inscripcion-encuesta-salida');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-enrollment/filters')
+      .flush({ success: true, data: { studentTypes: [{ value: 'Todos', text: 'Todos' }], modalities: [{ value: 'Todos', text: 'Todos' }], years: ['2024'] } });
+    await harness.detectChanges();
+    await Promise.resolve(); await Promise.resolve();
+    await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-enrollment')
+      .flush({ success: true, data: { rows: [], total: 0, canEnroll: true } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Inscripción Encuesta Salida');
+    expect(root.querySelectorAll('ng-select')).toHaveLength(3);
+    expect(root.textContent).toContain('Sin Datos');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
