@@ -27,7 +27,8 @@ public static class InitialiserExtensions
 }
 
 public sealed class ConfigurationInitialiser(
-    AppConfigContext configContext, SiteSettings settings, ILogger<ConfigurationInitialiser> logger)
+    AppConfigContext configContext, SiteSettings settings, PostgraduateSettings postgraduateSettings,
+    ILogger<ConfigurationInitialiser> logger)
 {
     private static readonly IReadOnlyDictionary<string, string> Defaults = new Dictionary<string, string>
     {
@@ -61,7 +62,8 @@ public sealed class ConfigurationInitialiser(
                 throw new InvalidOperationException("Los selectores de AppConfig son obligatorios.");
 
             var keys = SiteMenuFields.Names.Concat(SiteMenuFields.LegacyAliases.Values)
-                .Append("StatusSite").Select(name => name.ToLowerInvariant()).ToArray();
+                .Append("StatusSite").Append(PostgraduateSettings.UserConfigurationKey)
+                .Select(name => name.ToLowerInvariant()).ToArray();
             var rows = await configContext.Configurations.AsNoTracking()
                 .Where(row => row.IsActive && row.Application.IsActive && row.Environment.IsActive
                     && row.Application.ApplicationName == application
@@ -79,6 +81,7 @@ public sealed class ConfigurationInitialiser(
             var statusSite = RequiredValue(values, "StatusSite", "1");
             cancellationToken.ThrowIfCancellationRequested();
             settings.Initialize(statusSite, application, environment, menu);
+            postgraduateSettings.Initialize(values.GetValueOrDefault(PostgraduateSettings.UserConfigurationKey));
         }
         catch (Exception error) when (error is DbException or InvalidOperationException or ArgumentException)
         {

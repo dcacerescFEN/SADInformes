@@ -27,7 +27,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('alumnos-sin-contestar-encuesta', 'Alumnos sin contestar encuesta docente',
     'Listado de alumnos con evaluación docente pendiente.', 'AlumnosSinContestarEncuesta.aspx', true),
   entry('cursos-profesores', 'Cursos profesores Postgrado',
-    'Cursos y evaluación de profesores por período y departamento.', 'CursosProfesoresPostgrado.aspx'),
+    'Cursos y evaluación de profesores por período y departamento.', 'CursosProfesoresPostgrado.aspx', true),
   entry('solicitudes-alumnos', 'Solicitudes alumno',
     'Informe de solicitudes de alumnos por programa, modalidad, ingreso y estado.', 'SolicitudesAlumnosPostgrado.aspx'),
   entry('mantenedores', 'Mantenedores',

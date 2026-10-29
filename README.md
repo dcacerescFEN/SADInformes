@@ -128,6 +128,26 @@ Keycloak siguen disponibles después del intento de inicialización. Las pruebas
 de carga de configuración usan una base EF InMemory aislada y el endpoint HTTP
 real, no el SQL institucional.
 
+### Usuario de Postgrado en AppConfig
+
+`PostgraduateSettings.User` contiene el usuario SAD que se utilizará para consultar
+los departamentos de Cursos Profesores Postgrado. Se carga al arrancar desde la
+clave `PostgraduateUser`, con los mismos selectores de aplicación y ambiente de
+`ConfigureSite`, y solo admite registros activos. La clave no distingue mayúsculas.
+
+Si la clave no existe o su valor es `null`, `Initialize` usa `mvenegas` como
+usuario predeterminado, conservando el usuario de la pantalla legada. Un valor
+configurado tiene prioridad. La aplicación no crea ni modifica registros.
+El valor se recorta y debe tener entre 1 y 20 caracteres, como el parámetro
+`Usuario` de `spRec_DocentesDepartamentos`.
+
+Si el valor configurado está vacío o es inválido, acceder a `PostgraduateSettings.User`
+produce un error de configuración: nunca se envía un usuario vacío que elimine las restricciones de
+departamento. Esto no deshabilita la navegación. El usuario permanece en el
+backend y no se incluye en `/api/config/site`. Los cambios requieren reiniciar
+el proceso. Esta configuración prepara la migración; no habilita todavía el
+informe ni reemplaza su permiso de acceso.
+
 ### Acceso a los destinos de la navbar
 
 Se consulta el cliente físico exacto configurado en `resource_access` del token.

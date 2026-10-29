@@ -634,4 +634,72 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
 
         return _;
     }
+
+    public virtual async Task<List<SpRecDocentesDepartamentosResult>?> SpRec_DocentesDepartamentosAsync(string? incluirTodos, string? usuario, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "IncluirTodos",
+                Size = 2,
+                Value = incluirTodos ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Usuario",
+                Size = 20,
+                Value = usuario ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecDocentesDepartamentosResult>("EXEC @returnValue = [dbo].[spRec_DocentesDepartamentos] @IncluirTodos = @IncluirTodos, @Usuario = @Usuario", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
+
+    public virtual async Task<List<SpRecEvaPostgradoCursosDocentes2Result>?> SpRec_EvaPostgradoCursosDocentes2Async(string? año, string? departamento, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = System.Data.ParameterDirection.Output,
+            SqlDbType = System.Data.SqlDbType.Int,
+        };
+
+        var sqlParameters = new []
+        {
+            new SqlParameter
+            {
+                ParameterName = "Año",
+                Size = 4,
+                Value = año ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            new SqlParameter
+            {
+                ParameterName = "Departamento",
+                Size = 70,
+                Value = departamento ?? Convert.DBNull,
+                SqlDbType = System.Data.SqlDbType.VarChar,
+            },
+            parameterreturnValue,
+        };
+        var _ = await context.SqlQueryAsync<SpRecEvaPostgradoCursosDocentes2Result>("EXEC @returnValue = [dbo].[spRec_EvaPostgradoCursosDocentes2] @Año = @Año, @Departamento = @Departamento", sqlParameters, cancellationToken ?? CancellationToken.None);
+
+        returnValue?.SetValue(parameterreturnValue.Value);
+
+        return _;
+    }
 }

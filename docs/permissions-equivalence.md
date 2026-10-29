@@ -42,6 +42,7 @@ roles ni asignaciones**.
 | `ver Postgrado` + `informes acreditación` (Encuesta docente por curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` | Implementado |
 | `ver Postgrado` + `informes acreditación` (Alumnos sin contestar encuesta docente) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `informes acreditación` (Cursos vs alumnos) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSES_BY_STUDENT` | Implementado; requiere asignación en Keycloak |
+| Sin validación propia en el code-behind legado (Cursos Profesores Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Inscripción masiva: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT` | Implementado |
 | Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` | Implementado; exige también el permiso de consulta |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
@@ -56,6 +57,12 @@ Programación Docente Postgrado X Programa y Modalidad agrega el permiso
 incluye una validación específica en el code-behind; la migración protege tanto
 el catálogo como el listado con este permiso o los roles administrativos REPORT.
 No se crean roles ni asignaciones de Keycloak automáticamente.
+
+Cursos Profesores Postgrado agrega `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES`.
+Además del permiso, el alcance de datos depende del usuario SAD configurado en
+AppConfig (`PostgraduateUser`, con `mvenegas` como valor nulo predeterminado):
+la API solo devuelve los departamentos visibles para ese usuario y rechaza el
+resto antes de ejecutar el informe. El usuario no se elige desde el cliente.
 
 ## Diferencias de comportamiento a tener presentes
 

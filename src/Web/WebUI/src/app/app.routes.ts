@@ -19,6 +19,8 @@ export const routes: Routes = [
       ? import('./postgraduate/courses-by-students/courses-by-students').then((module) => module.CoursesByStudents)
       : report.slug === 'alumnos-sin-contestar-encuesta'
       ? import('./postgraduate/unanswered-teacher-survey/unanswered-teacher-survey').then((module) => module.UnansweredTeacherSurvey)
+      : report.slug === 'cursos-profesores'
+      ? import('./postgraduate/teacher-courses/teacher-courses').then((module) => module.TeacherCourses)
       : report.slug === 'programacion-docente-programa-modalidad'
       ? import('./postgraduate/teaching-schedule/teaching-schedule').then((module) => module.TeachingSchedule)
       : report.available

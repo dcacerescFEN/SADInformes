@@ -374,6 +374,19 @@ public sealed class AuthenticationTests : IDisposable
     }
 
     [Fact]
+    public async Task Postgraduate_user_is_not_exposed_in_the_public_site_configuration()
+    {
+        using var factory = MenuFactory([MenuRow("PostgraduateUser", "private-report-user")]);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("private-report-user", body);
+        Assert.Equal(18, JsonDocument.Parse(body).RootElement.GetProperty("data").EnumerateObject().Count());
+    }
+
+    [Fact]
     public async Task Configuration_is_published_once_at_startup_not_read_for_each_request()
     {
         var options = new DbContextOptionsBuilder<AppConfigContext>()

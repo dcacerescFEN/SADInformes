@@ -24,6 +24,9 @@ public static class ConfigureServices
         services.AddScoped<ISadContextProcedures, SadContextProcedures>();
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
+        services.AddSingleton<PostgraduateSettings>();
+        services.AddSingleton<Application.Common.Interfaces.IPostgraduateSettings>(
+            provider => provider.GetRequiredService<PostgraduateSettings>());
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();
         return services;
     }
