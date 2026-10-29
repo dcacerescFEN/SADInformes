@@ -13,6 +13,10 @@ namespace Infrastructure.Data;
 public partial class SadContext(DbContextOptions<SadContext> options)
     : DbContext(options), Application.Common.Interfaces.ISadContext
 {
+    public DbSet<AudiPostgradoAlumnosGuia> AudiPostgradoAlumnosGuia => Set<AudiPostgradoAlumnosGuia>();
+    public DbSet<AudiEstadoPostgradoAlumnosGuia> AudiEstadoPostgradoAlumnosGuia => Set<AudiEstadoPostgradoAlumnosGuia>();
+    public DbSet<Alumno> Alumnos => Set<Alumno>();
+    public DbSet<Persona> Personas => Set<Persona>();
     public DbSet<Catedra> Catedras => Set<Catedra>();
     public DbSet<Curso> Cursos => Set<Curso>();
     public DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras => Set<PlanesFormacionCatedra>();
@@ -40,6 +44,48 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<AudiPostgradoAlumnosGuia>(entity =>
+        {
+            entity.ToTable("Audi_PostgradoAlumnosGuia", "dbo");
+            entity.HasKey(row => row.Id);
+            entity.Property(row => row.Estado).HasMaxLength(5).IsUnicode(false);
+            entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona").HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.CodAlumnoAntiguo).HasColumnName("Cod_Alumno_Antiguo").HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.CodAlumnoNuevo).HasColumnName("Cod_Alumno_Nuevo").HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.CodSitAcademica).HasColumnName("Cod_SitAcademica").HasMaxLength(25).IsUnicode(false);
+            entity.Property(row => row.Matricula).HasMaxLength(10).IsUnicode(false);
+            entity.Property(row => row.FechaRegistro).HasColumnName("Fecha_Registro").HasColumnType("datetime");
+            entity.Property(row => row.MensajeError).HasColumnName("Mensaje_Error").HasMaxLength(500).IsUnicode(false);
+        });
+        modelBuilder.Entity<AudiEstadoPostgradoAlumnosGuia>(entity =>
+        {
+            entity.ToTable("Audi_EstadoPostgradoAlumnosGuia", "dbo");
+            entity.HasKey(row => row.Id);
+            entity.HasIndex(row => row.Estado).IsUnique();
+            entity.Property(row => row.Estado).HasMaxLength(5).IsUnicode(false);
+            entity.Property(row => row.Descripcion).HasMaxLength(100).IsUnicode(false);
+        });
+        modelBuilder.Entity<Alumno>(entity =>
+        {
+            entity.ToTable("Alumnos", "dbo");
+            entity.HasKey(row => new { row.Matricula, row.SemIngresoDecreto });
+            entity.HasIndex(row => row.CodAlumno).IsUnique();
+            entity.Property(row => row.Matricula).HasMaxLength(10).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.SemIngresoDecreto).HasColumnName("Sem_IngresoDecreto").HasMaxLength(5).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.CodAlumno).HasColumnName("Cod_Alumno").HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona").HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.TipoAlumno).HasColumnName("Tipo_Alumno").HasMaxLength(30).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Modalidad).HasMaxLength(30).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+        });
+        modelBuilder.Entity<Persona>(entity =>
+        {
+            entity.ToTable("Personas", "dbo");
+            entity.HasKey(row => row.CodPersona);
+            entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona").HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Nombre1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Apellido1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Apellido2).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+        });
         // Keys, column names, lengths and collations follow MappingDB/Models/SadContext.cs.
         modelBuilder.Entity<Catedra>(entity =>
         {

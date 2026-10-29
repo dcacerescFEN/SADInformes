@@ -1,5 +1,7 @@
 # SADInformes
 
+Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
+
 Solicitudes alumno Postgrado: [descarga Excel SSRS y configuración](docs/student-requests.md).
 
 Base independiente del sistema de informes, basada en SADAlumnos sin copiar

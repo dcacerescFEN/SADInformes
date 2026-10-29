@@ -7,6 +7,10 @@ namespace Application.Common.Interfaces;
 
 public partial interface ISadContext
 {
+    DbSet<AudiPostgradoAlumnosGuia> AudiPostgradoAlumnosGuia { get; }
+    DbSet<AudiEstadoPostgradoAlumnosGuia> AudiEstadoPostgradoAlumnosGuia { get; }
+    DbSet<Alumno> Alumnos { get; }
+    DbSet<Persona> Personas { get; }
     DbSet<Catedra> Catedras { get; }
     DbSet<Curso> Cursos { get; }
     DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras { get; }

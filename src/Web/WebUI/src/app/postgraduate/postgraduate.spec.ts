@@ -148,6 +148,22 @@ describe('Navegación visual de Postgrado', () => {
     expect(harness.routeNativeElement?.textContent).not.toContain('Pendiente de migración');
   });
 
+  it('opens SAD VTI audit with the original slug and direct date-filtered export', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/actualizacion-datos-sad-vti');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne('/api/reports/postgraduate/sad-vti-updates/filters')
+      .flush({ success: true, data: { states: [{ value: '-1', text: 'Todos' }] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Actualización datos SAD–VTI');
+    expect(root.querySelectorAll('input[type=date]')).toHaveLength(2);
+    expect(root.querySelectorAll('ng-select')).toHaveLength(1);
+    expect(root.textContent).toContain('Descargar Excel');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    expect(root.querySelector('iframe')).toBeNull();
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
