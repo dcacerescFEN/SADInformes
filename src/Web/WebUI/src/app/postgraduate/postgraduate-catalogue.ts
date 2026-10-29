@@ -33,7 +33,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('mantenedores', 'Mantenedores',
     'Acceso a mantenedores de constancias, coordinadores, directores y NCE.', 'Mantenedores.aspx'),
   entry('actualizacion-datos-sad-vti', 'Actualización datos SAD–VTI',
-    'Auditoría de actualización de datos de alumnos por fecha y estado.', 'ActulizacionDatosSADVTI.aspx'),
+    'Auditoría de actualización de datos de alumnos por fecha y estado.', 'ActulizacionDatosSADVTI.aspx', true),
   entry('ranking-titulados-egresados', 'Ranking alumnos titulados/egresados',
     'Ranking académico de alumnos titulados y egresados.', 'RankingTituladosEgresados.aspx'),
   entry('inscripcion-encuesta-salida', 'Inscripción encuesta salida',

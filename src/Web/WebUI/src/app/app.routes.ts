@@ -15,6 +15,8 @@ export const routes: Routes = [
     data: { report },
     loadComponent: () => report.slug === 'inscripcion-masiva'
       ? import('./postgraduate/mass-enrollment/mass-enrollment').then((module) => module.MassEnrollment)
+      : report.slug === 'actualizacion-datos-sad-vti'
+      ? import('./postgraduate/sad-vti-updates/sad-vti-updates').then((module) => module.SadVtiUpdates)
       : report.slug === 'solicitudes-alumnos'
       ? import('./postgraduate/student-requests/student-requests').then((module) => module.StudentRequests)
       : report.slug === 'cursos-por-alumnos'
