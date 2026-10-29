@@ -387,6 +387,46 @@ public sealed class AuthenticationTests : IDisposable
     }
 
     [Fact]
+    public async Task Reporting_settings_are_server_only_and_leave_the_existing_site_payload_unchanged()
+    {
+        using var factory = MenuFactory([
+            MenuRow("ReportingServiceBaseUrl", "https://reports.invalid/ReportServer"),
+            MenuRow("ReportingServicePath", "Reportes/SADInformes"),
+            MenuRow("ReportingServiceDomain", "private-domain"),
+            MenuRow("ReportingServiceUsername", "private-user"),
+            MenuRow("ReportingServicePassword", "private-password"),
+        ]);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        using var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("private-", body);
+        Assert.DoesNotContain("ReportingService", body);
+        Assert.Equal(18, JsonDocument.Parse(body).RootElement.GetProperty("data").EnumerateObject().Count());
+        var reporting = factory.Services.GetRequiredService<Infrastructure.Configuration.ReportingSettings>();
+        Assert.Equal("https://reports.invalid/ReportServer", reporting.BaseUrl);
+        Assert.Equal("Reportes/SADInformes", reporting.Path);
+        Assert.Equal("private-password", reporting.Password);
+    }
+
+    [Fact]
+    public async Task Missing_reporting_rows_keep_site_available_and_initialize_report_defaults()
+    {
+        using var factory = MenuFactory([]);
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", CreateToken());
+        using var response = await client.GetAsync("/api/config/site");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Equal(18, JsonDocument.Parse(body).RootElement.GetProperty("data").EnumerateObject().Count());
+        Assert.DoesNotContain("ReportingService", body);
+        var reporting = factory.Services.GetRequiredService<Infrastructure.Configuration.ReportingSettings>();
+        Assert.Equal("https://reportes-pbi-dev2.fen.uchile.cl/ReportServer", reporting.BaseUrl);
+        Assert.Equal("Reportes/Desarrollo/SADInformes", reporting.Path);
+    }
+
+    [Fact]
     public async Task Configuration_is_published_once_at_startup_not_read_for_each_request()
     {
         var options = new DbContextOptionsBuilder<AppConfigContext>()

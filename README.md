@@ -1,5 +1,7 @@
 # SADInformes
 
+Solicitudes alumno Postgrado: [descarga Excel SSRS y configuración](docs/student-requests.md).
+
 Base independiente del sistema de informes, basada en SADAlumnos sin copiar
 sus funcionalidades ni configuración sensible. Etapa 5: navegación visual de Postgrado.
 
