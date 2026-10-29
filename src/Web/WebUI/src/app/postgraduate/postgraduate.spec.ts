@@ -179,7 +179,7 @@ describe('Navegación visual de Postgrado', () => {
     await harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta de Salida');
-    expect(root.querySelectorAll('[data-tab]')).toHaveLength(14);
+    expect(root.querySelectorAll('[data-top]')).toHaveLength(5); expect(root.querySelectorAll('[data-tab]')).toHaveLength(8);
     expect(root.textContent).toContain('Sin Datos');
     expect(root.textContent).not.toContain('Pendiente de migración');
   });

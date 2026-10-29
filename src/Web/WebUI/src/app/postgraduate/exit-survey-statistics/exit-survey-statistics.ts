@@ -15,7 +15,16 @@ interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: Option[]; }
 interface Row { type: string; modality: string | null; sample: number; inProgress: number; answered: number; }
 interface Totals { sample: number; inProgress: number; answered: number; }
-interface Tab { id: string; label: string; group: string; }
+interface Tab { id: string; label: string; top: TopTabId; }
+type TopTabId = 'programa' | 'cursos' | 'docentes' | 'conocimientos' | 'graficos';
+interface TopTab { id: TopTabId; label: string; }
+const TOP_TABS: readonly TopTab[] = [
+  { id: 'programa', label: 'I. Evaluación Programa' },
+  { id: 'cursos', label: 'II. Evaluación Cursos' },
+  { id: 'docentes', label: 'III. Docentes' },
+  { id: 'conocimientos', label: 'IV. Conocimientos y Habilidades Adquiridas' },
+  { id: 'graficos', label: 'Gráficos' },
+];
 const BASE = '/api/reports/postgraduate/exit-survey-statistics';
 const LIKERT_TABS = new Set(['malla', 'cuerpo-academico', 'funcionamiento', 'infraestructura', 'servicios', 'vinculacion-medio', 'networking', 'evaluacion-general']);
 const RATING_TABS = new Set(['catedras-area', 'habilidades']);
@@ -33,20 +42,19 @@ interface CatedraTotals { alternative1: number; alternative2: number; alternativ
 interface SkillRow { question: string; description: string; alternative1: number; alternative2: number; alternative3: number; alternative4: number; alternative5: number; alternative6: number; alternative7: number; average: number | null; total: number; }
 interface SkillTotals { alternative1: number; alternative2: number; alternative3: number; alternative4: number; alternative5: number; alternative6: number; alternative7: number; }
 const TABS: readonly Tab[] = [
-  { id: 'malla', label: 'Malla Curricular', group: 'Parte I' },
-  { id: 'cuerpo-academico', label: 'Cuerpo Académico', group: 'Parte I' },
-  { id: 'funcionamiento', label: 'Funcionamiento', group: 'Parte I' },
-  { id: 'infraestructura', label: 'Infraestructura y recursos', group: 'Parte I' },
-  { id: 'servicios', label: 'Servicios', group: 'Parte I' },
-  { id: 'vinculacion-medio', label: 'Vinculación Medio', group: 'Parte I' },
-  { id: 'networking', label: 'Networking', group: 'Parte I' },
-  { id: 'resumen', label: 'Resumen', group: 'Parte I' },
-  { id: 'catedras-area', label: 'Cátedras x Área', group: 'Parte II' },
-  { id: 'ranking', label: 'Ranking', group: 'Parte III' },
-  { id: 'insatisfaccion', label: 'Insatisfacción', group: 'Parte III' },
-  { id: 'habilidades', label: 'Conocimientos y habilidades', group: 'Parte IV' },
-  { id: 'evaluacion-general', label: 'Evaluación general', group: 'Parte IV' },
-  { id: 'graficos', label: 'Gráficos', group: 'Gráficos' },
+  { id: 'malla', label: 'Malla Curricular', top: 'programa' },
+  { id: 'cuerpo-academico', label: 'Cuerpo Académico', top: 'programa' },
+  { id: 'funcionamiento', label: 'Funcionamiento', top: 'programa' },
+  { id: 'infraestructura', label: 'Infraestructura y recursos', top: 'programa' },
+  { id: 'servicios', label: 'Servicios', top: 'programa' },
+  { id: 'vinculacion-medio', label: 'Vinculación Medio', top: 'programa' },
+  { id: 'networking', label: 'Networking', top: 'programa' },
+  { id: 'resumen', label: 'Resumen', top: 'programa' },
+  { id: 'catedras-area', label: 'Cátedras x Área', top: 'cursos' },
+  { id: 'ranking', label: 'Ranking', top: 'docentes' },
+  { id: 'insatisfaccion', label: 'Insatisfacción', top: 'docentes' },
+  { id: 'habilidades', label: 'Conocimientos y habilidades', top: 'conocimientos' },
+  { id: 'evaluacion-general', label: 'Evaluación general', top: 'conocimientos' },
 ];
 
 @Component({
@@ -111,15 +119,23 @@ const TABS: readonly Tab[] = [
       } @else if (loaded() && !busy()) {
         <p class="text-body-secondary" role="status">Sin Datos</p>
       }
+      <div class="app-tabs mb-3" role="tablist" aria-label="Etapas de la encuesta">
+        @for (tab of topTabs; track tab.id) {
+          <button type="button" class="app-tab" role="tab" [attr.data-top]="tab.id"
+            [class.active]="activeTopTab() === tab.id" [attr.aria-selected]="activeTopTab() === tab.id"
+            (click)="selectTop(tab.id)">{{ tab.label }}</button>
+        }
+      </div>
       <div class="form-section mt-3">
-        <h2 class="h6">Secciones</h2>
-        <div class="d-flex flex-wrap gap-2" role="tablist" aria-label="Secciones de la encuesta">
-          @for (tab of tabs; track tab.id) {
-            <button type="button" class="btn btn-sm" role="tab" [attr.data-tab]="tab.id"
-              [class.btn-primary]="activeTab() === tab.id" [class.btn-outline-primary]="activeTab() !== tab.id"
-              [attr.aria-selected]="activeTab() === tab.id" (click)="selectTab(tab.id)">{{ tab.label }}</button>
-          }
-        </div>
+        @if (visibleTabs().length > 0) {
+          <div class="app-tabs app-tabs--secondary mb-3" role="tablist" [attr.aria-label]="activeTopLabel()">
+            @for (tab of visibleTabs(); track tab.id) {
+              <button type="button" class="app-tab" role="tab" [attr.data-tab]="tab.id"
+                [class.active]="activeTab() === tab.id" [attr.aria-selected]="activeTab() === tab.id"
+                (click)="selectTab(tab.id)">{{ tab.label }}</button>
+            }
+          </div>
+        }
         @if (isLikertTab()) {
           <div class="mt-3" role="tabpanel" data-panel>
             @if (likertLoading()) { <p role="status">Cargando sección…</p> }
@@ -166,20 +182,16 @@ const TABS: readonly Tab[] = [
           </div>
         } @else if (isChartsTab()) {
           <div class="mt-3" role="tabpanel" data-panel>
-            <div class="d-flex flex-wrap gap-2 mb-3" role="tablist" aria-label="Gráficos de la encuesta">
+            <div class="app-tabs app-tabs--secondary mb-3" role="tablist" aria-label="Gráficos de la encuesta">
               @for (chart of chartOptions; track chart.id) {
-                <button type="button" class="btn btn-sm" [attr.data-chart]="chart.id"
-                  [class.btn-primary]="selectedChart() === chart.id" [class.btn-outline-primary]="selectedChart() !== chart.id"
+                <button type="button" class="app-tab" [attr.data-chart]="chart.id"
+                  [class.active]="selectedChart() === chart.id" [attr.aria-selected]="selectedChart() === chart.id"
                   (click)="selectChart(chart.id)">{{ chart.label }}</button>
               }
             </div>
             @if (chartLoading()) { <p role="status">Cargando gráfico…</p> }
             @if (chartError()) { <div class="alert alert-warning" role="alert">{{ chartError() }}</div> }
             @if (chartData(); as data) { <h3 class="h5">{{ data.title }}</h3><app-survey-chart [data]="data" /> }
-          </div>
-        } @else {
-          <div class="alert alert-info mt-3" role="tabpanel" data-panel>
-            <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
           </div>
         }
       </div>
@@ -190,12 +202,14 @@ export class ExitSurveyStatistics {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   readonly form = inject(FormBuilder).nonNullable.group({ period: '', studentType: '', modality: '' });
-  protected readonly tabs = TABS;
+  protected readonly topTabs = TOP_TABS;
+  readonly activeTopTab = signal<TopTabId>('programa');
+  protected readonly visibleTabs = computed(() => TABS.filter(tab => tab.top === this.activeTopTab()));
+  protected readonly activeTopLabel = computed(() => TOP_TABS.find(tab => tab.id === this.activeTopTab())?.label ?? '');
   protected readonly filters = signal<Filters>({ periods: [], studentTypes: [], modalities: [] });
   protected readonly rows = signal<Row[]>([]);
   protected readonly totals = signal<Totals>({ sample: 0, inProgress: 0, answered: 0 });
   readonly activeTab = signal('malla');
-  protected readonly activeLabel = computed(() => TABS.find(tab => tab.id === this.activeTab())?.label ?? '');
   protected readonly loading = signal(false);
   private readonly filtering = signal(false);
   protected readonly loaded = signal(false);
@@ -313,6 +327,17 @@ export class ExitSurveyStatistics {
           this.error.set('No se pudo cargar la muestra.');
         },
       });
+  }
+
+  protected selectTop(id: TopTabId): void {
+    this.activeTopTab.set(id);
+    if (id === 'graficos') {
+      this.activeTab.set('graficos');
+      this.cancelLikert(); this.cancelRating(); this.cancelTeachers(); this.cancelInsatisfaction(); this.cancelDetail(); this.cancelSummary(); this.loadChart();
+      return;
+    }
+    const first = TABS.find(tab => tab.top === id);
+    if (first) this.selectTab(first.id);
   }
 
   protected selectTab(id: string): void {

@@ -44,7 +44,7 @@ T3 [S1] DONE (P3 Q8/Q11 verified): typed Q8/Q11 contracts, queries, endpoints an
 T4 [S1] DONE (P4 verified): Q9/Q10/detail typed queries, endpoints, corrected Q9 UI and inline motives panel; focused and full suites observed. Route: inline. Commit: withheld.
 T5 [S1] DONE (P5 verified): summary query/endpoint and N2 weighted matrix; focused and full suites observed. Route: inline. Commit: withheld.
 T6 [S1] DONE (P6 verified): Q17 section, CSS/SVG chart component and eight-option selector; focused and full suites observed. Route: inline. Commit: withheld.
-T7 [S1] PENDING: P7 hardening/docs/verification. Route: inline + independent verifier. Commit: withheld.
+T7 [S1] DONE (P7 verified): two-level app-tabs, Insatisfacción Search/pagination/modal/icon-only action, final docs and independent verification. Route: inline + verifier. Commit: withheld.
 
 ## Log
 L1. ahora hay que migrar EncuestaSalidaGraduados este son varios elementos verifica que necesitas y crea una rama y tambien un plan por partes
@@ -79,3 +79,19 @@ L17. P5 closed with available proof: full .NET 327/327, Node 38/38, Angular 192/
 L18. P6 implemented: Q17 mapped into Likert sections; SurveyChart uses CSS stacked bars and no new library; charts selector covers Q1-Q7+Q17 with loading/error/no-data. Focused: 40 backend, 11 component GREEN. No commits. Full suites/build pending.
 
 L19. P6 closed with available proof: full .NET 329/329, Node 38/38, Angular 194/199 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused: 40 backend, 11 component GREEN. Q17 and eight CSS chart options implemented; no chart dependency/export. No commits/staging. P7 is next (final hardening).
+
+L20. P7 closed: replaced button row with SADAlumnos `.app-tabs`/`.app-tab` styles; removed dead placeholder branch; updated exit-survey/permissions docs and README. Independent verifier mvtvwozk-c-3g95 found no candidate blockers; focused 50/50 exit-survey tests. Final suites after tab styling: 329 .NET/329, 38 Node/38, 194/199 Angular (same five prior Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. No commits/staging. Remaining limits: no live SQL Server/Keycloak/browser proof; native review unavailable.
+
+L21. Two-level tabs requested and implemented with SADAlumnos app-tabs: top stages I Programa, II Cursos, III Docentes, IV Conocimientos/Habilidades, Graficos; secondary tabs per stage and chart selector. Focused UI 23 GREEN. No commits. Final full-suite rerun pending after this UX change.
+
+L22. P7 closed after two-level tab change: top stages I Programa, II Cursos, III Docentes, IV Conocimientos/Habilidades and Graficos; secondary tabs and chart selector use app-tabs/app-tabs--secondary. Final checks: 329 .NET/329, 38 Node/38, 194/199 Angular (same five prior Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused UI 23 GREEN. No commits/staging. Limits: no live SQL Server, Keycloak or browser proof; native review unavailable.
+
+L23. P7 UX corrections: two-level tabs with top stages I/II/III/IV/Graficos and secondary app-tabs--secondary; Insatisfaccion table paginated by 10, icon-only btn-action with title/aria-label, motives in a modal, page clamp on row changes. Focused UI 25 GREEN. No commits. Full final suites pending.
+
+L24. P7 final closure: full final checks after pagination/modal/tabs = 329 .NET/329, 38 Node/38, 196/201 Angular (same five Node26/localStorage failures), production build GREEN, diff check clean. Insatisfacción paginated by 10, icon-only tooltip action, modal motives, page clamp; no commits/staging.
+
+L25. P7 search addition: reused SADAlumnos Search in Insatisfacción, filtering professor/code/count, resetting page; pagination uses filtered rows. Focused UI 14 GREEN. No commits. Full final suites pending.
+
+L26. P7 closed with Search: 14 focused UI GREEN; full .NET 329/329, Node 38/38, Angular 197/202 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. No commits/staging. Limits: no live SQL Server, Keycloak or browser proof; native review unavailable.
+
+L27. Modal de Motivos ampliado a modal-lg; prueba focalizada de Insatisfacción 3/3 GREEN. Sin commits.

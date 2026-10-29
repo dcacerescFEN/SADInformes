@@ -1,9 +1,26 @@
-# Estadísticas encuesta de salida — P1
+# Estadísticas encuesta de salida
 
-La ruta `/postgrado/estadisticas-encuesta-salida` ya abre el shell migrado de
-`EncuestaSalidaGraduados/Default.aspx`: filtros, muestra y navegación por
-secciones. Las secciones de resultados y los gráficos se implementan en fases
-posteriores; por ahora muestran un placeholder explícito.
+La ruta `/postgrado/estadisticas-encuesta-salida` implementa el informe completo de
+`EncuestaSalidaGraduados/Default.aspx`: filtros, muestra, las 14 secciones de
+resultados, Q17, Resumen y ocho gráficos CSS. La navegación usa dos niveles del patrón app-tabs de SADAlumnos. No usa SSRS ni modifica datos.
+
+## Navegación por etapas
+
+El primer nivel reproduce los grupos de Informes y queda fuera del contenedor de
+secciones:
+
+- **I. Evaluación Programa**
+- **II. Evaluación Cursos**
+- **III. Docentes**
+- **IV. Conocimientos y Habilidades Adquiridas**
+- **Gráficos**
+
+Dentro de cada etapa se muestran sus tabs secundarios con app-tabs--secondary:
+Programa incluye Malla, Cuerpo Académico, Funcionamiento, Infraestructura,
+Servicios, Vinculación Medio, Networking y Resumen; Cursos incluye Cátedras x Área;
+Docentes incluye Ranking e Insatisfacción; Conocimientos incluye Habilidades y
+Evaluación general. Gráficos contiene el selector de los ocho gráficos. Cambiar de
+etapa carga su primer tab y cancela las consultas de la etapa anterior.
 
 ## P1 entregado
 
@@ -13,8 +30,8 @@ posteriores; por ahora muestran un placeholder explícito.
   Incompletas y Contestadas, con totales de footer calculados por el servidor.
 - Cambios de tipo recargan modalidades; cambios de filtros cancelan la consulta
   anterior y no permiten que una respuesta vieja reemplace la nueva.
-- Tabs de las 14 secciones con placeholder; no se inventan datos ni se ejecutan
-  consultas de secciones todavía no migradas.
+- Tabs de las 14 secciones sobre un shell único; las fases P2-P6 incorporaron
+  el contenido de cada sección.
 - Permiso de solo lectura `REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS`.
   Las respuestas autenticadas llevan `Cache-Control: no-store`.
 
@@ -70,8 +87,10 @@ legado: **I** conocimientos teóricos, **II** experiencia práctico-profesional 
 título de práctico y II bajo el de formativo; esta migración no cambia los SP,
 solo presenta cada resultado con su título correcto.
 
-Q10 lista profesores insatisfechos y permite abrir sus motivos en un panel
-inline. El detalle conserva los cuatro filtros originales: período, tipo de
+Q10 lista profesores insatisfechos con paginación de 10 filas y el componente
+Search de SADAlumnos. La búsqueda filtra por profesor, código o cantidad y vuelve
+a la primera página. La acción es un botón de icono con tooltip y abre los motivos
+en un modal; el detalle conserva los cuatro filtros originales: período, tipo de
 alumno, modalidad y código de profesor.
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -147,15 +166,18 @@ modifican SP, funciones, vistas o tablas.
   de Q9 y DetalleProfesor se documentarán en P4.
 - Q1-Q7 Likert, Q8/Q11, docentes/detalle, Resumen y gráficos quedan para P2-P6.
 
-## Verificación P1
+## Verificación final
 
-14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 11 pruebas de componente, 12 de navegación y 40 pruebas backend (incluyendo ADO.NET
-para Q1/Q7/Q8/Q11/Q17/Q9/Q10/DetalleProfesor) cubren carga automática, cambio
-dependiente de modalidad, tabs, muestra vacía, matrices, porcentajes, promedio,
-ranking docente corregido, drilldown de insatisfacción, resumen N2/dimensión,
-Q17, ocho gráficos CSS, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
-build de producción correcto. Las cinco fallas Angular son las ya conocidas de
-tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
-No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni
-cambios de base de datos.
+Pruebas verificadas durante P1-P7:
+
+- 50 pruebas backend focalizadas del módulo; 329 en la suite .NET completa.
+- 23 pruebas de UI focalizadas del shell/navegación y 197/202 en la suite Angular.
+- 38 pruebas Node y build de producción correcto.
+- Verificación independiente final sin bloqueos: Q17 excluido de Resumen,
+  mapeo Q9 I/II/III correcto, fórmula de Resumen y permisos/no-store observados.
+
+Las cinco fallas Angular son las previas de tema/favoritos por `localStorage`
+ausente bajo Node 26, ajenas a esta pantalla. No se probó contra SQL Server,
+Keycloak, fotos, SADAlumnos ni un navegador real. Los defectos internos de
+`DetallesProf` se documentaron sin modificar SP, vistas o tablas. No hay commits
+ni cambios de base de datos.

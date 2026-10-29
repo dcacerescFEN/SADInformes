@@ -27,7 +27,7 @@ roles ni asignaciones**.
 | `solo informes` | `PERMISSION_REPORT_ACCESS` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
 | `informes acreditación` | `PERMISSION_REPORT_ACCESS` | Era un requisito adicional en varias páginas de Postgrado. |
 | `cuadro de honor` | `PERMISSION_REPORT_ACCESS` | Requisito adicional de rankings; hoy lo cubre el permiso del informe. |
-| `encuesta egresados` | `PERMISSION_REPORT_ACCESS` | Acceso a estadísticas de salida cuando se migren. |
+| `ver Postgrado` + `encuesta egresados` (Estadísticas encuesta salida) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
 | `reporte proximas licenciaturas` | `PERMISSION_REPORT_ACCESS` | Solo controlaba la visibilidad del enlace. |
 | `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS` | El acceso real lo define cada sistema externo. |
 | `INFORMES - MANTENEDORES POSTGRADO CONSTANCIAS` | — | Permiso de una aplicación externa; sigue en su sistema. |

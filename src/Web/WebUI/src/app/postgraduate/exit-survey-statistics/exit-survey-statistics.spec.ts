@@ -25,7 +25,7 @@ describe('Exit survey statistics shell', () => {
     expect(fixture.componentInstance.form.getRawValue()).toEqual({period:'2024A',studentType:'Todos',modality:'Todos'});
     expect(body.textContent).toContain('Muestra'); expect(body.textContent).toContain('Incompletas'); expect(body.textContent).toContain('Contestadas');
     expect(body.textContent).toContain('MBA'); expect(body.querySelector('tfoot')?.textContent).toContain('10'); expect(body.querySelector('tfoot')?.textContent).toContain('8');
-    expect(body.querySelectorAll('[data-tab]').length).toBe(14);
+    expect(body.querySelectorAll('[data-top]')).toHaveLength(5); expect(body.querySelectorAll('[data-tab]')).toHaveLength(8);
     expect(body.textContent).toContain('Pregunta A'); expect(body.textContent).toContain('12,0%'); expect(body.textContent).toContain('4,5');
     expect(body.querySelector('[data-panel]')?.textContent).not.toContain('pendiente de migración');
     fixture.destroy();
@@ -70,11 +70,11 @@ describe('Exit survey statistics shell', () => {
 
   it('loads Q8 and Q11 through the configurable matrices', async () => {
     const fixture=await ready();
-    (fixture.nativeElement.querySelector('[data-tab="catedras-area"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    (fixture.nativeElement.querySelector('[data-top="cursos"]') as HTMLButtonElement).click(); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/catedras-area').flush({success:true,data:{rows:[{code:'C1',description:'Cátedra Uno',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,average:3,total:5}],totals:{alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1}}});
     await fixture.whenStable(); fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Muy Malo'); expect(fixture.nativeElement.textContent).toContain('Muy Bueno'); expect(fixture.nativeElement.textContent).toContain('20,0%');
-    (fixture.nativeElement.querySelector('[data-tab="habilidades"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    (fixture.nativeElement.querySelector('[data-top="conocimientos"]') as HTMLButtonElement).click(); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/skills').flush({success:true,data:{rows:[{question:'Q11',description:'Habilidad Uno',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,alternative6:1,alternative7:1,average:4,total:7}],totals:{alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,alternative6:1,alternative7:1}}});
     await fixture.whenStable(); fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Deficiente'); expect(fixture.nativeElement.textContent).toContain('Sobresaliente'); expect(fixture.nativeElement.textContent).toContain('Habilidad Uno');
@@ -84,7 +84,7 @@ describe('Exit survey statistics shell', () => {
 
   it('loads corrected Q9 roles and Q10 detail', async () => {
     const fixture=await ready();
-    (fixture.nativeElement.querySelector('[data-tab="ranking"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    (fixture.nativeElement.querySelector('[data-top="docentes"]') as HTMLButtonElement).click(); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/teachers').flush({success:true,data:{theoretical:[{professor:'Teórico',frequency:5}],practical:[{professor:'Práctico',frequency:4}],formative:[{professor:'Formativo',frequency:3}]}});
     await fixture.whenStable(); fixture.detectChanges();
     const body:HTMLElement=fixture.nativeElement;
@@ -92,17 +92,22 @@ describe('Exit survey statistics shell', () => {
     (body.querySelector('[data-tab="insatisfaccion"]') as HTMLButtonElement).click(); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/insatisfaction').flush({success:true,data:{rows:[{professor:'Profesor Insatisfecho',count:3,professorCode:'P9',period:'2024A',studentType:'Todos',modality:'Todos'}]}});
     await fixture.whenStable(); fixture.detectChanges();
-    (body.querySelector('[data-detail="P9"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    const detailButton=body.querySelector('[data-detail="P9"]') as HTMLButtonElement;
+    expect(detailButton.getAttribute('title')).toBe('Ver motivos de Profesor Insatisfecho'); expect(detailButton.textContent.trim()).toBe('');
+    detailButton.click(); fixture.detectChanges(); expect(body.querySelector('.modal')?.textContent).toContain('Motivos de Profesor Insatisfecho');
     const detail=http.expectOne(r=>r.url===BASE+'/insatisfaction/detail');
     expect(detail.request.params.get('professor')).toBe('P9'); expect(detail.request.params.get('period')).toBe('2024A');
     detail.flush({success:true,data:{professor:'Profesor Insatisfecho',motives:['Motivo uno','Motivo dos']}});
     await fixture.whenStable(); fixture.detectChanges();
-    expect(body.querySelector('[data-teacher-detail]')?.textContent).toContain('Motivo uno'); expect(body.textContent).toContain('Ver motivos');
+    expect(body.querySelector('[data-teacher-detail]')?.textContent).toContain('Motivo uno');
+    (body.querySelector('[aria-label="Cerrar detalle"]') as HTMLButtonElement).click(); fixture.detectChanges(); expect(body.querySelector('.modal')).toBeNull();
     fixture.destroy();
   });
 
   it('loads Q17 as a Likert general-evaluation section', async () => {
     const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-top="conocimientos"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/skills').flush({success:true,data:{rows:[],totals:{alternative1:0,alternative2:0,alternative3:0,alternative4:0,alternative5:0,alternative6:0,alternative7:0}}}); await fixture.whenStable(); fixture.detectChanges();
     (fixture.nativeElement.querySelector('[data-tab="evaluacion-general"]') as HTMLButtonElement).click(); fixture.detectChanges();
     const request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('evaluacion-general');
     request.flush({success:true,data:{section:'evaluacion-general',title:'Evaluación general',rows:[{question:'Q17',description:'Evaluación general',alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5,average:3,total:15}],totals:{alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5}}});
@@ -113,7 +118,7 @@ describe('Exit survey statistics shell', () => {
 
   it('loads the eight CSS chart options and switches charts', async () => {
     const fixture=await ready();
-    (fixture.nativeElement.querySelector('[data-tab="graficos"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    (fixture.nativeElement.querySelector('[data-top="graficos"]') as HTMLButtonElement).click(); fixture.detectChanges();
     let request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('malla');
     request.flush(likert); await fixture.whenStable(); fixture.detectChanges();
     const body:HTMLElement=fixture.nativeElement;
