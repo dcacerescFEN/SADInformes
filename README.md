@@ -1,5 +1,7 @@
 # SADInformes
 
+Inscripción encuesta de salida: [escritura transaccional y filtros](docs/exit-survey-enrollment.md).
+
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
 Solicitudes alumno Postgrado: [descarga Excel SSRS y configuración](docs/student-requests.md).

@@ -11,6 +11,7 @@ public partial interface ISadContext
     DbSet<AudiEstadoPostgradoAlumnosGuia> AudiEstadoPostgradoAlumnosGuia { get; }
     DbSet<Alumno> Alumnos { get; }
     DbSet<Persona> Personas { get; }
+    DbSet<EncuestaSalidaGraduado> EncuestaSalidaGraduados { get; }
     DbSet<Catedra> Catedras { get; }
     DbSet<Curso> Cursos { get; }
     DbSet<PlanesFormacionCatedra> PlanesFormacionCatedras { get; }
