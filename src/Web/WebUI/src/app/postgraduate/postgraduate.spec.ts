@@ -164,6 +164,20 @@ describe('Navegación visual de Postgrado', () => {
     expect(root.querySelector('iframe')).toBeNull();
   });
 
+  it('opens weighted ranking with concrete filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/ranking-notas-ponderado');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/weighted-ranking/filters')
+      .flush({ success: true, data: { studentTypes: [{ value: 'MBA', text: 'MBA' }], modalities: ['PT'], years: ['2026'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Ranking Notas Ponderado');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(4);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens exit survey enrollment with automatic listing and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/inscripcion-encuesta-salida');
     await harness.detectChanges();

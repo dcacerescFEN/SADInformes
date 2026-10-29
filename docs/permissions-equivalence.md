@@ -47,6 +47,7 @@ roles ni asignaciones**.
 | Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` | Implementado; exige también el permiso de consulta |
 | `ver Postgrado` + `cuadro de honor` (Inscripción encuesta salida: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` | Implementado; requiere asignación en Keycloak |
 | Inscripción encuesta salida: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` | Implementado; exige también el permiso de consulta |
+| `ver Postgrado` + `cuadro de honor` (Ranking notas ponderado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_WEIGHTED_RANKING` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `Admin firma Postgrado` | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_SIGNATURE` (propuesto) | Pendiente; además requiere `UPLOAD` para imágenes |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
