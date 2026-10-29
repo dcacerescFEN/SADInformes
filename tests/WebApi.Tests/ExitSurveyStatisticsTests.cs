@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsFilters;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsLikert;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
@@ -73,6 +74,49 @@ public sealed class ExitSurveyStatisticsTests
         Assert.Contains(message, error.Message); Assert.Null(procedures.Period);
     }
 
+    [Theory]
+    [InlineData("malla", "Q1", "Malla Curricular")]
+    [InlineData("cuerpo-academico", "Q2", "Cuerpo Académico")]
+    [InlineData("funcionamiento", "Q3", "Funcionamiento")]
+    [InlineData("infraestructura", "Q4", "Infraestructura y recursos")]
+    [InlineData("servicios", "Q5", "Servicios")]
+    [InlineData("vinculacion-medio", "Q6", "Vinculación Medio")]
+    [InlineData("networking", "Q7", "Networking")]
+    public async Task Likert_maps_each_section_to_its_canonical_question_and_totals_alternatives(string section, string question, string title)
+    {
+        var procedures = new Procedures();
+        var result = await new GetExitSurveyStatisticsLikertHandler(procedures, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsLikert(section, "2024A", "MBA", "PT"), default);
+        Assert.Equal((question, title), (procedures.LikertCalls.Single(), result.Data.Title));
+        Assert.Equal(("2024A", "MBA", "PT"), (procedures.Period, procedures.Type, procedures.Modality));
+        Assert.Equal(2, result.Data.Rows.Length);
+        Assert.Equal(3, result.Data.Rows[0].Alternative1);
+        Assert.Equal(4.5, result.Data.Rows[0].Average);
+        Assert.Equal(new ExitSurveyLikertTotalsDTO(5, 7, 9, 11, 13), result.Data.Totals);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("Q1")]
+    [InlineData("MALLA")]
+    public async Task Invalid_likert_section_never_calls_procedures(string? section)
+    {
+        var procedures = new Procedures();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            new GetExitSurveyStatisticsLikertHandler(procedures, new ApiResponseService())
+                .Handle(new GetExitSurveyStatisticsLikert(section, "2024A", "MBA", "PT"), default));
+        Assert.Empty(procedures.LikertCalls);
+    }
+
+    [Fact]
+    public async Task Likert_keeps_empty_result_and_does_not_invent_totals()
+    {
+        var result = await new GetExitSurveyStatisticsLikertHandler(new Procedures { EmptyLikert = true }, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsLikert("malla", "2024A", "MBA", "PT"), default);
+        Assert.Empty(result.Data.Rows);
+        Assert.Equal(new ExitSurveyLikertTotalsDTO(0, 0, 0, 0, 0), result.Data.Totals);
+    }
+
     private static (WebApplicationFactory<Program>, TokenFactory) Create(Procedures procedures)
     {
         var tokens = new TokenFactory();
@@ -98,7 +142,7 @@ public sealed class ExitSurveyStatisticsTests
     {
         var (factory, tokens) = Create(new Procedures()); using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
         if (role is not null) client.SetBearer(tokens.CreateToken("SADInformes", role));
-        foreach (var suffix in new[] { "/filters", "/sample" + Query })
+        foreach (var suffix in new[] { "/filters", "/sample" + Query, "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos" })
             Assert.Equal(status, (int)(await client.GetAsync(Route + suffix)).StatusCode);
     }
 
@@ -117,6 +161,8 @@ public sealed class ExitSurveyStatisticsTests
         using var json = JsonDocument.Parse(await sample.Content.ReadAsStringAsync());
         Assert.Equal(10, json.RootElement.GetProperty("data").GetProperty("totals").GetProperty("sample").GetInt32());
         Assert.Equal(2, json.RootElement.GetProperty("data").GetProperty("rows")[0].GetProperty("inProgress").GetInt32());
+        using var likert = await client.GetAsync(Route + "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, likert.StatusCode);
+        Assert.True(likert.Headers.CacheControl!.NoStore); Assert.Contains("Malla Curricular", await likert.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -140,6 +186,8 @@ public sealed class ExitSurveyStatisticsTests
         public string? Period { get; private set; }
         public string? Type { get; private set; }
         public string? Modality { get; private set; }
+        public bool EmptyLikert { get; init; }
+        public List<string> LikertCalls { get; } = [];
         public override Task<List<SpRecEncuestaGraduadosPeriodosResult>?> spRec_EncuestaGraduados_PeriodosAsync(
             OutputParameter<int>? returnValue = null, CancellationToken? ct = default)
         {
@@ -153,6 +201,27 @@ public sealed class ExitSurveyStatisticsTests
             ModalityType = tipo;
             if (Fail) throw new InvalidOperationException("private-sql");
             return Task.FromResult<List<SpRecEncuestaGraduadosModalidadesResult>?>([new() { Modalidad = "Todos" }, new() { Modalidad = "PT" }]);
+        }
+        private Task<List<SpRecEncuestaGraduadosLikertResult>?> Likert(string question)
+        {
+            LikertCalls.Add(question);
+            return Task.FromResult<List<SpRecEncuestaGraduadosLikertResult>?>(EmptyLikert ? [] :
+            [
+                new() { Pregunta = "1", Descripcion = "Pregunta A", Alternativa1 = 3, Alternativa2 = 4, Alternativa3 = 5, Alternativa4 = 6, Alternativa5 = 7, Promedio = 4.5, Total = 25 },
+                new() { Pregunta = "2", Descripcion = "Pregunta B", Alternativa1 = 2, Alternativa2 = 3, Alternativa3 = 4, Alternativa4 = 5, Alternativa5 = 6, Promedio = 4.0, Total = 20 },
+            ]);
+        }
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ1Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q1", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ2Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q2", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ3Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q3", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ4Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q4", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ5Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q5", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ6Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q6", periodo, tipo_Alumno, modalidad);
+        public override Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ7Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default) => RecordLikert("Q7", periodo, tipo_Alumno, modalidad);
+        private Task<List<SpRecEncuestaGraduadosLikertResult>?> RecordLikert(string question, string? period, string? type, string? modality)
+        {
+            Period = period; Type = type; Modality = modality;
+            return Likert(question);
         }
         public override Task<List<SpRecEncuestaGraduadosEstadisticasResult>?> spRec_EncuestaGraduados_EstadisticasAsync(
             string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? ct = default)

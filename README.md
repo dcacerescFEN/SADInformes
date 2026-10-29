@@ -1,6 +1,6 @@
 # SADInformes
 
-Estadísticas encuesta de salida (P1): [shell de filtros y muestra](docs/exit-survey-statistics.md).
+Estadísticas encuesta de salida (P1-P2): [shell, muestra y Likert Q1-Q7](docs/exit-survey-statistics.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 

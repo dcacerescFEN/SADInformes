@@ -6,15 +6,18 @@ import { ExitSurveyStatistics } from './exit-survey-statistics';
 const BASE = '/api/reports/postgraduate/exit-survey-statistics';
 const filters = { success: true, data: { periods: [{value:'2024A',text:'2024'},{value:'Todos',text:'Todos'}], studentTypes: [{value:'Todos',text:'Todos'},{value:'MBA',text:'MBA'}], modalities: [{value:'Todos',text:'Todos'},{value:'PT',text:'PT'}] } };
 const sample = { success: true, data: { rows: [{type:'MBA',modality:'PT',sample:10,inProgress:2,answered:8},{type:'MBA GLOBAL',modality:null,sample:0,inProgress:0,answered:0}], totals: {sample:10,inProgress:2,answered:8} } };
+const likert = { success: true, data: { section:'malla', title:'Malla Curricular', rows:[{question:'1',description:'Pregunta A',alternative1:3,alternative2:4,alternative3:5,alternative4:6,alternative5:7,average:4.5,total:25}], totals:{alternative1:3,alternative2:4,alternative3:5,alternative4:6,alternative5:7} } };
 describe('Exit survey statistics shell', () => {
   let http: HttpTestingController;
   beforeEach(() => { TestBed.configureTestingModule({ imports:[ExitSurveyStatistics], providers:[provideHttpClient(),provideHttpClientTesting()] }); http=TestBed.inject(HttpTestingController); });
   afterEach(() => { http.verify(); TestBed.resetTestingModule(); });
-  async function ready(body: any = sample) {
+  async function ready(body: any = sample, likertBody: any = likert) {
     const fixture=TestBed.createComponent(ExitSurveyStatistics); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/filters').flush(filters);
     await fixture.whenStable(); fixture.detectChanges(); await Promise.resolve(); fixture.detectChanges();
     http.expectOne(r=>r.url===BASE+'/sample').flush(body);
+    await fixture.whenStable(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/likert').flush(likertBody);
     await fixture.whenStable(); fixture.detectChanges(); return fixture;
   }
   it('loads filters and muestra with legacy totals and tabs', async () => {
@@ -23,7 +26,8 @@ describe('Exit survey statistics shell', () => {
     expect(body.textContent).toContain('Muestra'); expect(body.textContent).toContain('Incompletas'); expect(body.textContent).toContain('Contestadas');
     expect(body.textContent).toContain('MBA'); expect(body.querySelector('tfoot')?.textContent).toContain('10'); expect(body.querySelector('tfoot')?.textContent).toContain('8');
     expect(body.querySelectorAll('[data-tab]').length).toBe(14);
-    expect(body.querySelector('[data-panel]')?.textContent).toContain('pendiente de migración');
+    expect(body.textContent).toContain('Pregunta A'); expect(body.textContent).toContain('12,0%'); expect(body.textContent).toContain('4,5');
+    expect(body.querySelector('[data-panel]')?.textContent).not.toContain('pendiente de migración');
     fixture.destroy();
   });
   it('reloads dependent modality and sample on type change', async () => {
@@ -34,10 +38,11 @@ describe('Exit survey statistics shell', () => {
     await Promise.resolve(); fixture.detectChanges();
     const request=http.expectOne(r=>r.url===BASE+'/sample'); expect(request.request.params.get('studentType')).toBe('MBA'); expect(request.request.params.get('modality')).toBe('PT');
     request.flush(sample); await fixture.whenStable(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/likert').flush(likert); await fixture.whenStable(); fixture.detectChanges();
     fixture.destroy();
   });
   it('switches placeholder tab and shows empty state without fabricating totals', async () => {
-    const fixture=await ready({success:true,data:{rows:[],totals:{sample:0,inProgress:0,answered:0}}});
+    const fixture=await ready({success:true,data:{rows:[],totals:{sample:0,inProgress:0,answered:0}}},{success:true,data:{section:'malla',title:'Malla Curricular',rows:[],totals:{alternative1:0,alternative2:0,alternative3:0,alternative4:0,alternative5:0}}});
     const body:HTMLElement=fixture.nativeElement; expect(body.textContent).toContain('Sin Datos');
     (body.querySelector('[data-tab="resumen"]') as HTMLButtonElement).click(); fixture.detectChanges();
     expect(fixture.componentInstance.activeTab()).toBe('resumen'); expect(body.querySelector('[data-panel]')?.textContent).toContain('pendiente de migración');
@@ -51,9 +56,20 @@ describe('Exit survey statistics shell', () => {
     expect(stale.cancelled).toBe(true);
     const fresh=http.expectOne(r=>r.url===BASE+'/sample');
     fresh.flush({...sample,data:{...sample.data,rows:[{...sample.data.rows[0],type:'FRESH'}]}}); await fixture.whenStable(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/likert').flush(likert); await fixture.whenStable(); fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('FRESH');
     fixture.destroy();
   });
+  it('loads another Likert section when its tab is selected', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="cuerpo-academico"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    const request=http.expectOne(r=>r.url===BASE+'/likert'); expect(request.request.params.get('section')).toBe('cuerpo-academico');
+    request.flush({success:true,data:{section:'cuerpo-academico',title:'Cuerpo Académico',rows:[{question:'2',description:'Pregunta Cuerpo',alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5,average:4.0,total:15}],totals:{alternative1:1,alternative2:2,alternative3:3,alternative4:4,alternative5:5}}});
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Pregunta Cuerpo'); expect(fixture.nativeElement.querySelector('[data-panel]')?.textContent).not.toContain('pendiente de migración');
+    fixture.destroy();
+  });
+
   it('ignores stale catalogs and sanitizes failures', async () => {
     const fixture=TestBed.createComponent(ExitSurveyStatistics); fixture.detectChanges();
     const stale=http.expectOne(r=>r.url===BASE+'/filters');

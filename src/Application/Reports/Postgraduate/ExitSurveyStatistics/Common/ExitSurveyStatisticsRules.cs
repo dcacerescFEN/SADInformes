@@ -48,3 +48,41 @@ internal static class ExitSurveyStatisticsRules
 internal sealed record Option(string Value, string Text);
 internal sealed record Filters(Option[] Periods, Option[] StudentTypes, Option[] Modalities, string SelectedType);
 internal sealed record SampleRow(string Type, string? Modality, int Sample, int InProgress, int Answered);
+internal sealed record LikertRow(string Question, string Description, int A1, int A2, int A3, int A4, int A5, double? Average, int Total);
+
+internal static class LikertSections
+{
+    internal static readonly string[] Ids = ["malla", "cuerpo-academico", "funcionamiento", "infraestructura", "servicios", "vinculacion-medio", "networking"];
+    internal static string Title(string id) => id switch
+    {
+        "malla" => "Malla Curricular",
+        "cuerpo-academico" => "Cuerpo Académico",
+        "funcionamiento" => "Funcionamiento",
+        "infraestructura" => "Infraestructura y recursos",
+        "servicios" => "Servicios",
+        "vinculacion-medio" => "Vinculación Medio",
+        "networking" => "Networking",
+        _ => throw new ArgumentException("La sección Likert no es válida."),
+    };
+    internal static string Required(string? id) => id is not null && Ids.Contains(id, StringComparer.Ordinal)
+        ? id : throw new ArgumentException("La sección Likert no es válida.");
+
+    internal static async Task<LikertRow[]> ReadAsync(ISadContextProcedures p, string section,
+        string? period, string? type, string? modality, CancellationToken ct)
+    {
+        var rows = section switch
+        {
+            "malla" => await p.spRec_EncuestaGraduadosEstadisticasQ1Async(period, type, modality, cancellationToken: ct),
+            "cuerpo-academico" => await p.spRec_EncuestaGraduadosEstadisticasQ2Async(period, type, modality, cancellationToken: ct),
+            "funcionamiento" => await p.spRec_EncuestaGraduadosEstadisticasQ3Async(period, type, modality, cancellationToken: ct),
+            "infraestructura" => await p.spRec_EncuestaGraduadosEstadisticasQ4Async(period, type, modality, cancellationToken: ct),
+            "servicios" => await p.spRec_EncuestaGraduadosEstadisticasQ5Async(period, type, modality, cancellationToken: ct),
+            "vinculacion-medio" => await p.spRec_EncuestaGraduadosEstadisticasQ6Async(period, type, modality, cancellationToken: ct),
+            "networking" => await p.spRec_EncuestaGraduadosEstadisticasQ7Async(period, type, modality, cancellationToken: ct),
+            _ => throw new ArgumentException("La sección Likert no es válida."),
+        };
+        return (rows ?? []).Select(row => new LikertRow(row.Pregunta?.Trim() ?? "", row.Descripcion?.Trim() ?? "",
+            row.Alternativa1 ?? 0, row.Alternativa2 ?? 0, row.Alternativa3 ?? 0, row.Alternativa4 ?? 0,
+            row.Alternativa5 ?? 0, row.Promedio, row.Total ?? 0)).ToArray();
+    }
+}

@@ -174,6 +174,9 @@ describe('Navegación visual de Postgrado', () => {
     http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/sample')
       .flush({ success: true, data: { rows: [], totals: { sample: 0, inProgress: 0, answered: 0 } } });
     await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/likert')
+      .flush({ success: true, data: { section: 'malla', title: 'Malla Curricular', rows: [], totals: { alternative1: 0, alternative2: 0, alternative3: 0, alternative4: 0, alternative5: 0 } } });
+    await harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta de Salida');
     expect(root.querySelectorAll('[data-tab]')).toHaveLength(14);

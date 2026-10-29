@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Subscription, firstValueFrom } from 'rxjs';
+import { LikertMatrix, LikertRow, LikertTotals } from './likert-matrix';
 
 interface Option { value: string; text: string; }
 interface Filters { periods: Option[]; studentTypes: Option[]; modalities: Option[]; }
@@ -11,6 +12,7 @@ interface Row { type: string; modality: string | null; sample: number; inProgres
 interface Totals { sample: number; inProgress: number; answered: number; }
 interface Tab { id: string; label: string; group: string; }
 const BASE = '/api/reports/postgraduate/exit-survey-statistics';
+const LIKERT_TABS = new Set(['malla', 'cuerpo-academico', 'funcionamiento', 'infraestructura', 'servicios', 'vinculacion-medio', 'networking']);
 const TABS: readonly Tab[] = [
   { id: 'malla', label: 'Malla Curricular', group: 'Parte I' },
   { id: 'cuerpo-academico', label: 'Cuerpo Académico', group: 'Parte I' },
@@ -30,7 +32,7 @@ const TABS: readonly Tab[] = [
 
 @Component({
   selector: 'app-exit-survey-statistics',
-  imports: [ReactiveFormsModule, NgSelectModule],
+  imports: [ReactiveFormsModule, NgSelectModule, LikertMatrix],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="container-fluid px-0 py-4">
@@ -99,9 +101,22 @@ const TABS: readonly Tab[] = [
               [attr.aria-selected]="activeTab() === tab.id" (click)="selectTab(tab.id)">{{ tab.label }}</button>
           }
         </div>
-        <div class="alert alert-info mt-3" role="tabpanel" data-panel>
-          <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
-        </div>
+        @if (isLikertTab()) {
+          <div class="mt-3" role="tabpanel" data-panel>
+            @if (likertLoading()) { <p role="status">Cargando sección…</p> }
+            @if (likertError()) { <div class="alert alert-warning" role="alert">{{ likertError() }}</div> }
+            @if (likertData(); as data) {
+              <h3 class="h5">{{ data.title }}</h3>
+              <app-likert-matrix [title]="data.title" [rows]="data.rows" [totals]="data.totals" />
+            } @else if (!likertLoading() && !likertError()) {
+              <p class="text-body-secondary" role="status">No existen datos disponibles.</p>
+            }
+          </div>
+        } @else {
+          <div class="alert alert-info mt-3" role="tabpanel" data-panel>
+            <strong>{{ activeLabel() }}</strong>: sección pendiente de migración.
+          </div>
+        }
       </div>
     </div>
   `,
@@ -120,13 +135,19 @@ export class ExitSurveyStatistics {
   private readonly filtering = signal(false);
   protected readonly loaded = signal(false);
   protected readonly error = signal('');
-  protected readonly busy = computed(() => this.loading() || this.filtering());
+  protected readonly busy = computed(() => this.loading() || this.filtering() || this.likertLoading());
+  protected readonly likertData = signal<{ section: string; title: string; rows: LikertRow[]; totals: LikertTotals } | null>(null);
+  protected readonly likertLoading = signal(false);
+  protected readonly likertError = signal('');
+  protected readonly isLikertTab = computed(() => LIKERT_TABS.has(this.activeTab()));
   private filterRevision = 0;
   private sampleRevision = 0;
+  private likertRevision = 0;
   private sampleSubscription?: Subscription;
+  private likertSubscription?: Subscription;
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.sampleSubscription?.unsubscribe());
+    this.destroyRef.onDestroy(() => { this.sampleSubscription?.unsubscribe(); this.likertSubscription?.unsubscribe(); });
     this.form.controls.studentType.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => void this.reloadForType());
     for (const control of ['period', 'modality'] as const) {
       this.form.controls[control].valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSample());
@@ -172,8 +193,9 @@ export class ExitSurveyStatistics {
     const selection = this.form.getRawValue();
     if (!selection.period || !selection.studentType || !selection.modality) return;
     this.sampleSubscription?.unsubscribe();
+    this.likertRevision++; this.likertSubscription?.unsubscribe(); this.likertLoading.set(false);
     const revision = ++this.sampleRevision;
-    this.loading.set(true); this.error.set('');
+    this.loading.set(true); this.error.set(''); this.likertData.set(null); this.likertError.set('');
     this.sampleSubscription = this.http.get<{ success: boolean; data: { rows: Row[]; totals: Totals } }>(BASE + '/sample', { params: selection })
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: response => {
@@ -181,6 +203,7 @@ export class ExitSurveyStatistics {
           this.loading.set(false); this.loaded.set(true);
           if (response.success !== true) { this.rows.set([]); this.error.set('No se pudo cargar la muestra.'); return; }
           this.rows.set(response.data.rows); this.totals.set(response.data.totals);
+          this.loadLikertIfActive();
         },
         error: () => {
           if (revision !== this.sampleRevision) return;
@@ -190,7 +213,36 @@ export class ExitSurveyStatistics {
       });
   }
 
-  protected selectTab(id: string): void { this.activeTab.set(id); }
+  protected selectTab(id: string): void {
+    this.activeTab.set(id);
+    if (!this.loading() && !this.filtering() && LIKERT_TABS.has(id)) this.loadLikert();
+  }
+
+  private loadLikertIfActive(): void { if (LIKERT_TABS.has(this.activeTab())) this.loadLikert(); }
+
+  private loadLikert(): void {
+    const section = this.activeTab();
+    if (!LIKERT_TABS.has(section)) return;
+    const selection = this.form.getRawValue();
+    if (!selection.period || !selection.studentType || !selection.modality) return;
+    this.likertSubscription?.unsubscribe();
+    const revision = ++this.likertRevision;
+    this.likertLoading.set(true); this.likertError.set('');
+    this.likertSubscription = this.http.get<{ success: boolean; data: { section: string; title: string; rows: LikertRow[]; totals: LikertTotals } }>(
+      BASE + '/likert', { params: { ...selection, section } })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (revision !== this.likertRevision) return;
+          this.likertLoading.set(false);
+          if (response.success !== true) { this.likertData.set(null); this.likertError.set('No se pudo cargar la sección.'); return; }
+          this.likertData.set(response.data);
+        },
+        error: () => {
+          if (revision !== this.likertRevision) return;
+          this.likertLoading.set(false); this.likertData.set(null); this.likertError.set('No se pudo cargar la sección.');
+        },
+      });
+  }
   private invalidateSample(): void {
     this.sampleRevision++; this.sampleSubscription?.unsubscribe(); this.rows.set([]); this.loaded.set(false); this.totals.set({ sample: 0, inProgress: 0, answered: 0 });
   }

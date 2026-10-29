@@ -18,6 +18,32 @@ posteriores; por ahora muestran un placeholder explícito.
 - Permiso de solo lectura `REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS`.
   Las respuestas autenticadas llevan `Cache-Control: no-store`.
 
+## P2 entregado
+
+Q1-Q7 están disponibles en las tabs Malla Curricular, Cuerpo Académico,
+Funcionamiento, Infraestructura y recursos, Servicios, Vinculación Medio y
+Networking. Una única consulta selecciona la pregunta canónica por sección.
+
+Cada fila muestra Descripción, conteo y porcentaje de las cinco alternativas
+(Muy en desacuerdo a Muy de acuerdo), promedio con un decimal y total. El footer
+suma cada alternativa. Los porcentajes usan `alternativa / total` con un decimal;
+si el total es cero se muestra 0,0. El promedio se presenta con formato es-CL.
+Una respuesta vacía muestra **No existen datos disponibles.** Sin datos no se
+inventan filas ni totales.
+
+## API P2
+
+| Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
+| --- | --- |
+| `GET /likert?section=malla&period=2024A&studentType=Todos&modality=Todos` | Matriz de la sección Q1 |
+| Secciones Q1-Q7 | `malla`, `cuerpo-academico`, `funcionamiento`, `infraestructura`, `servicios`, `vinculacion-medio`, `networking` |
+| Error | Sección inválida: 400; fallo de almacenamiento: 503 saneado |
+
+Los wrappers Q1-Q7 son métodos tipados separados y comparten el helper interno
+que fija el nombre de procedimiento desde una lista cerrada. No se concatena SQL
+de usuario. La consulta valida sección, período, tipo y modalidad antes de invocar
+el procedimiento.
+
 ## API P1
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -42,9 +68,10 @@ modifican SP, funciones, vistas o tablas.
 ## Verificación P1
 
 14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 5 pruebas de componente y 12 de navegación cubren
-carga automática, cambio dependiente de modalidad, tabs, muestra vacía,
-cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
+no-store y errores saneados. 6 pruebas de componente, 12 de navegación y 27 pruebas backend (incluyendo
+ADO.NET para parámetros/resultado Q1/Q7) cubren carga automática, cambio
+dependiente de modalidad, tabs, muestra vacía, matriz Likert, porcentajes,
+promedio, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
 build de producción correcto. Las cinco fallas Angular son las ya conocidas de
 tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
 No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni
