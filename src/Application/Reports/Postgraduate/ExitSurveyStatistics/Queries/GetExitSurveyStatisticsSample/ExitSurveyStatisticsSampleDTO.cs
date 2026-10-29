@@ -1,0 +1,2 @@
+namespace Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
+public sealed record ExitSurveyStatisticsSampleDTO(ExitSurveySampleRowDTO[] Rows, ExitSurveySampleTotalsDTO Totals);

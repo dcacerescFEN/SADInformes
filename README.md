@@ -1,5 +1,7 @@
 # SADInformes
 
+Estadísticas encuesta de salida (P1): [shell de filtros y muestra](docs/exit-survey-statistics.md).
+
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
 Solicitudes alumno Postgrado: [descarga Excel SSRS y configuración](docs/student-requests.md).
