@@ -70,6 +70,20 @@ describe('Exit survey statistics shell', () => {
     fixture.destroy();
   });
 
+  it('loads Q8 and Q11 through the configurable matrices', async () => {
+    const fixture=await ready();
+    (fixture.nativeElement.querySelector('[data-tab="catedras-area"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/catedras-area').flush({success:true,data:{rows:[{code:'C1',description:'Cátedra Uno',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,average:3,total:5}],totals:{alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1}}});
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Muy Malo'); expect(fixture.nativeElement.textContent).toContain('Muy Bueno'); expect(fixture.nativeElement.textContent).toContain('20,0%');
+    (fixture.nativeElement.querySelector('[data-tab="habilidades"]') as HTMLButtonElement).click(); fixture.detectChanges();
+    http.expectOne(r=>r.url===BASE+'/skills').flush({success:true,data:{rows:[{question:'Q11',description:'Habilidad Uno',alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,alternative6:1,alternative7:1,average:4,total:7}],totals:{alternative1:1,alternative2:1,alternative3:1,alternative4:1,alternative5:1,alternative6:1,alternative7:1}}});
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Deficiente'); expect(fixture.nativeElement.textContent).toContain('Sobresaliente'); expect(fixture.nativeElement.textContent).toContain('Habilidad Uno');
+    expect(fixture.nativeElement.textContent).not.toContain('Cátedra Uno');
+    fixture.destroy();
+  });
+
   it('ignores stale catalogs and sanitizes failures', async () => {
     const fixture=TestBed.createComponent(ExitSurveyStatistics); fixture.detectChanges();
     const stale=http.expectOne(r=>r.url===BASE+'/filters');

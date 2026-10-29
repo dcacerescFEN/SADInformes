@@ -39,12 +39,76 @@ public sealed class ExitSurveyStatisticsProcedureTests
             (row.Pregunta, row.Descripcion, row.Alternativa1, row.Alternativa2, row.Alternativa3, row.Alternativa4, row.Alternativa5, row.Promedio, row.Total));
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Q8_and_Q11_wrappers_preserve_distinct_shapes_and_parameters(bool q8)
+    {
+        var capture = new RatingReaderCapture(q8);
+        await using var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseSqlServer("Server=unused.invalid;Database=isolated;Integrated Security=true")
+            .AddInterceptors(new NoNetwork(), capture).Options);
+        var output = new OutputParameter<int>();
+        var procedures = new SadContextProcedures(context);
+        var token = CancellationToken.None;
+        if (q8)
+        {
+            var rows = await procedures.spRec_EncuestaGraduadosEstadisticasQ8Async("2024A", "MBA", "PT", output, token);
+            Assert.Equal(9, output.Value);
+            Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduadosEstadisticasQ8]", capture.Text);
+            var row = Assert.Single(rows!);
+            Assert.Equal(("C1", "Cátedra Uno", 1, 2, 3, 4, 5, 3.0d, 15),
+                (row.CodCatedra, row.Descripcion, row.Alternativa1, row.Alternativa2, row.Alternativa3, row.Alternativa4, row.Alternativa5, row.Promedio, row.Total));
+        }
+        else
+        {
+            var rows = await procedures.spRec_EncuestaGraduadosEstadisticasQ11Async("2024A", "MBA", "PT", output, token);
+            Assert.Equal(9, output.Value);
+            Assert.StartsWith("EXEC @returnValue = [dbo].[spRec_EncuestaGraduadosEstadisticasQ11]", capture.Text);
+            var row = Assert.Single(rows!);
+            Assert.Equal(("Q11", "Habilidad", 1, 2, 3, 4, 5, 6, 7, 4.0d, 28),
+                (row.Pregunta, row.Descripcion, row.Alternativa1, row.Alternativa2, row.Alternativa3, row.Alternativa4, row.Alternativa5, row.Alternativa6, row.Alternativa7, row.Promedio, row.Total));
+        }
+        var parameters = capture.Parameters.ToDictionary(parameter => parameter.ParameterName);
+        Assert.Equal((5, 30, 10), (parameters["Periodo"].Size, parameters["Tipo_Alumno"].Size, parameters["Modalidad"].Size));
+        Assert.Equal(ParameterDirection.Output, parameters["returnValue"].Direction);
+    }
+
     private sealed class NoNetwork : DbConnectionInterceptor
     {
         public override ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection,
             ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default) =>
             ValueTask.FromResult(InterceptionResult.Suppress());
     }
+    private sealed class RatingReaderCapture(bool q8) : DbCommandInterceptor
+    {
+        public string Text { get; private set; } = "";
+        public SqlParameter[] Parameters { get; private set; } = [];
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
+            CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+        {
+            Text = command.CommandText;
+            Parameters = command.Parameters.Cast<SqlParameter>().ToArray();
+            Parameters.Single(parameter => parameter.Direction == ParameterDirection.Output).Value = 9;
+            var table = new DataTable();
+            if (q8)
+            {
+                table.Columns.Add("Cod_Catedra", typeof(string)); table.Columns.Add("Descripcion", typeof(string));
+                for (var i = 1; i <= 5; i++) table.Columns.Add("Alternativa" + i, typeof(int));
+                table.Columns.Add("Promedio", typeof(double)); table.Columns.Add("Total", typeof(int));
+                table.Rows.Add("C1", "Cátedra Uno", 1, 2, 3, 4, 5, 3.0d, 15);
+            }
+            else
+            {
+                table.Columns.Add("Pregunta", typeof(string)); table.Columns.Add("Descripcion", typeof(string));
+                for (var i = 1; i <= 7; i++) table.Columns.Add("Alternativa" + i, typeof(int));
+                table.Columns.Add("Promedio", typeof(double)); table.Columns.Add("Total", typeof(int));
+                table.Rows.Add("Q11", "Habilidad", 1, 2, 3, 4, 5, 6, 7, 4.0d, 28);
+            }
+            return ValueTask.FromResult(InterceptionResult<DbDataReader>.SuppressWithResult(table.CreateDataReader()));
+        }
+    }
+
     private sealed class ReaderCapture : DbCommandInterceptor
     {
         public string Text { get; private set; } = "";

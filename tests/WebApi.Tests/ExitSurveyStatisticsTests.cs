@@ -2,7 +2,9 @@ using System.Net;
 using System.Text.Json;
 using Application.Common.Interfaces;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsFilters;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsCatedrasArea;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsLikert;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSkills;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
@@ -117,6 +119,31 @@ public sealed class ExitSurveyStatisticsTests
         Assert.Equal(new ExitSurveyLikertTotalsDTO(0, 0, 0, 0, 0), result.Data.Totals);
     }
 
+    [Fact]
+    public async Task Q8_preserves_five_alternatives_codes_and_totals()
+    {
+        var procedures = new Procedures();
+        var result = await new GetExitSurveyStatisticsCatedrasAreaHandler(procedures, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsCatedrasArea("2024A", "MBA", "PT"), default);
+        Assert.Equal(("2024A", "MBA", "PT"), (procedures.Period, procedures.Type, procedures.Modality));
+        var row = Assert.Single(result.Data.Rows);
+        Assert.Equal(("C1", "Cátedra Uno", 1, 2, 3, 4, 5, 3.0, 15),
+            (row.Code, row.Description, row.Alternative1, row.Alternative2, row.Alternative3, row.Alternative4, row.Alternative5, row.Average, row.Total));
+        Assert.Equal(new ExitSurveyCatedraTotalsDTO(1, 2, 3, 4, 5), result.Data.Totals);
+    }
+
+    [Fact]
+    public async Task Q11_preserves_seven_alternatives_and_totals()
+    {
+        var procedures = new Procedures();
+        var result = await new GetExitSurveyStatisticsSkillsHandler(procedures, new ApiResponseService())
+            .Handle(new GetExitSurveyStatisticsSkills("Todos", "MGP", "Todos"), default);
+        var row = Assert.Single(result.Data.Rows);
+        Assert.Equal(("Q11", "Habilidad", 1, 2, 3, 4, 5, 6, 7, 4.0, 28),
+            (row.Question, row.Description, row.Alternative1, row.Alternative2, row.Alternative3, row.Alternative4, row.Alternative5, row.Alternative6, row.Alternative7, row.Average, row.Total));
+        Assert.Equal(new ExitSurveySkillTotalsDTO(1, 2, 3, 4, 5, 6, 7), result.Data.Totals);
+    }
+
     private static (WebApplicationFactory<Program>, TokenFactory) Create(Procedures procedures)
     {
         var tokens = new TokenFactory();
@@ -142,7 +169,7 @@ public sealed class ExitSurveyStatisticsTests
     {
         var (factory, tokens) = Create(new Procedures()); using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
         if (role is not null) client.SetBearer(tokens.CreateToken("SADInformes", role));
-        foreach (var suffix in new[] { "/filters", "/sample" + Query, "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos" })
+        foreach (var suffix in new[] { "/filters", "/sample" + Query, "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos", "/catedras-area?period=2024A&studentType=Todos&modality=Todos", "/skills?period=2024A&studentType=Todos&modality=Todos" })
             Assert.Equal(status, (int)(await client.GetAsync(Route + suffix)).StatusCode);
     }
 
@@ -163,6 +190,8 @@ public sealed class ExitSurveyStatisticsTests
         Assert.Equal(2, json.RootElement.GetProperty("data").GetProperty("rows")[0].GetProperty("inProgress").GetInt32());
         using var likert = await client.GetAsync(Route + "/likert?section=malla&period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, likert.StatusCode);
         Assert.True(likert.Headers.CacheControl!.NoStore); Assert.Contains("Malla Curricular", await likert.Content.ReadAsStringAsync());
+        using var q8 = await client.GetAsync(Route + "/catedras-area?period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, q8.StatusCode); Assert.Contains("Cátedra Uno", await q8.Content.ReadAsStringAsync());
+        using var q11 = await client.GetAsync(Route + "/skills?period=2024A&studentType=Todos&modality=Todos"); Assert.Equal(HttpStatusCode.OK, q11.StatusCode); Assert.Contains("Habilidad", await q11.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -222,6 +251,16 @@ public sealed class ExitSurveyStatisticsTests
         {
             Period = period; Type = type; Modality = modality;
             return Likert(question);
+        }
+        public override Task<List<SpRecEncuestaGraduadosQ8Result>?> spRec_EncuestaGraduadosEstadisticasQ8Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default)
+        {
+            Period = periodo; Type = tipo_Alumno; Modality = modalidad;
+            return Task.FromResult<List<SpRecEncuestaGraduadosQ8Result>?>([new() { CodCatedra = "C1", Descripcion = "Cátedra Uno", Alternativa1 = 1, Alternativa2 = 2, Alternativa3 = 3, Alternativa4 = 4, Alternativa5 = 5, Promedio = 3.0, Total = 15 }]);
+        }
+        public override Task<List<SpRecEncuestaGraduadosQ11Result>?> spRec_EncuestaGraduadosEstadisticasQ11Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? r = null, CancellationToken? ct = default)
+        {
+            Period = periodo; Type = tipo_Alumno; Modality = modalidad;
+            return Task.FromResult<List<SpRecEncuestaGraduadosQ11Result>?>([new() { Pregunta = "Q11", Descripcion = "Habilidad", Alternativa1 = 1, Alternativa2 = 2, Alternativa3 = 3, Alternativa4 = 4, Alternativa5 = 5, Alternativa6 = 6, Alternativa7 = 7, Promedio = 4.0, Total = 28 }]);
         }
         public override Task<List<SpRecEncuestaGraduadosEstadisticasResult>?> spRec_EncuestaGraduados_EstadisticasAsync(
             string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? ct = default)

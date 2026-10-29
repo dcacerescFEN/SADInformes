@@ -13,6 +13,42 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecEncuestaGraduadosQ8Result>?> spRec_EncuestaGraduadosEstadisticasQ8Async(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 10, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaGraduadosQ8Result>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaGraduadosEstadisticasQ8] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEncuestaGraduadosQ11Result>?> spRec_EncuestaGraduadosEstadisticasQ11Async(
+        string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 10, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaGraduadosQ11Result>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaGraduadosEstadisticasQ11] @Periodo = @Periodo, @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ1Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
         ExecuteLikertAsync("Q1", periodo, tipo_Alumno, modalidad, returnValue, cancellationToken);
     public virtual Task<List<SpRecEncuestaGraduadosLikertResult>?> spRec_EncuestaGraduadosEstadisticasQ2Async(string? periodo, string? tipo_Alumno, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>

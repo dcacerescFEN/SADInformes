@@ -1,6 +1,8 @@
 using Application.Common.Mediator;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsFilters;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsCatedrasArea;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsLikert;
+using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSkills;
 using Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsSample;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
@@ -18,6 +20,8 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         group.MapGet("/filters", Filters).WithSummary("Filtros de estadísticas de encuesta de salida");
         group.MapGet("/sample", Sample).WithSummary("Muestra y avance de la encuesta de salida");
         group.MapGet("/likert", Likert).WithSummary("Matriz Likert Q1-Q7 por sección");
+        group.MapGet("/catedras-area", CatedrasArea).WithSummary("Evaluación de cátedras por área (Q8)");
+        group.MapGet("/skills", Skills).WithSummary("Conocimientos y habilidades adquiridas (Q11)");
     }
 
     private static Task<IResult> Filters(HttpContext context, IRequestDispatcher sender, string? studentType, CancellationToken ct) =>
@@ -32,6 +36,16 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
         string? period, string? studentType, string? modality, CancellationToken ct) =>
         Execute(context, async () => Results.Ok(await sender.Send(
             new GetExitSurveyStatisticsLikert(section, period, studentType, modality), ct)));
+
+    private static Task<IResult> CatedrasArea(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsCatedrasArea(period, studentType, modality), ct)));
+
+    private static Task<IResult> Skills(HttpContext context, IRequestDispatcher sender,
+        string? period, string? studentType, string? modality, CancellationToken ct) =>
+        Execute(context, async () => Results.Ok(await sender.Send(
+            new GetExitSurveyStatisticsSkills(period, studentType, modality), ct)));
 
     private static async Task<IResult> Execute(HttpContext context, Func<Task<IResult>> operation)
     {

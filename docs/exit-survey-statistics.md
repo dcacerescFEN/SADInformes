@@ -44,6 +44,24 @@ que fija el nombre de procedimiento desde una lista cerrada. No se concatena SQL
 de usuario. La consulta valida sección, período, tipo y modalidad antes de invocar
 el procedimiento.
 
+## P3 entregado
+
+Q8 **Cátedras x Área** usa cinco alternativas: Muy Malo, Malo, Regular, Bueno y
+Muy Bueno. Q11 **Conocimientos y habilidades** usa siete: Malo, Deficiente,
+Insuficiente, Suficiente, Bueno, Muy Bueno y Sobresaliente. Ambas matrices
+muestran conteo y porcentaje por alternativa, promedio con un decimal y total;
+sus tablas comparten un componente configurable para no duplicar renderizado.
+
+| Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
+| --- | --- |
+| `GET /catedras-area?period=2024A&studentType=Todos&modality=Todos` | Filas Q8 y totales de cinco alternativas |
+| `GET /skills?period=2024A&studentType=Todos&modality=Todos` | Filas Q11 y totales de siete alternativas |
+| Error | Filtros inválidos 400; almacenamiento 503 saneado |
+
+Los tipos de resultado conservan `Cod_Catedra` para Q8 y `Pregunta` para Q11.
+Los wrappers son métodos tipados separados con parámetros período varchar(5),
+tipo varchar(30) y modalidad varchar(10). No se modifica el SQL de los SP.
+
 ## API P1
 
 | Ruta base: `/api/reports/postgraduate/exit-survey-statistics` | Resultado |
@@ -68,10 +86,10 @@ modifican SP, funciones, vistas o tablas.
 ## Verificación P1
 
 14 pruebas backend cubren filtros, muestra, totales, nulos, validación, permisos,
-no-store y errores saneados. 6 pruebas de componente, 12 de navegación y 27 pruebas backend (incluyendo
-ADO.NET para parámetros/resultado Q1/Q7) cubren carga automática, cambio
-dependiente de modalidad, tabs, muestra vacía, matriz Likert, porcentajes,
-promedio, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
+no-store y errores saneados. 7 pruebas de componente, 12 de navegación y 31 pruebas backend (incluyendo
+ADO.NET para parámetros/resultados Q1/Q7/Q8/Q11) cubren carga automática, cambio
+dependiente de modalidad, tabs, muestra vacía, matrices Likert/configurables,
+porcentajes, promedio, cancelación de respuestas obsoletas y errores. Suites completas observadas: 293 pruebas .NET, 38 Node, 188/193 Angular y
 build de producción correcto. Las cinco fallas Angular son las ya conocidas de
 tema/favoritos por `localStorage` ausente bajo Node 26, ajenas a esta pantalla.
 No se probó contra SQL Server, Keycloak ni un navegador real. No hay commits ni

@@ -40,7 +40,7 @@ Dependencies: P2 and P3 after P1; P4 after P1; P5 after P2; P6 after P2 and D1. 
 T0 [D1-D5] DONE: decisions recorded 2026-10-29. Route: user. Commit: n/a.
 T1 [S1] DONE (P1 shell focused GREEN): permission, filters, muestra with totals, tabs, route/catalogue, HTTP/UI tests. Route: inline. Commit: withheld.
 T2 [S1] DONE (P2 Likert Q1-Q7): typed Q1-Q7 wrappers, generic section query, endpoint and reusable matrix; focused backend/ADO/UI GREEN. Route: inline. Commit: withheld.
-T3 [S1] PENDING: P3 Q8/Q11. Route: inline. Commit: withheld.
+T3 [S1] DONE (P3 Q8/Q11 verified): typed Q8/Q11 contracts, queries, endpoints and configurable matrix; docs, focused and full suites observed. Route: inline. Commit: withheld.
 T4 [S1] PENDING: P4 docentes/detalle. Route: inline. Commit: withheld.
 T5 [S1] PENDING: P5 Resumen. Route: inline. Commit: withheld.
 T6 [S1] PENDING: P6 charts. Route: inline + verifier if UI shared surfaces change. Commit: withheld.
@@ -63,3 +63,7 @@ L9. P1 closed with available proof: full .NET 293/293, Node 38/38, Angular 188/1
 L10. P2 implemented: Q1-Q7 typed wrappers share a closed procedure-name helper; generic section query and /likert endpoint; Angular LikertMatrix with five alternatives, per-row percentages, one-decimal es-CL average, footer totals, empty state and tab switching. Backend focused 27 GREEN (including ADO Q1/Q7), component 6 GREEN, navigation 12 GREEN. No commits. Remaining P2 full suites/build verification follows.
 
 L11. P2 closed with available proof: full .NET 306/306, Node 38/38, Angular 189/194 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused Q1-Q7: 27 backend (including ADO parameters/result Q1/Q7), 6 component, 12 navigation GREEN. No commits/staging. P3 is next; P2 only covers Q1-Q7.
+
+L12. P3 implemented: Q8 five-label and Q11 seven-label typed wrappers/queries/endpoints, MultiScaleMatrix with labels/conteos/porcentajes/promedio/totales and tab loading. Focused backend 31 GREEN including ADO Q8/Q11; component 7 GREEN; navigation remains 12. No commits. Full suites/build pending before closing P3.
+
+L13. P3 closed with available proof: full .NET 310/310, Node 38/38, Angular 190/195 (same five pre-existing Node26/localStorage theme/sidebar failures), production build GREEN, diff check clean. Focused Q8/Q11: 31 backend (including ADO Q8/Q11), 7 component, 12 navigation GREEN. No commits/staging. P4 is next (teachers/insatisfaction/detail); P3 did not add charts or Resumen.

@@ -1,0 +1,2 @@
+namespace Application.Reports.Postgraduate.ExitSurveyStatistics.Queries.GetExitSurveyStatisticsCatedrasArea;
+public sealed record ExitSurveyCatedrasAreaDTO(ExitSurveyCatedraRowDTO[] Rows, ExitSurveyCatedraTotalsDTO Totals);
