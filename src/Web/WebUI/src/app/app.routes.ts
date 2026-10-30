@@ -23,6 +23,8 @@ export const routes: Routes = [
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'
       ? import('./postgraduate/enrolled-students/enrolled-students').then((module) => module.EnrolledStudents)
+      : report.slug === 'profesores-vigencias'
+      ? import('./postgraduate/teacher-validities/teacher-validities').then((module) => module.TeacherValidities)
       : report.slug === 'actualizacion-datos-sad-vti'
       ? import('./postgraduate/sad-vti-updates/sad-vti-updates').then((module) => module.SadVtiUpdates)
       : report.slug === 'solicitudes-alumnos'
