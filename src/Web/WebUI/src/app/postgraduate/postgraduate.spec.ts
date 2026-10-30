@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens thesis defenses with four Todos filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/defensas-tesis');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/thesis-defenses/filters')
+      .flush({ success: true, data: { years: ['2026'], studentTypes: ['Todos', 'MBA'], modalities: ['Todos'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Reporte Defensas de Tesis Postgrado');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(4);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens SAD Sigma with one year filter and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/vista-sad-sigma');
     await harness.detectChanges();

@@ -29,6 +29,8 @@ export const routes: Routes = [
       ? import('./postgraduate/area-courses/area-courses').then((module) => module.AreaCourses)
       : report.slug === 'vista-sad-sigma'
       ? import('./postgraduate/sad-sigma/sad-sigma').then((module) => module.SadSigma)
+      : report.slug === 'defensas-tesis'
+      ? import('./postgraduate/thesis-defenses/thesis-defenses').then((module) => module.ThesisDefenses)
       : report.slug === 'actualizacion-datos-sad-vti'
       ? import('./postgraduate/sad-vti-updates/sad-vti-updates').then((module) => module.SadVtiUpdates)
       : report.slug === 'solicitudes-alumnos'
