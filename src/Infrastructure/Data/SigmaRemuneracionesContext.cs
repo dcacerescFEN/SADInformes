@@ -24,6 +24,8 @@ public sealed class SigmaRemuneracionesContext(
             entity.HasKey(row => row.Id).HasName("PRIMARY");
             entity.Property(row => row.Id).HasColumnName("id");
             entity.Property(row => row.CreatedAt).HasColumnName("created_at").HasColumnType("datetime");
+            entity.Property(row => row.EstadoId).HasColumnName("estado_id");
+            entity.Property(row => row.BanderaId).HasColumnName("bandera_id");
         });
         modelBuilder.Entity<Prestacion>(entity =>
         {

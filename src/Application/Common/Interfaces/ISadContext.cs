@@ -18,6 +18,7 @@ public partial interface ISadContext
     DbSet<VacantesCurso> VacantesCursos { get; }
     DbSet<AlumnosCatedra> AlumnosCatedras { get; }
     DbSet<MovimientosInscripcion> MovimientosInscripcions { get; }
+    DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial { get; }
 
     Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);
 }
