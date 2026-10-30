@@ -24,12 +24,12 @@ describe('Navegación visual de Postgrado', () => {
 
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-  it('incluye las 31 pantallas principales, sin duplicar el detalle de profesor', () => {
-    expect(POSTGRADUATE_REPORTS).toHaveLength(31);
-    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.slug)).size).toBe(31);
-    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.legacyPath)).size).toBe(31);
-    expect(POSTGRADUATE_REPORTS.slice(0, 30).every(report => report.legacyPath.startsWith('Informes/Postgrado/'))).toBe(true);
-    expect(POSTGRADUATE_REPORTS[30].legacyPath).toBe('Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx');
+  it('incluye las 30 pantallas principales, sin duplicar el detalle de profesor', () => {
+    expect(POSTGRADUATE_REPORTS).toHaveLength(30);
+    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.slug)).size).toBe(30);
+    expect(new Set(POSTGRADUATE_REPORTS.map(report => report.legacyPath)).size).toBe(30);
+    expect(POSTGRADUATE_REPORTS.slice(0, 29).every(report => report.legacyPath.startsWith('Informes/Postgrado/'))).toBe(true);
+    expect(POSTGRADUATE_REPORTS[29].legacyPath).toBe('Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx');
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.includes('DetalleProfesor'))).toBe(false);
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.endsWith('EstadisticasISS/Resumen.aspx'))).toBe(true);
     expect(POSTGRADUATE_REPORTS.some(report => report.legacyPath.endsWith('EncuestaSalidaGraduados/Default.aspx'))).toBe(true);

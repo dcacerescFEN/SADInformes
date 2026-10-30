@@ -55,7 +55,6 @@ roles ni asignaciones**.
 | `ver Postgrado` + `cuadro de honor` (Defensas de tesis) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Ayudantías Postgrado Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
-| `Admin firma Postgrado` | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_SIGNATURE` (propuesto) | Pendiente; además requiere `UPLOAD` para imágenes |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
 
 Los nombres propuestos **no existen todavía** en Keycloak: se definen al migrar
