@@ -6,6 +6,9 @@ namespace Application.Common.Interfaces;
 /// <summary>Procedimientos del SAD consumidos por los informes, al estilo de SADAlumnos.</summary>
 public partial interface ISadContextProcedures
 {
+    Task<List<SpRecProfesoresVigenciasResult>?> SpRec_ProfesoresVigenciasAsync(
+        string? año, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecAlumnosMatriculadosPostgradoResult>?> SpRec_AlumnosMatriculadosPostgradoAsync(
         string? modalidad, string? anio,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

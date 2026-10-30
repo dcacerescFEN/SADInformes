@@ -45,7 +45,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('alumnos-matriculados', 'Alumnos matriculados MBA',
     'Alumnos matriculados por año de ingreso y modalidad.', 'AlumnosMatriculados.aspx', true),
   entry('profesores-vigencias', 'Profesores vigencias',
-    'Informe de vigencias de profesores de Postgrado.', 'ProfesoresVigencias.aspx'),
+    'Informe de vigencias de profesores de Postgrado.', 'ProfesoresVigencias.aspx', true),
   entry('alumnos-por-area', 'Alumnos por área',
     'Informe de alumnos y cursos por área académica.', 'ReporteAreasCatedras.aspx'),
   entry('vista-sad-sigma', 'Reporte vista SAD Sigma',

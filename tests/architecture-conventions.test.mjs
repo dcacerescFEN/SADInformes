@@ -18,6 +18,7 @@ const modules = [
   'src/Application/Reports/Postgraduate/MassEnrollment',
   'src/Application/Reports/Postgraduate/WeightedRanking',
   'src/Application/Reports/Postgraduate/EnrolledStudents',
+  'src/Application/Reports/Postgraduate/TeacherValidities',
 ];
 const commandActions = ['Create', 'Update', 'Delete', 'Upload', 'Download'];
 

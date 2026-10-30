@@ -4,6 +4,7 @@ Inscripción encuesta de salida: [escritura transaccional y filtros](docs/exit-s
 Estadísticas encuesta de salida (P1-P7): [informe completo](docs/exit-survey-statistics.md).
 Ranking notas ponderado: [consulta y exportación](docs/weighted-ranking.md).
 Alumnos matriculados MBA: [exportación Excel](docs/enrolled-students.md).
+Profesores confirmados por cátedra: [vigencias y exportación](docs/teacher-validities.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 

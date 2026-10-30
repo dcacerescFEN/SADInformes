@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens teacher validities with its year filter and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/profesores-vigencias');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/teacher-validities/filters')
+      .flush({ success: true, data: { years: ['2026', '2024'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Profesores Confirmados x Cátedra');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(1);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens enrolled students with the legacy export-only page and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/alumnos-matriculados');
     await harness.detectChanges();
