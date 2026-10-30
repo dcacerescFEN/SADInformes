@@ -13,6 +13,66 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecInformePostgradoProfesoresGCIResult>?> SpRec_InformePostgradoProfesoresGCIAsync(
+        string? anioDefensa, string? tipoAlumno, string? modalidad, string? anioIngreso,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        await ExecuteDefenseAsync<SpRecInformePostgradoProfesoresGCIResult>(
+            "SpRec_InformePostgradoProfesoresGCI", anioDefensa, tipoAlumno, modalidad, anioIngreso,
+            returnValue, cancellationToken);
+
+    public virtual async Task<List<SpRecInformePostgradoProfesoresGCI2Result>?> SpRec_InformePostgradoProfesoresGCI2Async(
+        string? anioDefensa, string? tipoAlumno, string? modalidad, string? anioIngreso,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        await ExecuteDefenseAsync<SpRecInformePostgradoProfesoresGCI2Result>(
+            "SpRec_InformePostgradoProfesoresGCI2", anioDefensa, tipoAlumno, modalidad, anioIngreso,
+            returnValue, cancellationToken);
+
+    private async Task<List<T>?> ExecuteDefenseAsync<T>(string procedure, string? anioDefensa,
+        string? tipoAlumno, string? modalidad, string? anioIngreso,
+        OutputParameter<int>? returnValue, CancellationToken? cancellationToken) where T : class
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "AnioDefensa", Size = 100, Value = anioDefensa ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "TipoAlumno", Size = 100, Value = tipoAlumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 100, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "AnioIngreso", Size = 100, Value = anioIngreso ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<T>(
+            $"EXEC @returnValue = [dbo].[{procedure}] @AnioDefensa = @AnioDefensa, @TipoAlumno = @TipoAlumno, @Modalidad = @Modalidad, @AnioIngreso = @AnioIngreso",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecTipoAlumnosPostgradoResult>?> SpRecTipoAlumnosPostgradoAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var result = await context.SqlQueryAsync<SpRecTipoAlumnosPostgradoResult>(
+            "EXEC @returnValue = [dbo].[SpRecTipoAlumnosPostgrado]", [parameterreturnValue], cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecModalidadesPostgradoResult>?> SpRecModalidadesPostgradoAsync(
+        string? tipoAlumno, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "TipoAlumno", Size = 100, Value = tipoAlumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecModalidadesPostgradoResult>(
+            "EXEC @returnValue = [dbo].[SpRecModalidadesPostgrado] @TipoAlumno = @TipoAlumno",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecCatedrasAreasXPagosProfesoresResult>?> SpRec_CatedrasAreasXPagosProfesoresAsync(
         string? año, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
     {
