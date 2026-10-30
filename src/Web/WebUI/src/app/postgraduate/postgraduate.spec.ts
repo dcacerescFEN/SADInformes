@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens thesis registration with three filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/registro-tesis');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/thesis-registration/filters')
+      .flush({ success: true, data: { studentTypes: [{ value: 'Todos', text: 'Todos' }], modalities: ['Todos'], years: ['Todos'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Registro de tesis');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(3);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens personal data with three filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/datos-personales');
     await harness.detectChanges();

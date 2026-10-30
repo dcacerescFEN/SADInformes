@@ -13,6 +13,25 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecRegistroTesisPostgradoResult>?> SpRec_RegistroTesisPostgradoAsync(
+        string? tipo_Alumno, string? modalidad, string? ingreso,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 50, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 30, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Ingreso", Size = 5, Value = ingreso ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecRegistroTesisPostgradoResult>(
+            "EXEC @returnValue = [dbo].[spRec_RegistroTesisPostgrado] @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad, @Ingreso = @Ingreso",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecAlumnosDatosPersonalesPostgradoResult>?> SpRec_AlumnosDatosPersonalesPostgradoAsync(
         string? tipo_Alumno, string? modalidad, string? ingreso,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

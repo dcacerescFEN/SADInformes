@@ -12,6 +12,7 @@ Ayudantías Postgrado Sigma: [estado de remuneraciones](docs/sigma-tutorships.md
 Encuesta de entrada: [diccionario y exportación](docs/entry-survey-statistics.md).
 Evaluación docente/curso: [año, tipo y exportación](docs/course-teacher-evaluation.md).
 Datos personales Postgrado: [filtros y exportación](docs/personal-data.md).
+Registro de tesis Postgrado: [filtros y exportación](docs/thesis-registration.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 

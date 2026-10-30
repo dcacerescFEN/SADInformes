@@ -57,6 +57,7 @@ roles ni asignaciones**.
 | `ver Postgrado` (Estadísticas encuesta entrada) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Evaluación docente/curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_TEACHER_EVALUATION` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Datos personales Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_PERSONAL_DATA` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Registro de tesis Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_REGISTRATION` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
 
