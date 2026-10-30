@@ -25,10 +25,8 @@
     <Exec Command="pnpm build" WorkingDirectory="$(SpaRoot)" />
     <ItemGroup>
       <AngularDist Include="$(SpaRoot)dist/webui/browser/**/*" />
-      <ResolvedFileToPublish Include="@(AngularDist->'%(FullPath)')"
-        Exclude="@(ResolvedFileToPublish)"
-        RelativePath="wwwroot/%(RecursiveDir)%(Filename)%(Extension)"
-        CopyToPublishDirectory="PreserveNewest" />
+      <ResolvedFileToPublish Include="@(AngularDist->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)" RelativePath="wwwroot/%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -6,6 +6,7 @@ Ranking notas ponderado: [consulta y exportación](docs/weighted-ranking.md).
 Alumnos matriculados MBA: [exportación Excel](docs/enrolled-students.md).
 Profesores confirmados por cátedra: [vigencias y exportación](docs/teacher-validities.md).
 Reporte de áreas y cátedras: [dos años y exportación](docs/area-courses.md).
+Reporte SAD Sigma: [estado de pagos y exportación](docs/sad-sigma.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
