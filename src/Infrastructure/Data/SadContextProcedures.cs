@@ -13,6 +13,20 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecEstadisticaEncuestaEntradaResult>?> SpRec_EstadisticaEncuestaEntradaAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int,
+        };
+        var result = await context.SqlQueryAsync<SpRecEstadisticaEncuestaEntradaResult>(
+            "EXEC @returnValue = [dbo].[spRec_EstadisticaEncuestaEntrada]", [parameterreturnValue],
+            cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecInformePostgradoProfesoresGCIResult>?> SpRec_InformePostgradoProfesoresGCIAsync(
         string? anioDefensa, string? tipoAlumno, string? modalidad, string? anioIngreso,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>

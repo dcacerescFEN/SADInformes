@@ -113,7 +113,7 @@ describe('Sidebar de Informes', () => {
     fixture.nativeElement.querySelector('[data-section="postgrado"]').click();
     await settle();
     const menu = document.querySelector<HTMLElement>('.dropdown-menu.show')!;
-    expect(menu.querySelectorAll('a')).toHaveLength(31);
+    expect(menu.querySelectorAll('a')).toHaveLength(POSTGRADUATE_REPORTS.length);
     expect(menu.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
     menu.querySelector<HTMLAnchorElement>('a')!.click();
     await settle();

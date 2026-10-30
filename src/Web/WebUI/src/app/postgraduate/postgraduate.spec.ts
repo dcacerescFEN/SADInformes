@@ -178,6 +178,16 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens entry survey statistics with its question dictionary and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-entrada');
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta Entrada');
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(40);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    TestBed.inject(HttpTestingController).expectNone(() => true);
+  });
+
   it('opens Sigma tutorships with its year filter and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/ayudantias-sigma');
     await harness.detectChanges();
