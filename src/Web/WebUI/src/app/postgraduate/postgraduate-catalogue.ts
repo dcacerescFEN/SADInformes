@@ -47,7 +47,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('profesores-vigencias', 'Profesores vigencias',
     'Informe de vigencias de profesores de Postgrado.', 'ProfesoresVigencias.aspx', true),
   entry('alumnos-por-area', 'Alumnos por área',
-    'Informe de alumnos y cursos por área académica.', 'ReporteAreasCatedras.aspx'),
+    'Informe de alumnos y cursos por área académica.', 'ReporteAreasCatedras.aspx', true),
   entry('vista-sad-sigma', 'Reporte vista SAD Sigma',
     'Cruce de información de cursos y pagos de profesores con Sigma.', 'ReporteVistaSadSigma.aspx'),
   entry('defensas-tesis', 'Defensas de tesis Postgrado',
