@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens course teacher evaluation with year/type filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/evaluacion-docente-curso');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/course-teacher-evaluation/filters')
+      .flush({ success: true, data: { years: ['2026'], types: ['EX', 'FT'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Evaluación Docente/Curso');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(2);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens entry survey statistics with its question dictionary and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-entrada');
     await harness.detectChanges();
