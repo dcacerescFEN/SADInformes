@@ -54,6 +54,7 @@ roles ni asignaciones**.
 | `ver Postgrado` + `cuadro de honor` (Reporte Vista SAD Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Defensas de tesis) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Ayudantías Postgrado Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Estadísticas encuesta entrada) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
 

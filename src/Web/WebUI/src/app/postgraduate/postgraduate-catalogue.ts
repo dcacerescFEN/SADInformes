@@ -55,7 +55,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('ayudantias-sigma', 'Ayudantías Postgrado Sigma',
     'Cruce de ayudantías con remuneraciones y estados de Sigma.', 'ReporteAyudantiaSigma.aspx', true),
   entry('estadisticas-encuesta-entrada', 'Estadísticas encuesta entrada',
-    'Resultados de la encuesta de entrada de alumnos de Postgrado.', 'EstadisticaEncuestaEntrada.aspx'),
+    'Resultados de la encuesta de entrada de alumnos de Postgrado.', 'EstadisticaEncuestaEntrada.aspx', true),
   entry('evaluacion-docente-curso', 'Evaluación docente/curso',
     'Resultados de evaluación docente y cursos según modalidad y año.', 'Eva_CursosProfesores.aspx'),
   entry('datos-personales', 'Datos personales',

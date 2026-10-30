@@ -9,6 +9,7 @@ Reporte de áreas y cátedras: [dos años y exportación](docs/area-courses.md).
 Reporte SAD Sigma: [estado de pagos y exportación](docs/sad-sigma.md).
 Defensas de tesis: [comisiones Coordinación y Tesorería](docs/thesis-defenses.md).
 Ayudantías Postgrado Sigma: [estado de remuneraciones](docs/sigma-tutorships.md).
+Encuesta de entrada: [diccionario y exportación](docs/entry-survey-statistics.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
