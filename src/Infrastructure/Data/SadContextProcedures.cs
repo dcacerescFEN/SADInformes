@@ -13,6 +13,27 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecCatedrasAreasReportePostgradoResult>?> SpRec_CatedrasAreas_ReportePostgradoAsync(
+        string? año1, string? año2, OutputParameter<int>? returnValue = null,
+        CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int,
+        };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Año1", Size = 10, Value = año1 ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Año2", Size = 10, Value = año2 ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecCatedrasAreasReportePostgradoResult>(
+            "EXEC @returnValue = [dbo].[spRec_CatedrasAreas_ReportePostgrado] @Año1 = @Año1, @Año2 = @Año2",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecProfesoresVigenciasResult>?> SpRec_ProfesoresVigenciasAsync(
         string? año, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
     {

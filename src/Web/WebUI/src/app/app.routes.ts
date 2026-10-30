@@ -25,6 +25,8 @@ export const routes: Routes = [
       ? import('./postgraduate/enrolled-students/enrolled-students').then((module) => module.EnrolledStudents)
       : report.slug === 'profesores-vigencias'
       ? import('./postgraduate/teacher-validities/teacher-validities').then((module) => module.TeacherValidities)
+      : report.slug === 'alumnos-por-area'
+      ? import('./postgraduate/area-courses/area-courses').then((module) => module.AreaCourses)
       : report.slug === 'actualizacion-datos-sad-vti'
       ? import('./postgraduate/sad-vti-updates/sad-vti-updates').then((module) => module.SadVtiUpdates)
       : report.slug === 'solicitudes-alumnos'

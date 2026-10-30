@@ -5,6 +5,7 @@ Estadísticas encuesta de salida (P1-P7): [informe completo](docs/exit-survey-st
 Ranking notas ponderado: [consulta y exportación](docs/weighted-ranking.md).
 Alumnos matriculados MBA: [exportación Excel](docs/enrolled-students.md).
 Profesores confirmados por cátedra: [vigencias y exportación](docs/teacher-validities.md).
+Reporte de áreas y cátedras: [dos años y exportación](docs/area-courses.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
