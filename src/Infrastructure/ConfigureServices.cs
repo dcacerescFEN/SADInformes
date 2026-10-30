@@ -22,8 +22,14 @@ public static class ConfigureServices
         services.AddDbContext<SadContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("Sad"),
                 sql => sql.CommandTimeout(60)));
+        services.AddDbContext<SigmaRemuneracionesContext>(options =>
+            options.UseMySQL(configuration.GetConnectionString("SigmaRemuneraciones")!));
+
+
         services.AddScoped<ISadContext>(provider => provider.GetRequiredService<SadContext>());
         services.AddScoped<ISadContextProcedures, SadContextProcedures>();
+        services.AddScoped<ISigmaRemuneracionesContext>(provider => provider.GetRequiredService<SigmaRemuneracionesContext>());
+
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<PostgraduateSettings>();
@@ -41,7 +47,7 @@ public static class ConfigureServices
                     UseCookies = false,
                 };
             });
-        services.AddSingleton<Application.Common.Interfaces.IPostgraduateSettings>(
+        services.AddSingleton<IPostgraduateSettings>(
             provider => provider.GetRequiredService<PostgraduateSettings>());
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();
         return services;

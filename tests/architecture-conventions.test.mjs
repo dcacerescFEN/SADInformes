@@ -20,6 +20,7 @@ const modules = [
   'src/Application/Reports/Postgraduate/EnrolledStudents',
   'src/Application/Reports/Postgraduate/TeacherValidities',
   'src/Application/Reports/Postgraduate/AreaCourses',
+  'src/Application/Reports/Postgraduate/SadSigma',
 ];
 const commandActions = ['Create', 'Update', 'Delete', 'Upload', 'Download'];
 

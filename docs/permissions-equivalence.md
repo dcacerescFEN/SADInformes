@@ -51,6 +51,7 @@ roles ni asignaciones**.
 | `ver Postgrado` + `cuadro de honor` (Alumnos matriculados MBA) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ENROLLED_STUDENTS` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Profesores confirmados por cátedra) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_VALIDITIES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Reporte áreas y cátedras) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_AREA_COURSES` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Reporte Vista SAD Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `Admin firma Postgrado` | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_SIGNATURE` (propuesto) | Pendiente; además requiere `UPLOAD` para imágenes |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |

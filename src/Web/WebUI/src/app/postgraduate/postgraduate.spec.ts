@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens SAD Sigma with one year filter and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/vista-sad-sigma');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/sad-sigma/filters')
+      .flush({ success: true, data: { years: ['2026', '2024'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Reporte Vista Sad Sigma');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(1);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens area courses with two year filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/alumnos-por-area');
     await harness.detectChanges();
