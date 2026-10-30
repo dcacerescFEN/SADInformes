@@ -53,7 +53,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('defensas-tesis', 'Defensas de tesis Postgrado',
     'Reportes de profesores de defensas de tesis por programa, modalidad y año.', 'ReporteProfesoresNuevo.aspx', true),
   entry('ayudantias-sigma', 'Ayudantías Postgrado Sigma',
-    'Cruce de ayudantías con remuneraciones y estados de Sigma.', 'ReporteAyudantiaSigma.aspx'),
+    'Cruce de ayudantías con remuneraciones y estados de Sigma.', 'ReporteAyudantiaSigma.aspx', true),
   entry('cambio-firma', 'Cambio firma Postgrado',
     'Administración de firmas, imágenes y excepciones de firmantes.', 'CambioFirmaPostgrado.aspx'),
   entry('estadisticas-encuesta-entrada', 'Estadísticas encuesta entrada',

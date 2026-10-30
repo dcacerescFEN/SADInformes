@@ -24,6 +24,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<VacantesCurso> VacantesCursos => Set<VacantesCurso>();
     public DbSet<AlumnosCatedra> AlumnosCatedras => Set<AlumnosCatedra>();
     public DbSet<MovimientosInscripcion> MovimientosInscripcions => Set<MovimientosInscripcion>();
+    public DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial => Set<PostgradoAyudanteSigmaSinHistorial>();
 
     /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
     public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
@@ -45,6 +46,21 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<PostgradoAyudanteSigmaSinHistorial>(entity =>
+        {
+            entity.ToView("POSTGRADO_Ayudantes_Sigma_SinHistorial", "dbo");
+            entity.HasKey(row => new { row.CodCatedra, row.CodSeccion, row.Periodo, row.CodPersona, row.Ccosto });
+            entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona");
+            entity.Property(row => row.CodCatedra).HasColumnName("Cod_Catedra");
+            entity.Property(row => row.NomCatedra).HasColumnName("Nom_Catedra");
+            entity.Property(row => row.CodSeccion).HasColumnName("Cod_Seccion");
+            entity.Property(row => row.AñoCatedra).HasColumnName("Año_Catedra");
+            entity.Property(row => row.TipoAlumnoPostgrado).HasColumnName("Tipo_AlumnoPostgrado");
+            entity.Property(row => row.ModalidadPostgrado).HasColumnName("ModalidadPostgrado");
+            entity.Property(row => row.TipoPago).HasColumnName("tipoPago");
+            entity.Property(row => row.Inicio).HasColumnType("date");
+            entity.Property(row => row.Termino).HasColumnType("date");
+        });
         modelBuilder.Entity<EncuestaSalidaGraduado>(entity =>
         {
             entity.ToTable("Encuesta_Salida_Graduados", "dbo");

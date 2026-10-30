@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens Sigma tutorships with its year filter and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/ayudantias-sigma');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/ayudantias-sigma/filters')
+      .flush({ success: true, data: { years: ['2026'] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Reporte Ayudantías Postgrado Sigma');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(1);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens thesis defenses with four Todos filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/defensas-tesis');
     await harness.detectChanges();
