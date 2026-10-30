@@ -21,6 +21,8 @@ export const routes: Routes = [
       ? import('./postgraduate/exit-survey-statistics/exit-survey-statistics').then((module) => module.ExitSurveyStatistics)
       : report.slug === 'estadisticas-encuesta-entrada'
       ? import('./postgraduate/entry-survey-statistics/entry-survey-statistics').then((module) => module.EntrySurveyStatistics)
+      : report.slug === 'evaluacion-docente-curso'
+      ? import('./postgraduate/course-teacher-evaluation/course-teacher-evaluation').then((module) => module.CourseTeacherEvaluation)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'

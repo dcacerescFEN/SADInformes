@@ -13,6 +13,31 @@ namespace Infrastructure.Data;
 /// </summary>
 public partial class SadContextProcedures(SadContext context) : ISadContextProcedures
 {
+    public virtual async Task<List<SpRecEvaPostgradoCursosDocentesResult>?> SpRec_EvaPostgradoCursosDocentesAsync(
+        string? año, string? tipo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        await ExecuteCourseEvaluationAsync<SpRecEvaPostgradoCursosDocentesResult>(año, tipo, returnValue, cancellationToken);
+
+    public virtual async Task<List<SpRecEvaPostgradoCursosDocentesFullTimeResult>?> SpRec_EvaPostgradoCursosDocentesFullTimeAsync(
+        string? año, string? tipo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default) =>
+        await ExecuteCourseEvaluationAsync<SpRecEvaPostgradoCursosDocentesFullTimeResult>(año, tipo, returnValue, cancellationToken);
+
+    private async Task<List<T>?> ExecuteCourseEvaluationAsync<T>(string? año, string? tipo,
+        OutputParameter<int>? returnValue, CancellationToken? cancellationToken) where T : class
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Año", Size = 4, Value = año ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo", Size = 2, Value = tipo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<T>(
+            "EXEC @returnValue = [dbo].[spRec_EvaPostgradoCursosDocentes] @Año = @Año, @Tipo = @Tipo",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecEstadisticaEncuestaEntradaResult>?> SpRec_EstadisticaEncuestaEntradaAsync(
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
     {
