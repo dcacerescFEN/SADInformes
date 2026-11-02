@@ -144,4 +144,6 @@ public partial interface ISadContextProcedures
     Task<List<SpRecAfePorPeriodoTipoAlumnoResult>?> SpRec_AfePorPeriodoTipoAlumnoAsync(string? periodo, string? tipo, string? modalidad, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
     Task<List<SpRecObtenerTareasAfeReporteResult>?> SpRec_ObtenerTareasAFEReporteAsync(string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpListAlumnosCumpleLicenciaturaResult>?> SpList_AlumnosCumpleLicenciaturaAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }

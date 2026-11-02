@@ -178,6 +178,16 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens licenciatura with on-demand search and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/proximas-licenciaturas-pregrado');
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Próximas Licenciaturas Pregrado');
+    expect(root.querySelector('[data-action=search]')).not.toBeNull();
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    TestBed.inject(HttpTestingController).verify();
+  });
+
   it('opens AFE report with five filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/avances-afe');
     await harness.detectChanges();

@@ -16,6 +16,7 @@ Registro de tesis Postgrado: [filtros y exportación](docs/thesis-registration.m
 Estadísticas ISS Postgrado: [muestra, categorías y observaciones](docs/iss-statistics.md).
 Estadísticas Encuesta Alumni: [diccionario y exportación](docs/alumni-survey-statistics.md).
 Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
+Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
