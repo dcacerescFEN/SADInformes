@@ -69,7 +69,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('avances-afe', 'Avances AFE',
     'Seguimiento de tareas, grupos y entregas de alumnos en AFE.', 'ReporteAFE.aspx', true),
   entry('proximas-licenciaturas-pregrado', 'Próximas licenciaturas Pregrado',
-    'Alumnos que cumplen requisitos de licenciatura; opción ubicada en Postgrado del SAD.', 'LicenciaturaPregrado.aspx'),
+    'Alumnos que cumplen requisitos de licenciatura; opción ubicada en Postgrado del SAD.', 'LicenciaturaPregrado.aspx', true),
   entry('notificaciones-causal-eliminacion', 'Notificaciones causal de eliminación',
     'Informe de notificaciones de causal de eliminación de Postgrado.', 'InformeNce.aspx'),
   entry('actividades-cursos', 'Actividades cursos Postgrado',
