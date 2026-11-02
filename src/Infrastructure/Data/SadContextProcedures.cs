@@ -1294,4 +1294,40 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecAfePorPeriodoTipoAlumnoResult>?> SpRec_AfePorPeriodoTipoAlumnoAsync(
+        string? periodo, string? tipo, string? modalidad,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "periodo", Size = 20, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "tipo", Size = 20, Value = tipo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "modalidad", Size = 20, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecAfePorPeriodoTipoAlumnoResult>(
+            "EXEC @returnValue = [dbo].[spRec_AfePorPeriodoTipoAlumno] @periodo = @periodo, @tipo = @tipo, @modalidad = @modalidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecObtenerTareasAfeReporteResult>?> SpRec_ObtenerTareasAFEReporteAsync(
+        string? periodo, OutputParameter<int>? returnValue = null,
+        CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "periodo", Size = 20, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecObtenerTareasAfeReporteResult>(
+            "EXEC @returnValue = [dbo].[SpRec_ObtenerTareasAFEReporte] @periodo = @periodo",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }

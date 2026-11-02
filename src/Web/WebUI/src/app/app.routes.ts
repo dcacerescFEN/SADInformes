@@ -31,6 +31,8 @@ export const routes: Routes = [
       ? import('./postgraduate/iss-statistics/iss-statistics').then((module) => module.IssStatistics)
       : report.slug === 'estadisticas-encuesta-alumni'
       ? import('./postgraduate/alumni-survey-statistics/alumni-survey-statistics').then((module) => module.AlumniSurveyStatistics)
+      : report.slug === 'avances-afe'
+      ? import('./postgraduate/afe-report/afe-report').then((module) => module.AfeReport)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'

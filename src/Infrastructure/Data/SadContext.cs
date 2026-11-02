@@ -111,6 +111,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.Property(row => row.Nombre1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Apellido1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Apellido2).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Uname).HasMaxLength(50).IsUnicode(false);
         });
         // Keys, column names, lengths and collations follow MappingDB/Models/SadContext.cs.
         modelBuilder.Entity<Catedra>(entity =>
