@@ -1194,4 +1194,93 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
 
         return _;
     }
+
+    public virtual async Task<List<SpRecEncuestaIssCatedraSeccionResult>?> SpRec_EncuestaISSCatedraSeccionAsync(
+        string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaIssCatedraSeccionResult>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaISSCatedraSeccion] @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEncuestaIssEstadisticasMuestraResult>?> SpRec_EncuestaISSEstadisticasMuestraAsync(
+        string? periodo, string? catedraSeccion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 30, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "CatedraSeccion", Size = 15, Value = catedraSeccion ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaIssEstadisticasMuestraResult>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaISSEstadisticasMuestra] @Periodo = @Periodo, @CatedraSeccion = @CatedraSeccion",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEncuestaIssCategoriasResult>?> SpRec_EncuestaISSCategoriasAsync(
+        string? periodo, string? catedraSeccion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "CatedraSeccion", Size = 15, Value = catedraSeccion ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEncuestaIssCategoriasResult>(
+            "EXEC @returnValue = [dbo].[spRec_EncuestaISSCategorias] @Periodo = @Periodo, @CatedraSeccion = @CatedraSeccion",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEvaluacionIssEstadisticasResult>?> SpRec_EvaluacionISSEstadisticasAsync(
+        string? periodo, string? catedra, string? seccion, int? categoria,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Catedra", Size = 10, Value = catedra ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Seccion", Size = 2, Value = seccion ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Categoria", Value = categoria ?? (object)DBNull.Value, SqlDbType = SqlDbType.Int },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEvaluacionIssEstadisticasResult>(
+            "EXEC @returnValue = [dbo].[spRec_EvaluacionISSEstadisticas] @Periodo = @Periodo, @Catedra = @Catedra, @Seccion = @Seccion, @Categoria = @Categoria",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecEvaluacionIssObservacionesResult>?> SpRec_EvaluacionISSObservacionesAsync(
+        string? periodo, string? catedra, string? seccion,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Catedra", Size = 10, Value = catedra ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Seccion", Size = 2, Value = seccion ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecEvaluacionIssObservacionesResult>(
+            "EXEC @returnValue = [dbo].[spRec_EvaluacionISSObservaciones] @Periodo = @Periodo, @Catedra = @Catedra, @Seccion = @Seccion",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }

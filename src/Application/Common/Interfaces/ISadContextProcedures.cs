@@ -128,4 +128,14 @@ public partial interface ISadContextProcedures
     Task<List<SpRecDocentesDepartamentosResult>?> SpRec_DocentesDepartamentosAsync(string? incluirTodos, string? usuario, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
     Task<List<SpRecEvaPostgradoCursosDocentes2Result>?> SpRec_EvaPostgradoCursosDocentes2Async(string? año, string? departamento, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEncuestaIssCatedraSeccionResult>?> SpRec_EncuestaISSCatedraSeccionAsync(string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEncuestaIssEstadisticasMuestraResult>?> SpRec_EncuestaISSEstadisticasMuestraAsync(string? periodo, string? catedraSeccion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEncuestaIssCategoriasResult>?> SpRec_EncuestaISSCategoriasAsync(string? periodo, string? catedraSeccion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEvaluacionIssEstadisticasResult>?> SpRec_EvaluacionISSEstadisticasAsync(string? periodo, string? catedra, string? seccion, int? categoria, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecEvaluacionIssObservacionesResult>?> SpRec_EvaluacionISSObservacionesAsync(string? periodo, string? catedra, string? seccion, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }
