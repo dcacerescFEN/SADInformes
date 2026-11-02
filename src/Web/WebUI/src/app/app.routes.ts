@@ -35,6 +35,8 @@ export const routes: Routes = [
       ? import('./postgraduate/afe-report/afe-report').then((module) => module.AfeReport)
       : report.slug === 'proximas-licenciaturas-pregrado'
       ? import('./postgraduate/licenciatura/licenciatura').then((module) => module.Licenciatura)
+      : report.slug === 'actividades-cursos'
+      ? import('./postgraduate/course-activities/course-activities').then((module) => module.CourseActivities)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'
