@@ -178,6 +178,26 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens AFE report with five filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/avances-afe');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/afe-report/filters')
+      .flush({ success: true, data: {
+        periods: [{ value: '2024A', text: '2024' }], studentTypes: [{ value: 'Todos', text: 'Todos' }],
+        modalities: [{ value: 'Todos', text: 'Todos' }], courses: [{ value: 'ENECO775/1', text: 'ENECO775/1' }],
+      } });
+    await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/afe-report/advances')
+      .flush({ success: true, data: { advances: [{ value: '-1', text: 'Todos' }] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Reporte Avances AFE');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(5);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens Alumni survey statistics with the shared dictionary and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-alumni');
     await harness.detectChanges();

@@ -67,7 +67,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('estadisticas-encuesta-alumni', 'Estadísticas encuesta Alumni',
     'Resultados de la encuesta Alumni de Postgrado.', 'EstadisticaEncuestaAlumni.aspx', true),
   entry('avances-afe', 'Avances AFE',
-    'Seguimiento de tareas, grupos y entregas de alumnos en AFE.', 'ReporteAFE.aspx'),
+    'Seguimiento de tareas, grupos y entregas de alumnos en AFE.', 'ReporteAFE.aspx', true),
   entry('proximas-licenciaturas-pregrado', 'Próximas licenciaturas Pregrado',
     'Alumnos que cumplen requisitos de licenciatura; opción ubicada en Postgrado del SAD.', 'LicenciaturaPregrado.aspx'),
   entry('notificaciones-causal-eliminacion', 'Notificaciones causal de eliminación',

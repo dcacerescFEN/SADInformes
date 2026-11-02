@@ -18,18 +18,25 @@ public static class ConfigureServices
         services.AddDbContext<AppConfigContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("AppConfig"),
                 sql => sql.CommandTimeout(10)));
-        services.AddScoped<IApiResponseService, ApiResponseService>();
+
         services.AddDbContext<SadContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("Sad"),
                 sql => sql.CommandTimeout(60)));
+
+        services.AddDbContext<DocenciaWebContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DocenciaWeb"),
+                sql => sql.CommandTimeout(60)));
+
         services.AddDbContext<SigmaRemuneracionesContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SigmaRemuneraciones")!));
 
 
         services.AddScoped<ISadContext>(provider => provider.GetRequiredService<SadContext>());
         services.AddScoped<ISadContextProcedures, SadContextProcedures>();
+        services.AddScoped<IDocenciaWebContext>(provider => provider.GetRequiredService<DocenciaWebContext>());
         services.AddScoped<ISigmaRemuneracionesContext>(provider => provider.GetRequiredService<SigmaRemuneracionesContext>());
 
+        services.AddScoped<IApiResponseService, ApiResponseService>();
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<PostgraduateSettings>();
