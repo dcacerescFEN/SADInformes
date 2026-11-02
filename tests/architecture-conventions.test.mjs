@@ -27,6 +27,7 @@ const modules = [
   'src/Application/Reports/Postgraduate/PersonalData',
   'src/Application/Reports/Postgraduate/ThesisRegistration',
   'src/Application/Reports/Postgraduate/IssStatistics',
+  'src/Application/Reports/Postgraduate/AlumniSurveyStatistics',
   'src/Application/Reports/Postgraduate/AyudantiaSigma',
 ];
 const commandActions = ['Create', 'Update', 'Delete', 'Upload', 'Download'];

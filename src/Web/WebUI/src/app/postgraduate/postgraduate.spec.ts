@@ -178,6 +178,16 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens Alumni survey statistics with the shared dictionary and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-alumni');
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta Alumni');
+    expect(root.querySelector('app-table')).not.toBeNull();
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    TestBed.inject(HttpTestingController).verify();
+  });
+
   it('opens ISS statistics with two dependent filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/estadisticas-iss');
     await harness.detectChanges();

@@ -65,7 +65,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('estadisticas-iss', 'Estadísticas ISS',
     'Muestra, categorías y observaciones de la evaluación ISS.', 'EstadisticasISS/Resumen.aspx', true),
   entry('estadisticas-encuesta-alumni', 'Estadísticas encuesta Alumni',
-    'Resultados de la encuesta Alumni de Postgrado.', 'EstadisticaEncuestaAlumni.aspx'),
+    'Resultados de la encuesta Alumni de Postgrado.', 'EstadisticaEncuestaAlumni.aspx', true),
   entry('avances-afe', 'Avances AFE',
     'Seguimiento de tareas, grupos y entregas de alumnos en AFE.', 'ReporteAFE.aspx'),
   entry('proximas-licenciaturas-pregrado', 'Próximas licenciaturas Pregrado',

@@ -29,6 +29,8 @@ export const routes: Routes = [
       ? import('./postgraduate/thesis-registration/thesis-registration').then((module) => module.ThesisRegistration)
       : report.slug === 'estadisticas-iss'
       ? import('./postgraduate/iss-statistics/iss-statistics').then((module) => module.IssStatistics)
+      : report.slug === 'estadisticas-encuesta-alumni'
+      ? import('./postgraduate/alumni-survey-statistics/alumni-survey-statistics').then((module) => module.AlumniSurveyStatistics)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'
