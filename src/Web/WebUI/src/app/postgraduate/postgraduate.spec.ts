@@ -178,6 +178,23 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens course activities with year filter, auto-loaded table and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/actividades-cursos');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/course-activities/filters')
+      .flush({ success: true, data: { years: [{ value: '2024', text: '2024' }] } });
+    await harness.detectChanges();
+    http.expectOne(request => request.url === '/api/reports/postgraduate/course-activities/report')
+      .flush({ success: true, data: { year: '2024', total: 0, rows: [] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Actividades Cursos Postgrado');
+    expect(root.querySelector('ng-select[data-filter=year]')).not.toBeNull();
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens licenciatura with on-demand search and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/proximas-licenciaturas-pregrado');
     await harness.detectChanges();

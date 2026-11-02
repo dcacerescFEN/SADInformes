@@ -17,6 +17,7 @@ Estadísticas ISS Postgrado: [muestra, categorías y observaciones](docs/iss-sta
 Estadísticas Encuesta Alumni: [diccionario y exportación](docs/alumni-survey-statistics.md).
 Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
 Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
+Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 

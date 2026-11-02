@@ -62,6 +62,7 @@ roles ni asignaciones**.
 | `ver Postgrado` (Estadísticas Encuesta Alumni) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `informes acreditación` (Avances AFE) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_AFE_REPORT` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Próximas Licenciaturas Pregrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Actividades Cursos Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
 
