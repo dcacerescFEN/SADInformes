@@ -63,7 +63,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('registro-tesis', 'Registro de tesis',
     'Informe de tesis, taller AFE, profesores, notas y exámenes.', 'RegistroTesisPostgrado.aspx', true),
   entry('estadisticas-iss', 'Estadísticas ISS',
-    'Muestra, categorías y observaciones de la evaluación ISS.', 'EstadisticasISS/Resumen.aspx'),
+    'Muestra, categorías y observaciones de la evaluación ISS.', 'EstadisticasISS/Resumen.aspx', true),
   entry('estadisticas-encuesta-alumni', 'Estadísticas encuesta Alumni',
     'Resultados de la encuesta Alumni de Postgrado.', 'EstadisticaEncuestaAlumni.aspx'),
   entry('avances-afe', 'Avances AFE',

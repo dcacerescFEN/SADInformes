@@ -25,6 +25,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<AlumnosCatedra> AlumnosCatedras => Set<AlumnosCatedra>();
     public DbSet<MovimientosInscripcion> MovimientosInscripcions => Set<MovimientosInscripcion>();
     public DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial => Set<PostgradoAyudanteSigmaSinHistorial>();
+    public DbSet<EvaluacionIssPostgradoCategoria> EvaluacionIssPostgradoCategorias => Set<EvaluacionIssPostgradoCategoria>();
 
     /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
     public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
@@ -267,6 +268,15 @@ public partial class SadContext(DbContextOptions<SadContext> options)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .UseCollation("Compatibility_42_409_30003");
+        });
+        modelBuilder.Entity<EvaluacionIssPostgradoCategoria>(entity =>
+        {
+            entity.ToTable("Evaluacion_ISS_PostgradoCategorias", "dbo");
+            entity.HasKey(row => row.IdCategoria);
+            entity.Property(row => row.IdCategoria).HasColumnName("Id_Categoria");
+            entity.Property(row => row.Descripcion).HasMaxLength(50).IsUnicode(false)
+                .UseCollation("Modern_Spanish_CI_AS");
+            entity.Property(row => row.IdEvaluacion).HasColumnName("Id_Evaluacion");
         });
     }
 }

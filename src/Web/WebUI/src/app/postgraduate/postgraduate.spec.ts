@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens ISS statistics with two dependent filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-iss');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/iss-statistics/filters')
+      .flush({ success: true, data: { periods: [{ value: '2024A', text: '2024' }], courseSections: [{ value: 'ENECO775/1', text: 'Economía' }] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas ISS');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(2);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens thesis registration with three filters and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/registro-tesis');
     await harness.detectChanges();
