@@ -14,6 +14,7 @@ Evaluación docente/curso: [año, tipo y exportación](docs/course-teacher-evalu
 Datos personales Postgrado: [filtros y exportación](docs/personal-data.md).
 Registro de tesis Postgrado: [filtros y exportación](docs/thesis-registration.md).
 Estadísticas ISS Postgrado: [muestra, categorías y observaciones](docs/iss-statistics.md).
+Estadísticas Encuesta Alumni: [diccionario y exportación](docs/alumni-survey-statistics.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
