@@ -178,6 +178,24 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens basic right payment with five filters and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/pago-derecho-basico-anual');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/basic-right-payment/filters')
+      .flush({ success: true, data: {
+        studentTypes: [{ value: 'MBA', text: 'MBA' }], modalities: [{ value: 'PT', text: 'PT' }],
+        years: [{ value: '2024', text: '2024' }],
+        paymentStatuses: [{ value: 'Todos', text: 'Todos' }],
+      } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Pago Derecho Básico Anual');
+    expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(5);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens the read-only NCE report and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/notificaciones-causal-eliminacion');
     await harness.detectChanges();

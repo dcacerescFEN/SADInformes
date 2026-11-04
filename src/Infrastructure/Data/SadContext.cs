@@ -27,6 +27,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<MovimientosInscripcion> MovimientosInscripcions => Set<MovimientosInscripcion>();
     public DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial => Set<PostgradoAyudanteSigmaSinHistorial>();
     public DbSet<EvaluacionIssPostgradoCategoria> EvaluacionIssPostgradoCategorias => Set<EvaluacionIssPostgradoCategoria>();
+    public DbSet<PagoDerechoBasicoAnualMonto> PagosDerechoBasicoAnualMontos => Set<PagoDerechoBasicoAnualMonto>();
     public DbSet<NotificacionCausalEliminacionPostgrado> NotificacionesCausalEliminacionPostgrado => Set<NotificacionCausalEliminacionPostgrado>();
     public DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado => Set<CausalEliminacionPostgrado>();
     public DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado => Set<TipoCausalEliminacionPostgrado>();
@@ -276,6 +277,12 @@ public partial class SadContext(DbContextOptions<SadContext> options)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .UseCollation("Compatibility_42_409_30003");
+        });
+        modelBuilder.Entity<PagoDerechoBasicoAnualMonto>(entity =>
+        {
+            entity.ToTable("PagoDerechoBasicoAnual_Montos", "dbo");
+            entity.HasKey(row => row.Año);
+            entity.Property(row => row.Año).HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
         });
         modelBuilder.Entity<EvaluacionIssPostgradoCategoria>(entity =>
         {

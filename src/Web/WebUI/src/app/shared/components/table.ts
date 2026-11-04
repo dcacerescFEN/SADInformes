@@ -15,6 +15,7 @@ export interface TableColumn {
   alternateActionVisible?: (row: object) => boolean;
   badges?: boolean;
   emphasized?: boolean;
+  link?: (row: object) => string | null;
 }
 
 export interface TableAction {
@@ -236,6 +237,12 @@ export interface TableAction {
                           }
                           {{ actionLabel(column.action, row) }}
                         </button>
+                      </td>
+                    } @else if (column.link?.(row); as href) {
+                      <td>
+                        <a [href]="href" target="_blank" rel="noopener noreferrer">
+                          {{ getCellValue(row, column.key) }}
+                        </a>
                       </td>
                     } @else if (getValueType(getCellValue(row, column.key)) === 'boolean') {
                       <td [class.table-cell-multiline]="column.multiline">

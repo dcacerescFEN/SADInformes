@@ -39,6 +39,8 @@ export const routes: Routes = [
       ? import('./postgraduate/course-activities/course-activities').then((module) => module.CourseActivities)
       : report.slug === 'notificaciones-causal-eliminacion'
       ? import('./postgraduate/nce/nce').then((module) => module.Nce)
+      : report.slug === 'pago-derecho-basico-anual'
+      ? import('./postgraduate/basic-right-payment/basic-right-payment').then((module) => module.BasicRightPayment)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'

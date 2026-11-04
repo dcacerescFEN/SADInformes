@@ -35,6 +35,24 @@ public sealed class PostgraduateSettingsTests
     }
 
     [Fact]
+    public async Task Student_photo_base_url_is_loaded_and_normalized_from_AppConfig()
+    {
+        using var services = CreateServices(Row("StudentPhotoBaseUrl", "https://photos.fen.uchile.cl/test"));
+        await Initialise(services);
+        Assert.Equal("https://photos.fen.uchile.cl/test/",
+            services.GetRequiredService<StudentPhotoSettings>().BaseUrl);
+    }
+
+    [Fact]
+    public async Task Missing_student_photo_base_url_uses_the_institutional_default()
+    {
+        using var services = CreateServices();
+        await Initialise(services);
+        Assert.Equal("https://fotos.fen.uchile.cl/",
+            services.GetRequiredService<StudentPhotoSettings>().BaseUrl);
+    }
+
+    [Fact]
     public async Task Missing_user_uses_mvenegas_as_the_default()
     {
         using var services = CreateServices();

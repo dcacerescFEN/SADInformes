@@ -19,7 +19,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('encuesta-docente-por-curso', 'Encuesta docente por curso',
     'Resultados de la evaluación docente por período, programa y modalidad.', 'EncuestaDocenteXCurso.aspx', true),
   entry('pago-derecho-basico-anual', 'Pago derecho básico anual',
-    'Consulta y registro del pago anual de derecho básico de alumnos.', 'PagoDerechoBasicoAnual.aspx'),
+    'Consulta y registro del pago anual de derecho básico de alumnos.', 'PagoDerechoBasicoAnual.aspx', true),
   entry('cursos-por-alumnos', 'Cursos vs. alumnos',
     'Relación de alumnos y cursos por semestre de ingreso, programa y modalidad.', 'CursosXAlumnos.aspx', true),
   entry('inscripcion-masiva', 'Inscripción masiva',

@@ -19,6 +19,7 @@ Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
 Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
+Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
 
 Actualización SAD–VTI: [auditoría y descarga Excel](docs/sad-vti-updates.md).
 
