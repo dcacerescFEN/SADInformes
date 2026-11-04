@@ -147,5 +147,9 @@ public partial interface ISadContextProcedures
 
     Task<List<SpListAlumnosCumpleLicenciaturaResult>?> SpList_AlumnosCumpleLicenciaturaAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecAlumnosXPagoDerechoBasicoResult>?> SpRec_AlumnosXPago_Derecho_BasicoAsync(string? tipo_Alumno, string? modalidad, string? añoIngreso, string? año, string? pago, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpCre_AlumnosXPago_Derecho_BasicoAsync(string? cod_Alumno, string? año, bool? pago, string? usuario, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecReporteActividadesCursosPostgradoResult>?> SpRec_ReporteActividadesCursosPostgradoAsync(int? anno, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }

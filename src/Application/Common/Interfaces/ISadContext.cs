@@ -21,6 +21,7 @@ public partial interface ISadContext
     DbSet<MovimientosInscripcion> MovimientosInscripcions { get; }
     DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial { get; }
     DbSet<EvaluacionIssPostgradoCategoria> EvaluacionIssPostgradoCategorias { get; }
+    DbSet<PagoDerechoBasicoAnualMonto> PagosDerechoBasicoAnualMontos { get; }
     DbSet<NotificacionCausalEliminacionPostgrado> NotificacionesCausalEliminacionPostgrado { get; }
     DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado { get; }
     DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado { get; }

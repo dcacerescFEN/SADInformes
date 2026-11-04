@@ -1358,4 +1358,41 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecAlumnosXPagoDerechoBasicoResult>?> SpRec_AlumnosXPago_Derecho_BasicoAsync(
+        string? tipo_Alumno, string? modalidad, string? añoIngreso, string? año, string? pago,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipo_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modalidad", Size = 30, Value = modalidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "AñoIngreso", Size = 4, Value = añoIngreso ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Año", Size = 4, Value = año ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Pago", Size = 20, Value = pago ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnosXPagoDerechoBasicoResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosXPago_Derecho_Basico] @Tipo_Alumno = @Tipo_Alumno, @Modalidad = @Modalidad, @AñoIngreso = @AñoIngreso, @Año = @Año, @Pago = @Pago",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<int> SpCre_AlumnosXPago_Derecho_BasicoAsync(
+        string? cod_Alumno, string? año, bool? pago, string? usuario,
+        CancellationToken? cancellationToken = default)
+    {
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Cod_Alumno", Size = 20, Value = cod_Alumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Año", Size = 4, Value = año ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Pago", Value = pago ?? (object)DBNull.Value, SqlDbType = SqlDbType.Bit },
+            new SqlParameter { ParameterName = "Usuario", Size = 20, Value = usuario ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        return await context.Database.ExecuteSqlRawAsync(
+            "EXEC [dbo].[spCre_AlumnosXPago_Derecho_Basico] @Cod_Alumno = @Cod_Alumno, @Año = @Año, @Pago = @Pago, @Usuario = @Usuario",
+            sqlParameters, cancellationToken ?? default);
+    }
 }

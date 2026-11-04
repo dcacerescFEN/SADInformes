@@ -102,6 +102,24 @@ describe('Table sorting and filtering', () => {
     expect(checkbox.checked).toBe(true);
   });
 
+  it('renders a safe column link when the consumer provides one', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: {
+        value: signal<TableColumn[]>([{ key: 'code', name: 'Código',
+          link: row => `https://sad.example.test/students/detail/${(row as { code: string }).code}` }]),
+      },
+      data: { value: signal([{ code: 'A1' }]) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+    const link = fixture.nativeElement.querySelector('tbody a') as HTMLAnchorElement;
+    expect(link).not.toBeNull();
+    expect(link.getAttribute('href')).toBe('https://sad.example.test/students/detail/A1');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer');
+  });
+
   it('styles an emphasized action header like sortable buttons without enabling sorting', async () => {
     const fixture = TestBed.createComponent(Table);
     Object.defineProperties(fixture.componentInstance, {

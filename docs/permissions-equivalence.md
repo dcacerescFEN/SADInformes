@@ -63,6 +63,8 @@ roles ni asignaciones**.
 | `ver Postgrado` + `informes acreditación` (Avances AFE) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_AFE_REPORT` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Próximas Licenciaturas Pregrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Actividades Cursos Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Pago Derecho Básico: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT` | Implementado; requiere asignación en Keycloak |
+| Pago Derecho Básico: Guardar (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT` | Implementado; exige también el permiso de consulta |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
 | `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE` | Implementado; reemplaza el iframe/cookie de Maestro |
 | `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; `Bloquear/Activar` sigue en Maestro. |

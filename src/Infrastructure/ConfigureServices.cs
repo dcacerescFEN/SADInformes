@@ -40,6 +40,7 @@ public static class ConfigureServices
         services.AddScoped<ConfigurationInitialiser>();
         services.AddSingleton<SiteSettings>();
         services.AddSingleton<PostgraduateSettings>();
+        services.AddSingleton<StudentPhotoSettings>();
         services.AddSingleton<ReportingSettings>();
         services.AddScoped<IReportRenderer, SsrsReportRenderer>();
         services.AddHttpClient(SsrsReportRenderer.ClientName, client => client.Timeout = Timeout.InfiniteTimeSpan)
@@ -56,6 +57,8 @@ public static class ConfigureServices
             });
         services.AddSingleton<IPostgraduateSettings>(
             provider => provider.GetRequiredService<PostgraduateSettings>());
+        services.AddSingleton<IStudentPhotoSettings>(
+            provider => provider.GetRequiredService<StudentPhotoSettings>());
         services.AddSingleton<ISiteMenuProvider, SiteMenuProvider>();
         return services;
     }
