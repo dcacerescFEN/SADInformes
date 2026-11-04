@@ -71,7 +71,7 @@ export const POSTGRADUATE_REPORTS: readonly PostgraduateReport[] = [
   entry('proximas-licenciaturas-pregrado', 'Próximas licenciaturas Pregrado',
     'Alumnos que cumplen requisitos de licenciatura; opción ubicada en Postgrado del SAD.', 'LicenciaturaPregrado.aspx', true),
   entry('notificaciones-causal-eliminacion', 'Notificaciones causal de eliminación',
-    'Informe de notificaciones de causal de eliminación de Postgrado.', 'InformeNce.aspx'),
+    'Informe de notificaciones de causal de eliminación de Postgrado.', 'InformeNce.aspx', true),
   entry('actividades-cursos', 'Actividades cursos Postgrado',
     'Reporte de actividades de cursos de Postgrado por año.', 'ActividadesCursosPostgrado.aspx', true),
   {

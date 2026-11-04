@@ -32,8 +32,8 @@ roles ni asignaciones**.
 | `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS` | El acceso real lo define cada sistema externo. |
 | `INFORMES - MANTENEDORES POSTGRADO CONSTANCIAS` | — | Permiso de una aplicación externa; sigue en su sistema. |
 | `INFORMES - MANTENEDORES POSTGRADO D Y C` | — | Permiso de una aplicación externa; sigue en su sistema. |
-| `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Permiso de una aplicación externa; sigue en su sistema. |
-| `INFORMES - POSTGRADO I NCE POSTGRADO` | — | Permiso de una aplicación externa; sigue en su sistema. |
+| `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; sigue en Maestro. |
+| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE` | Implementado; el listado y el informe requieren este permiso |
 
 ## Informes migrados
 
@@ -64,7 +64,8 @@ roles ni asignaciones**.
 | `ver Postgrado` (Próximas Licenciaturas Pregrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` (Actividades Cursos Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES` | Implementado; requiere asignación en Keycloak |
 | `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
-| `INFORMES - POSTGRADO I NCE POSTGRADO` | Integración externa | Pendiente de definir contrato |
+| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE` | Implementado; reemplaza el iframe/cookie de Maestro |
+| `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; `Bloquear/Activar` sigue en Maestro. |
 
 Los nombres propuestos **no existen todavía** en Keycloak: se definen al migrar
 cada informe, con su prueba de autorización.

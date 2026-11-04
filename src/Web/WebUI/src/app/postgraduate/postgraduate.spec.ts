@@ -178,6 +178,20 @@ describe('Navegación visual de Postgrado', () => {
     http.verify();
   });
 
+  it('opens the read-only NCE report and no placeholder', async () => {
+    const harness = await RouterTestingHarness.create('/postgrado/notificaciones-causal-eliminacion');
+    await harness.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(request => request.url === '/api/reports/postgraduate/nce/report')
+      .flush({ success: true, data: { total: 0, rows: [] } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Informe Notificaciones Causal de Eliminación');
+    expect(root.querySelectorAll('[data-tab]')).toHaveLength(0);
+    expect(root.textContent).not.toContain('Pendiente de migración');
+    http.verify();
+  });
+
   it('opens course activities with year filter, auto-loaded table and no placeholder', async () => {
     const harness = await RouterTestingHarness.create('/postgrado/actividades-cursos');
     await harness.detectChanges();
