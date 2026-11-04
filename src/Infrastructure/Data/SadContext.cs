@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Domain.Entities.Sad.Tables.dbo;
+using Domain.Entities.Sad.Tables.Sad;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -26,6 +27,9 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<MovimientosInscripcion> MovimientosInscripcions => Set<MovimientosInscripcion>();
     public DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial => Set<PostgradoAyudanteSigmaSinHistorial>();
     public DbSet<EvaluacionIssPostgradoCategoria> EvaluacionIssPostgradoCategorias => Set<EvaluacionIssPostgradoCategoria>();
+    public DbSet<NotificacionCausalEliminacionPostgrado> NotificacionesCausalEliminacionPostgrado => Set<NotificacionCausalEliminacionPostgrado>();
+    public DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado => Set<CausalEliminacionPostgrado>();
+    public DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado => Set<TipoCausalEliminacionPostgrado>();
 
     /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
     public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
@@ -102,6 +106,8 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona").HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.TipoAlumno).HasColumnName("Tipo_Alumno").HasMaxLength(30).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Modalidad).HasMaxLength(30).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.CodSitAcademica).HasColumnName("Cod_SitAcademica").HasMaxLength(25).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Motivo).HasMaxLength(50).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
         });
         modelBuilder.Entity<Persona>(entity =>
         {
@@ -109,6 +115,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.HasKey(row => row.CodPersona);
             entity.Property(row => row.CodPersona).HasColumnName("Cod_Persona").HasMaxLength(20).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Nombre1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
+            entity.Property(row => row.Nombre2).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Apellido1).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Apellido2).HasMaxLength(100).IsUnicode(false).UseCollation("Compatibility_42_409_30003");
             entity.Property(row => row.Uname).HasMaxLength(50).IsUnicode(false);
@@ -278,6 +285,28 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.Property(row => row.Descripcion).HasMaxLength(50).IsUnicode(false)
                 .UseCollation("Modern_Spanish_CI_AS");
             entity.Property(row => row.IdEvaluacion).HasColumnName("Id_Evaluacion");
+        });
+        modelBuilder.Entity<NotificacionCausalEliminacionPostgrado>(entity =>
+        {
+            entity.ToTable("NotificacionCausalEliminacionPostgrado", "SAD");
+            entity.HasKey(row => row.IdNotificacionCausalEliminacionPostgrado);
+            entity.HasIndex(row => row.IdPublico).IsUnique();
+            entity.Property(row => row.CodigoAlumno).HasMaxLength(250).IsUnicode(false);
+            entity.Property(row => row.Notificacion).HasMaxLength(5000).IsUnicode(false);
+            entity.Property(row => row.CasillaCordinadora).HasMaxLength(250).IsUnicode(false);
+        });
+        modelBuilder.Entity<CausalEliminacionPostgrado>(entity =>
+        {
+            entity.ToTable("CausalEliminacionPostgrado", "SAD");
+            entity.HasKey(row => row.IdCausalEliminacionPostgrado);
+            entity.HasIndex(row => row.IdPublico).IsUnique();
+        });
+        modelBuilder.Entity<TipoCausalEliminacionPostgrado>(entity =>
+        {
+            entity.ToTable("TipoCausalEliminacionPostgrado", "SAD");
+            entity.HasKey(row => row.IdTipoCausalEliminacionPostgrado);
+            entity.HasIndex(row => row.IdPublico).IsUnique();
+            entity.Property(row => row.Descripcion).HasMaxLength(250).IsUnicode(false);
         });
     }
 }

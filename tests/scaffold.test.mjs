@@ -34,7 +34,7 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
       assert.deepEqual(
         [...project.matchAll(/<PackageReference Include="([^"]+)"/g)].map((match) => match[1]),
         ['Microsoft.AspNetCore.SpaProxy', 'Microsoft.AspNetCore.Authentication.JwtBearer',
-          'Microsoft.AspNetCore.OpenApi', 'Scalar.AspNetCore'],
+          'Microsoft.AspNetCore.OpenApi', 'PDFsharp-MigraDoc', 'Scalar.AspNetCore'],
       );
     } else if (layer === 'Application') {
       assert.match(project, /PackageReference Include="Scrutor" Version="7.0.0"/);

@@ -23,6 +23,10 @@
   --dropdown-option-hover-background: #eef4fb;
   --card-radius: 0.75rem;
   --card-shadow: 0 2px 10px rgba(15, 35, 70, 0.06);
+  --export-excel: #198754;
+  --export-excel-hover: #157347;
+  --export-pdf: #b02a37;
+  --export-pdf-hover: #8c1f2a;
 }
 :root[data-theme='dark'] {
   --primary-blue: #295ea4;
@@ -111,6 +115,8 @@ body {
 // Botones compartidos con SADAlumnos y SADAdministracion.
 .btn-create,
 .btn-search,
+.btn-export-excel,
+.btn-export-pdf,
 .btn-clear,
 .btn-back {
   border-radius: 8px;
@@ -121,7 +127,9 @@ body {
 }
 
 .btn-create,
-.btn-search {
+.btn-search,
+.btn-export-excel,
+.btn-export-pdf {
   border: none;
   color: #fff;
 }
@@ -135,6 +143,30 @@ body {
   background: #16a34a;
   box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   text-decoration: none;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-export-excel {
+  background: var(--export-excel);
+  font-weight: 600;
+}
+
+.btn-export-excel:hover {
+  background: var(--export-excel-hover);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-export-pdf {
+  background: var(--export-pdf);
+  font-weight: 600;
+}
+
+.btn-export-pdf:hover {
+  background: var(--export-pdf-hover);
+  box-shadow: 0 4px 12px rgba(176, 42, 55, 0.3);
   color: #fff;
   transform: translateY(-1px);
 }
@@ -164,10 +196,13 @@ body {
 }
 
 .btn-search:disabled,
+.btn-export-excel:disabled,
+.btn-export-pdf:disabled,
 .btn-clear:disabled,
 .btn-back:disabled {
   transform: none;
   box-shadow: none;
+  opacity: 0.65;
 }
 
 // Tabla reutilizable de shared.

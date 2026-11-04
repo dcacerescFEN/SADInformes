@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Domain.Entities.Sad.Tables.dbo;
+using Domain.Entities.Sad.Tables.Sad;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Common.Interfaces;
@@ -20,6 +21,10 @@ public partial interface ISadContext
     DbSet<MovimientosInscripcion> MovimientosInscripcions { get; }
     DbSet<PostgradoAyudanteSigmaSinHistorial> PostgradoAyudantesSigmaSinHistorial { get; }
     DbSet<EvaluacionIssPostgradoCategoria> EvaluacionIssPostgradoCategorias { get; }
+    DbSet<NotificacionCausalEliminacionPostgrado> NotificacionesCausalEliminacionPostgrado { get; }
+    DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado { get; }
+    DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado { get; }
+
 
     Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);
 }

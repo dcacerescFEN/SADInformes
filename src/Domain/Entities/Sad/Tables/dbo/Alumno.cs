@@ -8,4 +8,6 @@ public sealed class Alumno
     public string CodPersona { get; set; } = "";
     public string TipoAlumno { get; set; } = "";
     public string? Modalidad { get; set; }
+    public string? CodSitAcademica { get; set; }
+    public string? Motivo { get; set; }
 }

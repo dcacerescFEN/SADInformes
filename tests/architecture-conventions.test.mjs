@@ -31,6 +31,7 @@ const modules = [
   'src/Application/Reports/Postgraduate/AfeReport',
   'src/Application/Reports/Postgraduate/Licenciatura',
   'src/Application/Reports/Postgraduate/CourseActivities',
+  'src/Application/Reports/Postgraduate/Nce',
   'src/Application/Reports/Postgraduate/AyudantiaSigma',
 ];
 const commandActions = ['Create', 'Update', 'Delete', 'Upload', 'Download'];

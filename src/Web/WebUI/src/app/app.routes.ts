@@ -37,6 +37,8 @@ export const routes: Routes = [
       ? import('./postgraduate/licenciatura/licenciatura').then((module) => module.Licenciatura)
       : report.slug === 'actividades-cursos'
       ? import('./postgraduate/course-activities/course-activities').then((module) => module.CourseActivities)
+      : report.slug === 'notificaciones-causal-eliminacion'
+      ? import('./postgraduate/nce/nce').then((module) => module.Nce)
       : report.slug === 'ranking-notas-ponderado'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
       : report.slug === 'alumnos-matriculados'
