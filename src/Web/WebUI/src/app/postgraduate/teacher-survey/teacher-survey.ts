@@ -58,7 +58,10 @@ const COLUMNS: readonly TableColumn[] = [
         </div>
       </div>
 
-      <div class="page-header">
+      <section class="form-section mb-3" aria-labelledby="teacher-survey-filters-title">
+        <h2 class="section-title" id="teacher-survey-filters-title">
+          <i class="bi bi-funnel" aria-hidden="true"></i>Filtros
+        </h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             <div class="col-xl-3 col-lg-4 col-md-6">
@@ -71,7 +74,7 @@ const COLUMNS: readonly TableColumn[] = [
                   placeholder="Seleccione período" class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-4 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="surveyStudentType">
                   <i class="bi bi-people-fill me-1"></i>Tipo alumno
@@ -81,7 +84,7 @@ const COLUMNS: readonly TableColumn[] = [
                   placeholder="Seleccione tipo" class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-2 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="surveyModality">
                   <i class="bi bi-grid-3x3-gap-fill me-1"></i>Modalidad
@@ -100,29 +103,33 @@ const COLUMNS: readonly TableColumn[] = [
             </div>
           </div>
         </form>
-      </div>
+      </section>
 
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
       @if (loading()) { <p role="status">Cargando…</p> }
 
-      @if (rows().length > 0) {
-        <div class="form-section">
+      @if (rows().length > 0 || notice()) {
+        <section class="form-section" aria-labelledby="teacher-survey-results-title">
+          <h2 class="section-title" id="teacher-survey-results-title">
+            <i class="bi bi-table" aria-hidden="true"></i>Resultados
+          </h2>
           <app-table aria-label="Encuesta docente por curso" [data]="rows()" [columns]="columns"
             [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>
-        </div>
+        </section>
       }
 
-      <div class="form-section mt-3">
-        <h2 class="h6">Glosa</h2>
+      <section class="form-section mt-3" aria-labelledby="teacher-survey-glossary-title">
+        <h2 class="section-title" id="teacher-survey-glossary-title">
+          <i class="bi bi-book" aria-hidden="true"></i>Glosa
+        </h2>
         <h3 class="h6 text-body-secondary">Evaluación general del curso</h3>
         <app-glossary-table [entries]="courseQuestions" data-glossary="curso" />
         <h3 class="h6 text-body-secondary mt-3">Evaluación del profesor</h3>
         <app-glossary-table [entries]="teacherQuestions" data-glossary="profesor" />
         <h3 class="h6 text-body-secondary mt-3">Respuestas</h3>
         <app-glossary-table [entries]="answerScale" firstColumn="Número" data-glossary="respuestas" />
-      </div>
+      </section>
     </div>
   `,
   styles: ':host { display: block; }',

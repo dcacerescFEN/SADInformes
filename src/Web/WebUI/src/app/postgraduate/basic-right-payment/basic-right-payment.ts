@@ -55,7 +55,8 @@ const COLUMNS: readonly TableColumn[] = [
           </div>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             <div class="col-xl-4 col-lg-4 col-md-6">
@@ -113,6 +114,7 @@ const COLUMNS: readonly TableColumn[] = [
       @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
       @if (loaded()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
             <p class="fw-semibold mb-0">Monto {{ form.controls.paymentYear.value }}:
               {{ amount() === null ? 'Sin Monto' : '$ ' + (amount() | number:'1.0-0') }}</p>
@@ -125,14 +127,10 @@ const COLUMNS: readonly TableColumn[] = [
               <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
             }
           </div>
-          @if (rows().length > 0) {
-            <app-table aria-label="Pago derecho básico anual" [data]="rows()" [columns]="columns"
-              [searchTerm]="searchTerm()" [showSummary]="false" [showRowNumber]="false"
-              [selectionEnabled]="true" selectionLabel="Pago" (selectionChange)="togglePayment($event)" />
-            <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
-          } @else {
-            <p class="text-body-secondary" role="status">Sin Datos</p>
-          }
+          <app-table aria-label="Pago derecho básico anual" [data]="rows()" [columns]="columns"
+            [searchTerm]="searchTerm()" [showSummary]="false" [showRowNumber]="false"
+            [selectionEnabled]="true" selectionLabel="Pago" (selectionChange)="togglePayment($event)" />
+          <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
         </div>
       }
     </div>
@@ -240,7 +238,6 @@ export class BasicRightPayment {
           this.rows.set(result.data.rows.map(row => ({
             ...row, paid: row.paid, selected: row.paid, originalPaid: row.paid,
           })));
-          if (result.data.rows.length === 0) this.notice.set('Sin Datos');
         },
         error: () => {
           this.loading.set(false);

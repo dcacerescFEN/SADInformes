@@ -65,7 +65,7 @@ const QUESTIONS: readonly Question[] = [
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       <div class="form-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="h5 mb-0">Diccionario de preguntas</h2>
+          <h2 class="section-title mb-0"><i class="bi bi-book" aria-hidden="true"></i>Diccionario de preguntas</h2>
           <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
         </div>
         <app-table aria-label="Diccionario de preguntas de la encuesta Alumni"

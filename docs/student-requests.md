@@ -1,6 +1,6 @@
 # Solicitudes alumnos Postgrado
 
-La ruta `/postgrado/solicitudes-alumnos` descarga directamente Excel (xlsx), sin
+La ruta `/postgraduate/student-requests` descarga directamente Excel (xlsx), sin
 visor, modal ni vista previa PDF. SSRS sigue ejecutando el reporte
 **SolicitudesAlumnoPostgrado**, sin cambiar su nombre ni reconstruir su consulta.
 

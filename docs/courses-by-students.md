@@ -1,6 +1,6 @@
 # Cursos vs. alumnos
 
-Ruta: `/postgrado/cursos-por-alumnos`. Usa el formato de Encuesta docente por curso:
+Ruta: `/postgraduate/courses-by-students`. Usa el formato de Encuesta docente por curso:
 cabecera, tres selectores, Mostrar, tabla ordenable, total y Exportar CSV.
 
 ## Consulta

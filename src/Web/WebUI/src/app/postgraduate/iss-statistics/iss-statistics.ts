@@ -54,7 +54,8 @@ const OBSERVATION_COLUMNS: readonly TableColumn[] = [{ key: 'observation', name:
         <h1 class="page-title"><i class="bi bi-bar-chart-line" aria-hidden="true"></i>Estadísticas ISS</h1>
         <p class="page-subtitle mb-0">Muestra, categorías de preguntas y observaciones de la evaluación ISS de Postgrado.</p>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             <div class="col-md-4">
@@ -98,6 +99,7 @@ const OBSERVATION_COLUMNS: readonly TableColumn[] = [{ key: 'observation', name:
         </div>
         @if (currentTab(); as tab) {
           <div class="form-section" [attr.data-section]="tab.id">
+            <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>{{ tab.label }}</h2>
             <app-table [attr.aria-label]="tab.label" [data]="tab.rows" [columns]="tab.columns"
               [showSummary]="false" [showRowNumber]="false" />
           </div>

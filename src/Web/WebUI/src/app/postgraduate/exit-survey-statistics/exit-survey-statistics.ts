@@ -67,7 +67,8 @@ const TABS: readonly Tab[] = [
         <h1 class="page-title"><i class="bi bi-bar-chart-line" aria-hidden="true"></i>Estadísticas Encuesta de Salida</h1>
         <p class="page-subtitle mb-0">Resultados de la encuesta de graduados por período, tipo de alumno y modalidad.</p>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             <div class="col-xl-3 col-md-4">
@@ -101,9 +102,9 @@ const TABS: readonly Tab[] = [
       </div>
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (loading()) { <p role="status">Cargando muestra…</p> }
-      @if (rows().length > 0) {
+      @if (loaded() && !busy()) {
         <div class="form-section">
-          <h2 class="h6">Muestra</h2>
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Muestra</h2>
           <div class="table-responsive">
             <table class="table table-hover align-middle app-table" aria-label="Muestra encuesta de salida">
               <thead class="table-light"><tr><th>Tipo</th><th>Modalidad</th><th>Muestra</th><th>Incompletas</th><th>Contestadas</th></tr></thead>
@@ -112,12 +113,16 @@ const TABS: readonly Tab[] = [
                   <tr><td>{{ row.type }}</td><td>{{ row.modality ?? '' }}</td><td>{{ row.sample }}</td><td>{{ row.inProgress }}</td><td>{{ row.answered }}</td></tr>
                 }
               </tbody>
+              @if (rows().length === 0) {
+                <tr><td colspan="5" class="text-center text-muted py-5">
+                  <i class="bi bi-info-circle mb-2 empty-icon"></i>
+                  <p class="mb-0">No hay resultados</p>
+                </td></tr>
+              }
               <tfoot class="table-light fw-semibold"><tr><td colspan="2">Totales</td><td>{{ totals().sample }}</td><td>{{ totals().inProgress }}</td><td>{{ totals().answered }}</td></tr></tfoot>
             </table>
           </div>
         </div>
-      } @else if (loaded() && !busy()) {
-        <p class="text-body-secondary" role="status">Sin Datos</p>
       }
       <div class="app-tabs mb-3" role="tablist" aria-label="Etapas de la encuesta">
         @for (tab of topTabs; track tab.id) {
@@ -127,6 +132,7 @@ const TABS: readonly Tab[] = [
         }
       </div>
       <div class="form-section mt-3">
+        <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
         @if (visibleTabs().length > 0) {
           <div class="app-tabs app-tabs--secondary mb-3" role="tablist" [attr.aria-label]="activeTopLabel()">
             @for (tab of visibleTabs(); track tab.id) {

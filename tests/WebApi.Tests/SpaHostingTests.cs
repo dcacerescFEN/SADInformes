@@ -30,7 +30,7 @@ public sealed class SpaHostingTests : IDisposable
 
     [Theory]
     [InlineData("/")]
-    [InlineData("/postgrado/registro-tesis")]
+    [InlineData("/postgraduate/thesis-registration")]
     [InlineData("/apiculture")]
     public async Task Production_serves_the_SPA_for_client_routes(string route)
     {

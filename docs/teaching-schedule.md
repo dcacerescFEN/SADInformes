@@ -1,6 +1,6 @@
 # Programación Docente Postgrado X Programa y Modalidad
 
-Ruta: `/postgrado/programacion-docente-programa-modalidad`. La pantalla mantiene
+Ruta: `/postgraduate/teaching-schedule`. La pantalla mantiene
 los filtros y las columnas del informe legado de
 `Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx`, dentro del catálogo
 Postgrado actual. Los 30 informes anteriores conservan rutas y referencias.

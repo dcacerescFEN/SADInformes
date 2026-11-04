@@ -93,6 +93,26 @@ body {
   padding: 1.5rem;
 }
 
+.section-title {
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--light-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-container {
+  min-width: 0;
+}
+
+.empty-icon {
+  font-size: 2rem;
+}
+
 .form-control,
 .form-select,
 .input-group-text {

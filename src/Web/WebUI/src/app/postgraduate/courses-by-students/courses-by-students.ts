@@ -45,7 +45,8 @@ const COLUMNS: readonly TableColumn[] = [
         </div>
       </div>
 
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             <div class="col-xl-3 col-lg-4 col-md-6">
@@ -58,7 +59,7 @@ const COLUMNS: readonly TableColumn[] = [
                   placeholder="Seleccione semestre" class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-4 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="coursesStudentType">
                   <i class="bi bi-people-fill me-1"></i>Tipo alumno
@@ -68,7 +69,7 @@ const COLUMNS: readonly TableColumn[] = [
                   placeholder="Seleccione tipo" class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-2 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="coursesModality">
                   <i class="bi bi-grid-3x3-gap-fill me-1"></i>Modalidad
@@ -90,11 +91,11 @@ const COLUMNS: readonly TableColumn[] = [
       </div>
 
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
       @if (loading()) { <p role="status">Cargando…</p> }
 
-      @if (rows().length > 0) {
+      @if (rows().length > 0 || notice()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <app-table aria-label="Cursos vs. alumnos" [data]="rows()" [columns]="columns"
             [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>

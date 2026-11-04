@@ -1,6 +1,6 @@
 # Alumnos sin contestar encuesta docente
 
-Ruta: `/postgrado/alumnos-sin-contestar-encuesta`. La pantalla reemplaza la ficha
+Ruta: `/postgraduate/unanswered-teacher-survey`. La pantalla reemplaza la ficha
 pendiente y conserva el formato de los informes actuales: tres filtros, Mostrar,
 tabla ordenable, total y Exportar CSV.
 

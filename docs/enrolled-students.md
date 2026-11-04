@@ -1,6 +1,6 @@
 # Alumnos matriculados MBA
 
-`/postgrado/alumnos-matriculados` reemplaza `AlumnosMatriculados.aspx`. Es un
+`/postgraduate/enrolled-students` reemplaza `AlumnosMatriculados.aspx`. Es un
 informe **export-only**: conserva la grilla oculta del legado y entrega un XLSX
 real, sin mostrar datos personales en pantalla ni modificar datos.
 

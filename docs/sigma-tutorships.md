@@ -1,6 +1,6 @@
 # Ayudantías Postgrado Sigma
 
-`/postgrado/ayudantias-sigma` reemplaza `ReporteAyudantiaSigma.aspx`. Consulta la
+`/postgraduate/sigma-tutorships` reemplaza `ReporteAyudantiaSigma.aspx`. Consulta la
 vista SAD de ayudantías y enriquece cada fila con el estado de remuneración en
 Sigma; no modifica datos.
 

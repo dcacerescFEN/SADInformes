@@ -1,6 +1,6 @@
 # Estadísticas Encuesta Alumni
 
-`/postgrado/estadisticas-encuesta-alumni` reemplaza `EstadisticaEncuestaAlumni.aspx`.
+`/postgraduate/alumni-survey-statistics` reemplaza `EstadisticaEncuestaAlumni.aspx`.
 Es un informe **export-only**: muestra el diccionario de preguntas y descarga las
 respuestas en Excel; las respuestas individuales no se muestran en pantalla.
 

@@ -318,8 +318,10 @@ Las secciones ajenas a Postgrado muestran **Pendiente de migración** al
 expandirse; todavía no tienen pantallas funcionales ni rutas nuevas.
 Postgrado muestra 31 funcionalidades: las 30 principales de `SAD/Informes/Postgrado`,
 incluidas Estadísticas ISS y Encuesta Salida. Cada opción abre una ruta autenticada
-`/postgrado/<opción>` con título, descripción, referencia al archivo legado y
+`/postgraduate/<opción>` con título, descripción, referencia al archivo legado y
 estado **Pendiente de migración**. Un catálogo compartido define menú y rutas.
+Las URLs antiguas `/postgrado/<slug-español>` ya no existen. Los favoritos del
+sidebar se migran desde esos slugs al leer `sadinformes.sidebar.favorite-routes`.
 El detalle de profesor pertenece a Encuesta Salida, no tiene una opción separada.
 Programación Docente Postgrado X Programa y Modalidad se incorpora desde
 `SAD/Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx`; las 30 rutas
@@ -337,7 +339,7 @@ las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
 
 ### Programación Docente Postgrado X Programa y Modalidad
 
-Ruta: `/postgrado/programacion-docente-programa-modalidad`. Conserva los cinco
+Ruta: `/postgraduate/teaching-schedule`. Conserva los cinco
 filtros y las siete columnas del SAD. Promoción sigue mostrando `Promocion` y
 enviando `Descripcion`, sin corregir el binding ni cambiar el parámetro SQL de 7
 caracteres. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE`.
@@ -345,7 +347,7 @@ Contrato, compatibilidad y pruebas en [`docs/teaching-schedule.md`](docs/teachin
 
 ### Alumnos sin contestar encuesta docente
 
-La ruta `/postgrado/alumnos-sin-contestar-encuesta` ya abre el informe real:
+La ruta `/postgraduate/unanswered-teacher-survey` ya abre el informe real:
 período, tipo y modalidad concretos, tabla con las cinco columnas del SAD y CSV
 seguro. Usa el SP existente `spRec_Alumnos_Sin_Evaluacion_Docente`, sin cambios de
 base. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY`;
@@ -356,7 +358,7 @@ exacta de las evaluaciones pendientes y la verificación están en
 ### Primer informe funcional: Encuesta docente por curso
 
 La opción **Encuesta docente por curso** ya no muestra la ficha pendiente: abre la
-pantalla real en `/postgrado/encuesta-docente-por-curso`, con los tres filtros del
+pantalla real en `/postgraduate/teacher-survey`, con los tres filtros del
 SAD, tabla de resultados, total y exportación CSV.
 
 | Elemento | Valor |
@@ -556,14 +558,14 @@ Tampoco crea ni modifica roles. Esos pasos siguen siendo decisiones humanas.
 
 ## Cursos vs. alumnos de Postgrado
 
-Informe en `/postgrado/cursos-por-alumnos`, con el formato de Encuesta docente por
+Informe en `/postgraduate/courses-by-students`, con el formato de Encuesta docente por
 curso y sin opción Todos. Consulta por semestre de ingreso, tipo y modalidad.
 Contrato API, permiso específico, exportación y dependencias en
 [Courses vs. students](docs/courses-by-students.md).
 
 ## Inscripción masiva de Postgrado
 
-`/postgrado/inscripcion-masiva` incorpora consulta, selección y escritura real de
+`/postgraduate/mass-enrollment` incorpora consulta, selección y escritura real de
 inscripciones administrativas. Requiere permisos separados de consulta y gestión.
 Uso, API, transacciones y validación necesaria antes de operar con SAD real en
 [Inscripción masiva](docs/mass-enrollment.md).

@@ -3,13 +3,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
-import { ReportsSidebar } from './reports-sidebar';
+import { ReportsSidebar, migrateFavoriteSlugs } from './reports-sidebar';
 import { POSTGRADUATE_REPORTS } from '../../postgraduate/postgraduate-catalogue';
 
 @Component({ template: '' })
 class TestPage {}
 
 describe('Sidebar de Informes', () => {
+  it('migra slugs antiguos de favoritos y descarta opciones desconocidas', () => {
+    expect(migrateFavoriteSlugs(['registro-tesis', 'encuesta-docente-por-curso', 'unknown'])).toEqual([
+      'thesis-registration', 'teacher-survey',
+    ]);
+  });
+
   let fixture: ComponentFixture<ReportsSidebar>;
   let originalWidth: PropertyDescriptor;
   beforeEach(async () => {
@@ -18,7 +24,7 @@ describe('Sidebar de Informes', () => {
     await TestBed.configureTestingModule({ imports: [ReportsSidebar], providers: [
       provideRouter([
         { path: '', component: TestPage }, { path: 'otra', component: TestPage },
-        ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgrado/' + report.slug, component: TestPage })),
+        ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgraduate/' + report.slug, component: TestPage })),
       ]),
       { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba' } },
     ] }).compileComponents();
@@ -65,12 +71,12 @@ describe('Sidebar de Informes', () => {
     await settle();
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     for (const report of POSTGRADUATE_REPORTS) {
-      const link = root.querySelector<HTMLAnchorElement>(`a[href="/postgrado/${report.slug}"]`)!;
+      const link = root.querySelector<HTMLAnchorElement>(`a[href="/postgraduate/${report.slug}"]`)!;
       expect(link.textContent).toContain(report.title);
       expect(link.getAttribute('aria-label')).toBe(report.title);
       expect(link.title).toBe(report.title);
     }
-    await TestBed.inject(Router).navigateByUrl('/postgrado/' + POSTGRADUATE_REPORTS[0].slug);
+    await TestBed.inject(Router).navigateByUrl('/postgraduate/' + POSTGRADUATE_REPORTS[0].slug);
     await settle();
     expect(root.querySelectorAll('a[aria-current="page"]')).toHaveLength(1);
     expect(root.querySelector('a[aria-current="page"]')?.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
@@ -79,7 +85,7 @@ describe('Sidebar de Informes', () => {
   it('navega a Postgrado desde el panel móvil y lo cierra', async () => {
     fixture.componentInstance.openMobile();
     await settle();
-    const target = '/postgrado/' + POSTGRADUATE_REPORTS[0].slug;
+    const target = '/postgraduate/' + POSTGRADUATE_REPORTS[0].slug;
     document.querySelector<HTMLButtonElement>('[role="dialog"] [data-section="postgrado"]')!.click();
     await settle();
     document.querySelector<HTMLAnchorElement>(`[role="dialog"] a[href="${target}"]`)!.click();
@@ -117,7 +123,7 @@ describe('Sidebar de Informes', () => {
     expect(menu.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
     menu.querySelector<HTMLAnchorElement>('a')!.click();
     await settle();
-    expect(TestBed.inject(Router).url).toBe('/postgrado/' + POSTGRADUATE_REPORTS[0].slug);
+    expect(TestBed.inject(Router).url).toBe('/postgraduate/' + POSTGRADUATE_REPORTS[0].slug);
     expect(document.querySelector('.dropdown-menu.show')).toBeNull();
   });
 
@@ -156,7 +162,7 @@ describe('Sidebar de Informes', () => {
     expect(favorites.textContent).toContain('Favoritos');
     expect(favorites.textContent).toContain('Encuesta docente por curso');
     expect(JSON.parse(localStorage.getItem('sadinformes.sidebar.favorite-routes')!))
-      .toEqual(['encuesta-docente-por-curso']);
+      .toEqual(['teacher-survey']);
     expect(localStorage.getItem('students.detail.favorite-routes')).toBeNull();
 
     favorites.querySelector<HTMLButtonElement>('.sidebar-favorite-toggle')!.click();
@@ -174,6 +180,8 @@ describe('Sidebar de Informes', () => {
     const favorites = (fixture.nativeElement as HTMLElement)
       .querySelector<HTMLElement>('[data-favorites]');
     expect(favorites?.textContent).toContain('Registro de tesis');
+    expect(JSON.parse(localStorage.getItem('sadinformes.sidebar.favorite-routes')!))
+      .toEqual(['thesis-registration']);
   });
 
   it('abre un solo panel, enfoca cierre y Escape lo cierra', async () => {
@@ -208,7 +216,7 @@ describe('Sidebar de Informes', () => {
     await open();
     document.querySelector<HTMLButtonElement>('[role="dialog"] [data-section="postgrado"]')!.click();
     await settle();
-    document.querySelector<HTMLAnchorElement>('[role="dialog"] a[href="/postgrado/encuesta-docente-por-curso"]')!.click();
+    document.querySelector<HTMLAnchorElement>('[role="dialog"] a[href="/postgraduate/teacher-survey"]')!.click();
     await settle();
     expect(fixture.componentInstance.mobileOpen()).toBe(false);
     await open();

@@ -36,11 +36,12 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
           </div>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             @for (field of fields; track field.control) {
-              <div class="col-xl-3 col-md-6">
+              <div class="col-md-6" [class.col-xl-4]="field.control === 'studentType'" [class.col-xl-2]="field.control !== 'studentType'">
                 <div class="ng-select-container-custom">
                   <label class="floating-label" [for]="'weighted-' + field.control">{{ field.label }}</label>
                   <ng-select [labelForId]="'weighted-' + field.control" [formControlName]="field.control"
@@ -64,9 +65,9 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
       @if (filtersLoading()) { <p role="status">Cargando filtros…</p> }
       @if (loading()) { <p role="status">Cargando ranking…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
-      @if (rows().length > 0) {
+      @if (rows().length > 0 || notice()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="table-responsive">
             <table class="table table-hover align-middle app-table" aria-label="Ranking notas ponderado">
               <thead class="table-light">
@@ -98,6 +99,12 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                     <td>{{ row.weightedAverage }}</td>
                     <td>{{ row.percentile }}</td>
                   </tr>
+                }
+                @if (rows().length === 0) {
+                  <tr><td colspan="9" class="text-center text-muted py-5">
+                    <i class="bi bi-info-circle mb-2 empty-icon"></i>
+                    <p class="mb-0">No hay resultados</p>
+                  </td></tr>
                 }
               </tbody>
             </table>

@@ -179,8 +179,8 @@ describe('Postgraduate teacher validities', () => {
     input.value = 'inexistente';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    expect(body.querySelector('table')).toBeNull();
-    expect(body.textContent).toContain('No se encontraron registros.');
+    expect(body.querySelector('table')).not.toBeNull();
+    expect(body.textContent).toContain('No hay resultados');
     fixture.destroy();
   });
 
@@ -191,7 +191,7 @@ describe('Postgraduate teacher validities', () => {
       .flush({ success: true, data: { rows: [], total: 0 } });
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Sin Datos');
+    expect(fixture.nativeElement.textContent).toContain('No hay resultados');
     expect(fixture.nativeElement.querySelector('[data-action=export]').disabled).toBe(true);
     submit(fixture);
     http.expectOne(request => request.url === BASE)

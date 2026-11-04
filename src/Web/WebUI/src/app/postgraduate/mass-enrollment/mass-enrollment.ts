@@ -37,10 +37,11 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-4 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="massType">Tipo alumno</label>
                 <ng-select inputId="massType" formControlName="studentType" [items]="filters().studentTypes"
@@ -48,21 +49,21 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                   placeholder="Seleccione tipo" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-2 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="massModality">Modalidad</label>
                 <ng-select inputId="massModality" formControlName="modality" [items]="filters().modalities"
                   [clearable]="false" class="form-select ng-select-custom" placeholder="Seleccione modalidad" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-2 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="massCohort">Cohorte alumnos</label>
                 <ng-select inputId="massCohort" formControlName="cohort" [items]="filters().cohorts"
                   [clearable]="false" class="form-select ng-select-custom" placeholder="Seleccione cohorte" />
               </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-2 col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="massPeriod">Período</label>
                 <ng-select inputId="massPeriod" formControlName="period" [items]="filters().periods"
@@ -90,8 +91,9 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
       @if (notice()) { <div class="alert alert-success" role="status">{{ notice() }}</div> }
       @if (availabilityMessage()) { <div class="alert alert-warning" role="status">{{ availabilityMessage() }}</div> }
       @if (busy()) { <p role="status">{{ saving() ? 'Inscribiendo…' : 'Cargando…' }}</p> }
-      @if (rows().length > 0) {
+      @if (loaded()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="table-responsive">
             <table class="table table-hover align-middle app-table" aria-label="Alumnos para inscripción masiva">
               <thead class="table-light"><tr>
@@ -116,6 +118,12 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                   </tr>
                 }
               </tbody>
+              @if (rows().length === 0) {
+                <tr><td colspan="11" class="text-center text-muted py-5">
+                  <i class="bi bi-info-circle mb-2 empty-icon"></i>
+                  <p class="mb-0">No hay resultados</p>
+                </td></tr>
+              }
             </table>
           </div>
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }} · Seleccionados: {{ selected().size }}</p>
@@ -141,6 +149,7 @@ export class MassEnrollment {
   protected readonly saving = signal(false);
   private readonly filtering = signal(false);
   private readonly loading = signal(false);
+  protected readonly loaded = signal(false);
   protected readonly busy = computed(() => this.saving() || this.filtering() || this.loading());
   protected readonly eligibleCount = computed(() => this.canEnroll() ? this.rows().filter(row => !row.enrolled).length : 0);
   protected readonly allSelected = computed(() => this.eligibleCount() > 0 && this.selected().size === this.eligibleCount());
@@ -220,6 +229,7 @@ export class MassEnrollment {
     this.selected.set(new Set());
     this.loadedSelection = null;
     this.error.set('');
+    this.loaded.set(false);
     if (Object.values(selection).some(value => !value)) {
       this.rows.set([]);
       this.error.set('Seleccione tipo, modalidad, cohorte, período y curso.');
@@ -238,10 +248,11 @@ export class MassEnrollment {
       this.availabilityMessage.set(response.data.canEnroll ? ''
         : response.data.availabilityMessage ?? 'El curso ya no tiene vacantes.');
       this.loadedSelection = selection;
-      if (response.data.rows.length === 0) this.error.set('Sin datos para los filtros seleccionados.');
+      this.loaded.set(true);
     } catch {
       if (revision === this.candidateRevision) {
         this.rows.set([]);
+        this.loaded.set(true);
         this.error.set('No se pudo cargar el listado de alumnos.');
       }
     } finally { this.loading.set(false); }

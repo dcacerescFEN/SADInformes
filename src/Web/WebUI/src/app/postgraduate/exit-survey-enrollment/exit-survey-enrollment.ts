@@ -34,10 +34,11 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="exitSurveyType">Tipo Alumno</label>
                 <ng-select inputId="exitSurveyType" formControlName="studentType" [items]="filters().studentTypes"
@@ -51,7 +52,7 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                   bindLabel="text" bindValue="value" [clearable]="false" class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-2 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="exitSurveyYear">Año Egreso/Titulación</label>
                 <ng-select inputId="exitSurveyYear" formControlName="year" [items]="years()"
@@ -69,8 +70,9 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (notice()) { <div class="alert alert-success" role="status">{{ notice() }}</div> }
       @if (busy()) { <p role="status">{{ saving() ? 'Inscribiendo…' : 'Cargando…' }}</p> }
-      @if (rows().length > 0) {
+      @if (loaded() && !busy()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="table-responsive">
             <table class="table table-hover align-middle app-table" aria-label="Inscripción encuesta de salida">
               <thead class="table-light"><tr>
@@ -102,12 +104,16 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                   </tr>
                 }
               </tbody>
+              @if (rows().length === 0) {
+                <tr><td colspan="12" class="text-center text-muted py-5">
+                  <i class="bi bi-info-circle mb-2 empty-icon"></i>
+                  <p class="mb-0">No hay resultados</p>
+                </td></tr>
+              }
             </table>
           </div>
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }} · Seleccionados: {{ selected().size }}</p>
         </div>
-      } @else if (loaded() && !busy()) {
-        <p class="text-body-secondary" role="status">Sin Datos</p>
       }
     </div>
   `,

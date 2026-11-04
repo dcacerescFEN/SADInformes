@@ -1,6 +1,6 @@
 # Ranking de notas ponderado
 
-`/postgrado/ranking-notas-ponderado` reemplaza `RankingAlumnosGraduados.aspx`
+`/postgraduate/weighted-ranking` reemplaza `RankingAlumnosGraduados.aspx`
 ("Ranking Notas Ponderado"). Consulta el procedimiento heredado y descarga un
 XLSX real; no modifica datos ni usa SSRS.
 

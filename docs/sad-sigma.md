@@ -1,6 +1,6 @@
 # Reporte Vista SAD Sigma
 
-`/postgrado/vista-sad-sigma` reemplaza `ReporteVistaSadSigma.aspx`. Consulta el
+`/postgraduate/sad-sigma` reemplaza `ReporteVistaSadSigma.aspx`. Consulta el
 reporte SAD y completa el estado de pago en Sigma por año; no modifica datos.
 
 ## Uso

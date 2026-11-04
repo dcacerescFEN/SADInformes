@@ -43,7 +43,7 @@ describe('Exit survey statistics shell', () => {
   });
   it('shows empty sample without fabricating totals', async () => {
     const fixture=await ready({success:true,data:{rows:[],totals:{sample:0,inProgress:0,answered:0}}},{success:true,data:{section:'malla',title:'Malla Curricular',rows:[],totals:{alternative1:0,alternative2:0,alternative3:0,alternative4:0,alternative5:0}}});
-    const body:HTMLElement=fixture.nativeElement; expect(body.textContent).toContain('Sin Datos');
+    const body:HTMLElement=fixture.nativeElement; expect(body.textContent).toContain('No hay resultados');
     fixture.destroy();
   });
   it('cancels an older sample when filters change before it resolves', async () => {

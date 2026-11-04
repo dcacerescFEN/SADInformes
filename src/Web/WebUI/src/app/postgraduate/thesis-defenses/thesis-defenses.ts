@@ -74,7 +74,8 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
           </div>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             @for (field of fields; track field.control) {
@@ -102,7 +103,6 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
       @if (filtersLoading()) { <p role="status">Cargando filtros…</p> }
       @if (loading()) { <p role="status">Cargando defensas…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
       <div class="app-tabs mb-3" role="tablist" aria-label="Reportes de defensas">
         @for (tab of reportTabs; track tab.id) {
           <button type="button" class="app-tab" role="tab" [attr.data-report-tab]="tab.id"
@@ -110,10 +110,19 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
             (click)="selectTab(tab.id)">{{ tab.label }}</button>
         }
       </div>
+      @if (notice() && coordination().length === 0 && treasury().length === 0) {
+        <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-info-circle mb-2 empty-icon"></i>
+            <p class="mb-0">No hay resultados</p>
+          </div>
+        </div>
+      }
       @if (coordination().length > 0) {
         @if (activeTab() === 'coordination') {
         <div class="form-section">
-          <h2 class="h5 mb-3">Reporte Comisiones formato Coordinación</h2>
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Reporte Comisiones formato Coordinación</h2>
           <div class="d-flex justify-content-end mb-3"><div class="search-box"><app-search (search)="searchCoordination($event)" /></div></div>
           @if (filteredCoordination().length > 0) {
           <div class="table-responsive">
@@ -166,7 +175,7 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
       @if (treasury().length > 0) {
         @if (activeTab() === 'treasury') {
         <div class="form-section">
-          <h2 class="h5 mb-3">Reporte Comisiones formato Tesorería</h2>
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Reporte Comisiones formato Tesorería</h2>
           <div class="d-flex justify-content-end mb-3"><div class="search-box"><app-search (search)="searchTreasury($event)" /></div></div>
           @if (filteredTreasury().length > 0) {
           <div class="table-responsive">

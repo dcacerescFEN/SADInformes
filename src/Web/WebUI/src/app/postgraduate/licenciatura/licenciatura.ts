@@ -43,8 +43,9 @@ const COLUMNS: readonly TableColumn[] = [
         </div>
       </div>
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (rows().length > 0) {
+      @if (loaded() && !error()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex justify-content-end mb-3">
             <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
           </div>
@@ -52,8 +53,6 @@ const COLUMNS: readonly TableColumn[] = [
             [searchTerm]="searchTerm()" [showSummary]="false" />
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
         </div>
-      } @else if (loaded() && !error()) {
-        <p class="text-body-secondary" role="status">Sin Datos</p>
       }
     </div>
   `,

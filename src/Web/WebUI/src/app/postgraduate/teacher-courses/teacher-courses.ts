@@ -44,11 +44,12 @@ const COLUMNS: readonly TableColumn[] = [
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             @for (field of fields; track field.control) {
-              <div class="col-xl-3 col-lg-4 col-md-6">
+              <div class="col-lg-4 col-md-6" [class.col-xl-2]="field.control === 'year'" [class.col-xl-4]="field.control === 'department'">
                 <div class="ng-select-container-custom">
                   <label class="floating-label" [for]="'teacher-courses-' + field.control">
                     <i [class]="'bi ' + field.icon + ' me-1'" aria-hidden="true"></i>{{ field.label }}
@@ -68,10 +69,10 @@ const COLUMNS: readonly TableColumn[] = [
         </form>
       </div>
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
       @if (loading()) { <p role="status">Cargando…</p> }
-      @if (rows().length > 0) {
+      @if (rows().length > 0 || notice()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <app-table aria-label="Cursos Profesores Postgrado" [data]="rows()" [columns]="columns"
             [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>

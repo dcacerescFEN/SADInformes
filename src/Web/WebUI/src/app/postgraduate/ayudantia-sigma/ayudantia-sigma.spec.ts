@@ -132,7 +132,7 @@ describe('Postgraduate Sigma tutorships', () => {
     submit(fixture);
     http.expectOne(req => req.url === BASE).flush({ success: true, data: { rows: [], total: 0 } });
     await fixture.whenStable(); fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Sin Datos');
+    expect(fixture.nativeElement.textContent).toContain('No hay resultados');
     submit(fixture);
     http.expectOne(req => req.url === BASE).flush('private-sql', { status: 503, statusText: 'private' });
     await fixture.whenStable(); fixture.detectChanges();

@@ -49,7 +49,7 @@ describe('Postgraduate teaching schedule', () => {
   afterEach(() => { http.verify(); fixture.destroy(); vi.restoreAllMocks(); });
 
   it('uses five shared filters and the legacy initial selections', () => {
-    expect(root.querySelectorAll('.page-header')).toHaveLength(2);
+    expect(root.querySelectorAll('.page-header')).toHaveLength(1);
     expect(root.querySelectorAll('ng-select[data-filter]')).toHaveLength(5);
     expect(fixture.componentInstance.form.getRawValue()).toEqual({
       periodType: 'PERÍODO', program: 'MBA', modality: 'Todas', promotion: 'Todas', period: '2024B',
@@ -93,7 +93,7 @@ describe('Postgraduate teaching schedule', () => {
     expect(report.request.params.get('periodo')).toBe(period);
     report.flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
-    expect(root.textContent).toContain('No se encontraron cursos');
+    expect(root.textContent).toContain('No se encontraron registros');
   });
 
   it('clears report/export on filter changes and ignores older report responses', async () => {

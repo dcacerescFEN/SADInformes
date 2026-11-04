@@ -10,62 +10,62 @@ export const routes: Routes = [
     loadComponent: () => import('./home').then((module) => module.Home),
   },
   ...POSTGRADUATE_REPORTS.map(report => ({
-    path: 'postgrado/' + report.slug,
+    path: 'postgraduate/' + report.slug,
     canActivate: [authGuard],
     data: { report },
-    loadComponent: () => report.slug === 'inscripcion-masiva'
+    loadComponent: () => report.slug === 'mass-enrollment'
       ? import('./postgraduate/mass-enrollment/mass-enrollment').then((module) => module.MassEnrollment)
-      : report.slug === 'inscripcion-encuesta-salida'
+      : report.slug === 'exit-survey-enrollment'
       ? import('./postgraduate/exit-survey-enrollment/exit-survey-enrollment').then((module) => module.ExitSurveyEnrollment)
-      : report.slug === 'estadisticas-encuesta-salida'
+      : report.slug === 'exit-survey-statistics'
       ? import('./postgraduate/exit-survey-statistics/exit-survey-statistics').then((module) => module.ExitSurveyStatistics)
-      : report.slug === 'estadisticas-encuesta-entrada'
+      : report.slug === 'entry-survey-statistics'
       ? import('./postgraduate/entry-survey-statistics/entry-survey-statistics').then((module) => module.EntrySurveyStatistics)
-      : report.slug === 'evaluacion-docente-curso'
+      : report.slug === 'course-teacher-evaluation'
       ? import('./postgraduate/course-teacher-evaluation/course-teacher-evaluation').then((module) => module.CourseTeacherEvaluation)
-      : report.slug === 'datos-personales'
+      : report.slug === 'personal-data'
       ? import('./postgraduate/personal-data/personal-data').then((module) => module.PersonalData)
-      : report.slug === 'registro-tesis'
+      : report.slug === 'thesis-registration'
       ? import('./postgraduate/thesis-registration/thesis-registration').then((module) => module.ThesisRegistration)
-      : report.slug === 'estadisticas-iss'
+      : report.slug === 'iss-statistics'
       ? import('./postgraduate/iss-statistics/iss-statistics').then((module) => module.IssStatistics)
-      : report.slug === 'estadisticas-encuesta-alumni'
+      : report.slug === 'alumni-survey-statistics'
       ? import('./postgraduate/alumni-survey-statistics/alumni-survey-statistics').then((module) => module.AlumniSurveyStatistics)
-      : report.slug === 'avances-afe'
+      : report.slug === 'afe-report'
       ? import('./postgraduate/afe-report/afe-report').then((module) => module.AfeReport)
-      : report.slug === 'proximas-licenciaturas-pregrado'
+      : report.slug === 'undergraduate-licenciatura'
       ? import('./postgraduate/licenciatura/licenciatura').then((module) => module.Licenciatura)
-      : report.slug === 'actividades-cursos'
+      : report.slug === 'course-activities'
       ? import('./postgraduate/course-activities/course-activities').then((module) => module.CourseActivities)
-      : report.slug === 'notificaciones-causal-eliminacion'
+      : report.slug === 'nce'
       ? import('./postgraduate/nce/nce').then((module) => module.Nce)
-      : report.slug === 'pago-derecho-basico-anual'
+      : report.slug === 'basic-right-payment'
       ? import('./postgraduate/basic-right-payment/basic-right-payment').then((module) => module.BasicRightPayment)
-      : report.slug === 'ranking-notas-ponderado'
+      : report.slug === 'weighted-ranking'
       ? import('./postgraduate/weighted-ranking/weighted-ranking').then((module) => module.WeightedRanking)
-      : report.slug === 'alumnos-matriculados'
+      : report.slug === 'enrolled-students'
       ? import('./postgraduate/enrolled-students/enrolled-students').then((module) => module.EnrolledStudents)
-      : report.slug === 'profesores-vigencias'
+      : report.slug === 'teacher-validities'
       ? import('./postgraduate/teacher-validities/teacher-validities').then((module) => module.TeacherValidities)
-      : report.slug === 'alumnos-por-area'
+      : report.slug === 'area-courses'
       ? import('./postgraduate/area-courses/area-courses').then((module) => module.AreaCourses)
-      : report.slug === 'vista-sad-sigma'
+      : report.slug === 'sad-sigma'
       ? import('./postgraduate/sad-sigma/sad-sigma').then((module) => module.SadSigma)
-      : report.slug === 'defensas-tesis'
+      : report.slug === 'thesis-defenses'
       ? import('./postgraduate/thesis-defenses/thesis-defenses').then((module) => module.ThesisDefenses)
-      : report.slug === 'ayudantias-sigma'
+      : report.slug === 'sigma-tutorships'
       ? import('./postgraduate/ayudantia-sigma/ayudantia-sigma').then((module) => module.AyudantiaSigma)
-      : report.slug === 'actualizacion-datos-sad-vti'
+      : report.slug === 'sad-vti-updates'
       ? import('./postgraduate/sad-vti-updates/sad-vti-updates').then((module) => module.SadVtiUpdates)
-      : report.slug === 'solicitudes-alumnos'
+      : report.slug === 'student-requests'
       ? import('./postgraduate/student-requests/student-requests').then((module) => module.StudentRequests)
-      : report.slug === 'cursos-por-alumnos'
+      : report.slug === 'courses-by-students'
       ? import('./postgraduate/courses-by-students/courses-by-students').then((module) => module.CoursesByStudents)
-      : report.slug === 'alumnos-sin-contestar-encuesta'
+      : report.slug === 'unanswered-teacher-survey'
       ? import('./postgraduate/unanswered-teacher-survey/unanswered-teacher-survey').then((module) => module.UnansweredTeacherSurvey)
-      : report.slug === 'cursos-profesores'
+      : report.slug === 'teacher-courses'
       ? import('./postgraduate/teacher-courses/teacher-courses').then((module) => module.TeacherCourses)
-      : report.slug === 'programacion-docente-programa-modalidad'
+      : report.slug === 'teaching-schedule'
       ? import('./postgraduate/teaching-schedule/teaching-schedule').then((module) => module.TeachingSchedule)
       : report.available
         ? import('./postgraduate/teacher-survey/teacher-survey').then((module) => module.TeacherSurvey)

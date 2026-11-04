@@ -1,6 +1,6 @@
 # Evaluación Docente/Curso
 
-`/postgrado/evaluacion-docente-curso` reemplaza `Eva_CursosProfesores.aspx`. Es un
+`/postgraduate/course-teacher-evaluation` reemplaza `Eva_CursosProfesores.aspx`. Es un
 informe **export-only**: filtra por año y tipo, y descarga un XLSX; no muestra la
 grilla de respuestas en pantalla.
 

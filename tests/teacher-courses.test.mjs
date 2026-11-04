@@ -9,11 +9,11 @@ const read = path => readFileSync(resolve(root, path), 'utf8');
 
 test('Cursos Profesores Postgrado preserves the catalogue slug and loads its own route', () => {
   const catalogue = read('src/Web/WebUI/src/app/postgraduate/postgraduate-catalogue.ts');
-  assert.match(catalogue, /entry\('cursos-profesores'[^)]*CursosProfesoresPostgrado\.aspx', true\)/);
+  assert.match(catalogue, /entry\('teacher-courses'[^)]*CursosProfesoresPostgrado\.aspx', true\)/);
   const routes = read('src/Web/WebUI/src/app/app.routes.ts');
-  assert.match(routes, /report\.slug === 'cursos-profesores'[\s\S]*postgraduate\/teacher-courses\/teacher-courses/);
+  assert.match(routes, /report\.slug === 'teacher-courses'[\s\S]*postgraduate\/teacher-courses\/teacher-courses/);
   // The explicit branch must precede the generic available fallback to TeacherSurvey.
-  assert.ok(routes.indexOf("report.slug === 'cursos-profesores'") < routes.indexOf("report.available"));
+  assert.ok(routes.indexOf("report.slug === 'teacher-courses'") < routes.indexOf("report.available"));
 });
 
 test('Report module exposes one handler per action with action-local DTO records', () => {

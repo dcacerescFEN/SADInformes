@@ -33,7 +33,7 @@ const COLUMNS: readonly TableColumn[] = [
             <h1 class="page-title"><i class="bi bi-bell" aria-hidden="true"></i>Informe Notificaciones Causal de Eliminación</h1>
             <p class="page-subtitle mb-0">Notificaciones NCE de Postgrado, en solo lectura.</p>
           </div>
-          @if (rows().length > 0) {
+          @if (loaded() && !error()) {
             <div class="d-flex flex-wrap gap-2">
               <button type="button" class="btn btn-export-excel" data-action="export-excel"
                 [disabled]="exporting()" (click)="downloadExcel()">
@@ -53,16 +53,15 @@ const COLUMNS: readonly TableColumn[] = [
       </div>
       @if (loading()) { <p role="status">Cargando informe…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (rows().length > 0) {
+      @if (loaded() && !error()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex justify-content-end mb-3">
             <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
           </div>
           <app-table aria-label="Informe de notificaciones NCE" [data]="rows()" [columns]="columns"
             [searchTerm]="searchTerm()" [showSummary]="false" />
         </div>
-      } @else if (loaded() && !error()) {
-        <p class="text-body-secondary" role="status">Sin Datos</p>
       }
     </div>
   `,

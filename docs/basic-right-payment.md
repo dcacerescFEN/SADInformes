@@ -1,6 +1,6 @@
 # Pago Derecho Básico Anual
 
-`/postgrado/pago-derecho-basico-anual` reemplaza `PagoDerechoBasicoAnual.aspx`.
+`/postgraduate/basic-right-payment` reemplaza `PagoDerechoBasicoAnual.aspx`.
 Consulta alumnos de Postgrado, muestra el monto del año y permite registrar el pago
 anual de derecho básico.
 

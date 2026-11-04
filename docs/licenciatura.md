@@ -1,6 +1,6 @@
 # Próximas Licenciaturas Pregrado
 
-`/postgrado/proximas-licenciaturas-pregrado` reemplaza `LicenciaturaPregrado.aspx`.
+`/postgraduate/undergraduate-licenciatura` reemplaza `LicenciaturaPregrado.aspx`.
 Lista alumnos de Pregrado que cumplen los requisitos para obtener la licenciatura,
 con búsqueda y exportación.
 

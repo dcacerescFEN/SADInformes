@@ -92,8 +92,8 @@ describe('Licenciatura report', () => {
     fixture.nativeElement.querySelector('[data-action=search]').click();
     http.expectOne(BASE + '/report').flush({ success: true, data: { total: 0, rows: [] } });
     await fixture.whenStable(); fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Sin Datos');
-    expect(fixture.nativeElement.querySelector('app-table')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('No se encontraron registros');
+    expect(fixture.nativeElement.querySelector('app-table')).not.toBeNull();
     fixture.destroy();
   });
 });

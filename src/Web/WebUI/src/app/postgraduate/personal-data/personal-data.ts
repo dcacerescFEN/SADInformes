@@ -28,7 +28,8 @@ const BASE = '/api/reports/postgraduate/personal-data';
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             <div class="col-md-4">

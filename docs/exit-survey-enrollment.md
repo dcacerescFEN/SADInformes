@@ -1,6 +1,6 @@
 # Inscripción encuesta de salida
 
-`/postgrado/inscripcion-encuesta-salida` reemplaza
+`/postgraduate/exit-survey-enrollment` reemplaza
 `InscripcionEncuestaSalida.aspx`: lista alumnos por tipo, modalidad y año de
 egreso/titulación, y permite inscribirlos en la encuesta de salida. No usa SSRS.
 

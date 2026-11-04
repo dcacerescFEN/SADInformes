@@ -1,6 +1,6 @@
 # Estadísticas encuesta de salida
 
-La ruta `/postgrado/estadisticas-encuesta-salida` implementa el informe completo de
+La ruta `/postgraduate/exit-survey-statistics` implementa el informe completo de
 `EncuestaSalidaGraduados/Default.aspx`: filtros, muestra, las 14 secciones de
 resultados, Q17, Resumen y ocho gráficos CSS. La navegación usa dos niveles del patrón app-tabs de SADAlumnos. No usa SSRS ni modifica datos.
 

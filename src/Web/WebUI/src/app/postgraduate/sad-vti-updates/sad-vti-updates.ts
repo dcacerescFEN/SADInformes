@@ -19,10 +19,11 @@ const EMPTY = 'No hay registros para exportar.';
         <h1 class="page-title"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Actualización datos SAD–VTI</h1>
         <p class="page-subtitle mb-0">Auditoría de actualización de datos de alumnos por fecha y estado.</p>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="download()">
           <div class="row g-3 align-items-end">
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-6 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="sad-vti-state">Estado</label>
                 <ng-select labelForId="sad-vti-state" formControlName="state" data-filter="state"
@@ -30,13 +31,17 @@ const EMPTY = 'No hay registros para exportar.';
                   class="form-select ng-select-custom" />
               </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-              <label class="form-label" for="sad-vti-from">Desde</label>
-              <input id="sad-vti-from" type="date" class="form-control" formControlName="from" required />
+            <div class="col-lg-2 col-md-6">
+              <div class="form-floating">
+                <input id="sad-vti-from" type="date" class="form-control" formControlName="from" placeholder="Desde" required />
+                <label for="sad-vti-from">Desde</label>
+              </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-              <label class="form-label" for="sad-vti-to">Hasta</label>
-              <input id="sad-vti-to" type="date" class="form-control" formControlName="to" required />
+            <div class="col-lg-2 col-md-6">
+              <div class="form-floating">
+                <input id="sad-vti-to" type="date" class="form-control" formControlName="to" placeholder="Hasta" required />
+                <label for="sad-vti-to">Hasta</label>
+              </div>
             </div>
             <div class="col-auto">
               <button type="submit" class="btn btn-search" [disabled]="loading() || downloading() || !ready() || form.invalid">

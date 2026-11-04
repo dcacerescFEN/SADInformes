@@ -145,7 +145,7 @@ describe('Informe Alumnos sin contestar encuesta docente', () => {
   });
 
   it('uses the teacher-survey layout without Todos or survey questions', () => {
-    expect(root.querySelectorAll('.page-header')).toHaveLength(2);
+    expect(root.querySelectorAll('.page-header')).toHaveLength(1);
     expect(root.querySelector('h1')?.textContent).toContain('Alumnos sin contestar encuesta docente');
     expect(root.textContent).toContain('Período');
     expect(filters.data.studentTypes.some(option => option.value === 'Todos')).toBe(false);
@@ -157,8 +157,8 @@ describe('Informe Alumnos sin contestar encuesta docente', () => {
     await submit();
     http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
-    expect(root.querySelector('app-table table')).toBeNull();
-    expect(root.textContent).toContain('Sin resultados para los filtros seleccionados.');
+    expect(root.querySelector('app-table table')).not.toBeNull();
+    expect(root.textContent).toContain('No se encontraron registros');
   });
 
   it('muestra un aviso sanitizado y descarta datos previos si el informe falla', async () => {

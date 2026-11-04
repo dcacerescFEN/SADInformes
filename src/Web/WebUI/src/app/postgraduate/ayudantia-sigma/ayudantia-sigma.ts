@@ -55,7 +55,8 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="show()">
           <div class="row g-3 align-items-end">
             <div class="col-xl-3 col-md-6">
@@ -81,11 +82,10 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
       @if (filtersLoading()) { <p role="status">Cargando filtros…</p> }
       @if (loading()) { <p role="status">Cargando ayudantías…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
-      @if (rows().length > 0) {
+      @if (shownYear()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex justify-content-end mb-3"><div class="search-box"><app-search (search)="applySearch($event)" /></div></div>
-          @if (filteredRows().length > 0) {
           <div class="table-responsive">
             <table class="table table-hover align-middle app-table" aria-label="Ayudantías postgrado Sigma">
               <thead class="table-light"><tr>
@@ -107,7 +107,14 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
                   <td>{{ row.sigmaDate }}</td><td>{{ row.step }}</td><td>{{ row.flag }}</td>
                   <td>{{ row.remunerationId }}</td>
                 </tr>
-              }</tbody>
+              }
+                @if (filteredRows().length === 0) {
+                  <tr><td colspan="25" class="text-center text-muted py-5">
+                    <i class="bi bi-info-circle mb-2 empty-icon"></i>
+                    <p class="mb-0">No hay resultados</p>
+                  </td></tr>
+                }
+              </tbody>
             </table>
           </div>
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -128,9 +135,6 @@ function pageWindow(totalPages: number, currentPage: number): PageItem[] {
               </nav>
             }
           </div>
-          } @else {
-            <p class="text-body-secondary" role="status">No se encontraron registros.</p>
-          }
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
         </div>
       }

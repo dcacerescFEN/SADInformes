@@ -7,9 +7,16 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { NgbDropdownModule, NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { REPORT_SECTIONS, ReportSection } from './report-sections';
-import { PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
+import { LEGACY_POSTGRADUATE_SLUGS, POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
 
 const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
+
+export function migrateFavoriteSlugs(slugs: readonly string[]): string[] {
+  const migrated = slugs.map(slug =>
+    LEGACY_POSTGRADUATE_SLUGS[slug as keyof typeof LEGACY_POSTGRADUATE_SLUGS] ?? slug);
+  return [...new Set(migrated)]
+    .filter(slug => POSTGRADUATE_REPORTS.some(report => report.slug === slug));
+}
 
 @Component({
   selector: 'app-reports-sidebar',
@@ -47,7 +54,7 @@ const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
             <div class="sidebar-section-label">Favoritos</div>
             @for (report of favoriteReports(); track report.slug) {
               <div class="sidebar-report-row">
-                <a class="sidebar-link sidebar-report" [routerLink]="['/postgrado', report.slug]"
+                <a class="sidebar-link sidebar-report" [routerLink]="['/postgraduate', report.slug]"
                   routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
                   ariaCurrentWhenActive="page" [title]="report.title" [attr.aria-label]="report.title"
                   (click)="closeMobile()">{{ report.title }}</a>
@@ -110,7 +117,7 @@ const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
     <ng-template #sectionItems let-section let-menu="menu">
       @for (report of section.reports; track report.slug) {
         <div class="sidebar-report-row">
-          <a class="sidebar-link sidebar-report" [routerLink]="['/postgrado', report.slug]"
+          <a class="sidebar-link sidebar-report" [routerLink]="['/postgraduate', report.slug]"
             routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
             ariaCurrentWhenActive="page" [title]="report.title" [attr.aria-label]="report.title"
             (click)="menu?.close(); closeMobile()">{{ report.title }}</a>
@@ -207,12 +214,12 @@ export class ReportsSidebar {
   }
 
   protected isActive(section: ReportSection): boolean {
-    return section.id === 'postgrado' && this.currentUrl().startsWith('/postgrado/');
+    return section.id === 'postgrado' && this.currentUrl().startsWith('/postgraduate/');
   }
 
   private updateNavigation(url: string): void {
     this.currentUrl.set(url);
-    if (url.startsWith('/postgrado/') && !this.expanded().includes('postgrado')) {
+    if (url.startsWith('/postgraduate/') && !this.expanded().includes('postgrado')) {
       this.expanded.update(ids => [...ids, 'postgrado']);
     }
   }
@@ -233,7 +240,15 @@ export class ReportsSidebar {
     try {
       const stored = localStorage.getItem(FAVORITE_ROUTES_STORAGE_KEY);
       const parsed: unknown = stored ? JSON.parse(stored) : [];
-      return Array.isArray(parsed) ? parsed.filter((slug): slug is string => typeof slug === 'string') : [];
+      if (!Array.isArray(parsed)) return [];
+      const migrated = parsed
+        .filter((slug): slug is string => typeof slug === 'string')
+        .map(slug => LEGACY_POSTGRADUATE_SLUGS[slug as keyof typeof LEGACY_POSTGRADUATE_SLUGS] ?? slug);
+      const favorites = [...new Set(migrated)]
+        .filter(slug => POSTGRADUATE_REPORTS.some(report => report.slug === slug));
+      if (stored && JSON.stringify(parsed) !== JSON.stringify(favorites))
+        localStorage.setItem(FAVORITE_ROUTES_STORAGE_KEY, JSON.stringify(favorites));
+      return favorites;
     } catch {
       return [];
     }

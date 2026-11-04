@@ -108,7 +108,8 @@ describe('Course activities report', () => {
     http.expectOne(req => req.url === BASE + '/report')
       .flush({ success: true, data: { year: '2024', total: 0, rows: [] } });
     await fixture.whenStable(); fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Sin Datos');
+    expect(fixture.nativeElement.textContent).toContain('No se encontraron registros');
+    expect(fixture.nativeElement.querySelector('app-table')).not.toBeNull();
 
     fixture.nativeElement.querySelector('[data-action=show]').click();
     http.expectOne(req => req.url === BASE + '/report')

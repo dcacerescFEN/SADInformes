@@ -26,7 +26,8 @@ const BASE = '/api/reports/postgraduate/course-teacher-evaluation';
           </button>
         </div>
       </div>
-      <div class="form-section">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             <div class="col-md-4">

@@ -57,11 +57,12 @@ const COLUMNS: readonly TableColumn[] = [
           </button>
         </div>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form">
           <div class="row g-3 align-items-end">
             @for (field of fields; track field.control) {
-              <div class="col-xl-2 col-lg-4 col-md-6">
+              <div class="col-lg-4 col-md-6" [class.col-xl-4]="field.control === 'studentType'" [class.col-xl-2]="field.control !== 'studentType'">
                 <div class="ng-select-container-custom">
                   <label class="floating-label" [for]="'afe-' + field.control">{{ field.label }}</label>
                   <ng-select [id]="'afe-' + field.control" [formControlName]="field.control"
@@ -71,7 +72,7 @@ const COLUMNS: readonly TableColumn[] = [
                 </div>
               </div>
             }
-            <div class="col-auto">
+            <div class="col-12 d-flex justify-content-end">
               <button type="button" class="btn btn-search" data-action="show"
                 [disabled]="!canSearch() || loading()" (click)="show()">
                 <i class="bi bi-search me-1" aria-hidden="true"></i>
@@ -86,8 +87,9 @@ const COLUMNS: readonly TableColumn[] = [
       @if (loading()) { <p role="status">Cargando reporte…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
-      @if (rows().length > 0) {
+      @if (loaded() && !error()) {
         <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex justify-content-end mb-3">
             <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
           </div>
@@ -126,6 +128,7 @@ export class AfeReport {
   protected readonly filtersLoading = signal(false);
   protected readonly advancesLoading = signal(false);
   protected readonly loading = signal(false);
+  protected readonly loaded = signal(false);
   protected readonly exporting = signal(false);
   protected readonly error = signal('');
   protected readonly notice = signal('');
@@ -206,11 +209,11 @@ export class AfeReport {
       { params: { ...this.form.getRawValue() } }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: result => {
           this.loading.set(false);
+          this.loaded.set(true);
           if (!result.success) { this.rows.set([]); this.error.set('No se pudo cargar el reporte.'); return; }
           this.rows.set(result.data.rows);
-          this.notice.set(result.data.rows.length === 0 ? 'No se encontraron resultados' : '');
         },
-        error: () => { this.loading.set(false); this.rows.set([]); this.error.set('No se pudo cargar el reporte.'); },
+        error: () => { this.loading.set(false); this.loaded.set(true); this.rows.set([]); this.error.set('No se pudo cargar el reporte.'); },
       });
   }
 

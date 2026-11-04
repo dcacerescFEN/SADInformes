@@ -38,7 +38,7 @@ describe('Navegación visual de Postgrado', () => {
   it('cada ruta pendiente muestra su ficha sin formularios, acciones ni solicitudes HTTP', async () => {
     const harness = await RouterTestingHarness.create();
     for (const report of POSTGRADUATE_REPORTS.filter(item => item.available !== true)) {
-      await harness.navigateByUrl('/postgrado/' + report.slug);
+      await harness.navigateByUrl('/postgraduate/' + report.slug);
       const root = harness.routeNativeElement!;
       expect(root.querySelector('h1')?.textContent?.trim()).toBe(report.title);
       expect(root.textContent).toContain(report.description);
@@ -51,7 +51,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('la encuesta docente abre la pantalla funcional en lugar de la ficha pendiente', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/encuesta-docente-por-curso');
+    const harness = await RouterTestingHarness.create('/postgraduate/teacher-survey');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     const requests = http.match(request =>
@@ -71,7 +71,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('cursos vs alumnos abre la pantalla funcional en lugar de la ficha pendiente', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/cursos-por-alumnos');
+    const harness = await RouterTestingHarness.create('/postgraduate/courses-by-students');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     const requests = http.match(request =>
@@ -91,7 +91,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('inscripción masiva abre la pantalla funcional en lugar de la ficha pendiente', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/inscripcion-masiva');
+    const harness = await RouterTestingHarness.create('/postgraduate/mass-enrollment');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     const requests = http.match(request =>
@@ -111,7 +111,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens unanswered teacher survey on its existing catalogue slug', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/alumnos-sin-contestar-encuesta');
+    const harness = await RouterTestingHarness.create('/postgraduate/unanswered-teacher-survey');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     const request = http.expectOne('/api/reports/postgraduate/unanswered-teacher-survey/filters');
@@ -124,7 +124,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens teaching schedule with its postgraduate route and scoped period catalogue', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/programacion-docente-programa-modalidad');
+    const harness = await RouterTestingHarness.create('/postgraduate/teaching-schedule');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     const request = http.expectOne(request => request.url === '/api/reports/postgraduate/teaching-schedule/filters');
@@ -137,7 +137,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens student requests using its existing slug and four SSRS filters', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/solicitudes-alumnos');
+    const harness = await RouterTestingHarness.create('/postgraduate/student-requests');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/student-requests/filters')
@@ -149,7 +149,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens SAD VTI audit with the original slug and direct date-filtered export', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/actualizacion-datos-sad-vti');
+    const harness = await RouterTestingHarness.create('/postgraduate/sad-vti-updates');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne('/api/reports/postgraduate/sad-vti-updates/filters')
@@ -165,7 +165,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens weighted ranking with concrete filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/ranking-notas-ponderado');
+    const harness = await RouterTestingHarness.create('/postgraduate/weighted-ranking');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/weighted-ranking/filters')
@@ -179,7 +179,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens basic right payment with five filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/pago-derecho-basico-anual');
+    const harness = await RouterTestingHarness.create('/postgraduate/basic-right-payment');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/basic-right-payment/filters')
@@ -197,7 +197,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens the read-only NCE report and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/notificaciones-causal-eliminacion');
+    const harness = await RouterTestingHarness.create('/postgraduate/nce');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/nce/report')
@@ -211,7 +211,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens course activities with year filter, auto-loaded table and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/actividades-cursos');
+    const harness = await RouterTestingHarness.create('/postgraduate/course-activities');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/course-activities/filters')
@@ -228,7 +228,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens licenciatura with on-demand search and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/proximas-licenciaturas-pregrado');
+    const harness = await RouterTestingHarness.create('/postgraduate/undergraduate-licenciatura');
     await harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Próximas Licenciaturas Pregrado');
@@ -238,7 +238,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens AFE report with five filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/avances-afe');
+    const harness = await RouterTestingHarness.create('/postgraduate/afe-report');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/afe-report/filters')
@@ -258,7 +258,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens Alumni survey statistics with the shared dictionary and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-alumni');
+    const harness = await RouterTestingHarness.create('/postgraduate/alumni-survey-statistics');
     await harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta Alumni');
@@ -268,7 +268,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens ISS statistics with two dependent filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-iss');
+    const harness = await RouterTestingHarness.create('/postgraduate/iss-statistics');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/iss-statistics/filters')
@@ -282,7 +282,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens thesis registration with three filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/registro-tesis');
+    const harness = await RouterTestingHarness.create('/postgraduate/thesis-registration');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/thesis-registration/filters')
@@ -296,7 +296,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens personal data with three filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/datos-personales');
+    const harness = await RouterTestingHarness.create('/postgraduate/personal-data');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/personal-data/filters')
@@ -310,7 +310,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens course teacher evaluation with year/type filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/evaluacion-docente-curso');
+    const harness = await RouterTestingHarness.create('/postgraduate/course-teacher-evaluation');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/course-teacher-evaluation/filters')
@@ -324,7 +324,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens entry survey statistics with its question dictionary and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-entrada');
+    const harness = await RouterTestingHarness.create('/postgraduate/entry-survey-statistics');
     await harness.detectChanges();
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta Entrada');
@@ -334,7 +334,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens Sigma tutorships with its year filter and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/ayudantias-sigma');
+    const harness = await RouterTestingHarness.create('/postgraduate/sigma-tutorships');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/ayudantias-sigma/filters')
@@ -348,7 +348,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens thesis defenses with four Todos filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/defensas-tesis');
+    const harness = await RouterTestingHarness.create('/postgraduate/thesis-defenses');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/thesis-defenses/filters')
@@ -362,7 +362,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens SAD Sigma with one year filter and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/vista-sad-sigma');
+    const harness = await RouterTestingHarness.create('/postgraduate/sad-sigma');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/sad-sigma/filters')
@@ -376,7 +376,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens area courses with two year filters and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/alumnos-por-area');
+    const harness = await RouterTestingHarness.create('/postgraduate/area-courses');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/area-courses/filters')
@@ -390,7 +390,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens teacher validities with its year filter and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/profesores-vigencias');
+    const harness = await RouterTestingHarness.create('/postgraduate/teacher-validities');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/teacher-validities/filters')
@@ -404,7 +404,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens enrolled students with the legacy export-only page and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/alumnos-matriculados');
+    const harness = await RouterTestingHarness.create('/postgraduate/enrolled-students');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/enrolled-students/filters')
@@ -419,7 +419,7 @@ describe('Navegación visual de Postgrado', () => {
   });
 
   it('opens exit survey enrollment with automatic listing and no placeholder', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/inscripcion-encuesta-salida');
+    const harness = await RouterTestingHarness.create('/postgraduate/exit-survey-enrollment');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-enrollment/filters')
@@ -433,12 +433,12 @@ describe('Navegación visual de Postgrado', () => {
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Inscripción Encuesta Salida');
     expect(root.querySelectorAll('ng-select')).toHaveLength(3);
-    expect(root.textContent).toContain('Sin Datos');
+    expect(root.textContent).toContain('No hay resultados');
     expect(root.textContent).not.toContain('Pendiente de migración');
   });
 
   it('opens exit survey statistics shell on its pending slug with 14 tabs', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/estadisticas-encuesta-salida');
+    const harness = await RouterTestingHarness.create('/postgraduate/exit-survey-statistics');
     await harness.detectChanges();
     const http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url === '/api/reports/postgraduate/exit-survey-statistics/filters')
@@ -453,12 +453,16 @@ describe('Navegación visual de Postgrado', () => {
     const root = harness.routeNativeElement!;
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('Estadísticas Encuesta de Salida');
     expect(root.querySelectorAll('[data-top]')).toHaveLength(5); expect(root.querySelectorAll('[data-tab]')).toHaveLength(8);
-    expect(root.textContent).toContain('Sin Datos');
+    expect(root.textContent).toContain('No hay resultados');
     expect(root.textContent).not.toContain('Pendiente de migración');
   });
 
+  it('no conserva rutas antiguas de Postgrado', () => {
+    expect(routes.some(route => route.path?.startsWith('postgrado'))).toBe(false);
+  });
+
   it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
-    const harness = await RouterTestingHarness.create('/postgrado/no-existe');
+    const harness = await RouterTestingHarness.create('/postgraduate/no-existe');
     expect(TestBed.inject(Router).url).toBe('/');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('SADInformes');
   });
@@ -466,7 +470,7 @@ describe('Navegación visual de Postgrado', () => {
   it('no permite abrir una ficha sin sesión e inicia el login', async () => {
     auth.isAuthenticated.mockReturnValue(false);
     const harness = await RouterTestingHarness.create();
-    const target = '/postgrado/' + POSTGRADUATE_REPORTS[0].slug;
+    const target = '/postgraduate/' + POSTGRADUATE_REPORTS[0].slug;
     await harness.navigateByUrl(target);
     expect(auth.login).toHaveBeenCalledExactlyOnceWith(target);
     expect(harness.routeNativeElement?.querySelector('h1')).toBeFalsy();

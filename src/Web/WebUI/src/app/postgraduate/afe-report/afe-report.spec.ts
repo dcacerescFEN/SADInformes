@@ -118,7 +118,8 @@ describe('AFE report', () => {
     http.expectOne(req => req.url === BASE + '/report')
       .flush({ success: true, data: { total: 0, rows: [] } });
     await fixture.whenStable(); fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No se encontraron resultados');
+    expect(fixture.nativeElement.textContent).toContain('No se encontraron registros');
+    expect(fixture.nativeElement.querySelector('app-table table')).not.toBeNull();
 
     fixture.nativeElement.querySelector('[data-action=show]').click();
     http.expectOne(req => req.url === BASE + '/report')

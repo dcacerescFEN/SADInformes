@@ -155,7 +155,7 @@ describe('Postgraduate weighted ranking', () => {
       .flush({ success: true, data: { rows: [], total: 0 } });
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Sin Datos');
+    expect(fixture.nativeElement.textContent).toContain('No hay resultados');
     expect(fixture.nativeElement.querySelector('[data-action=export]').disabled).toBe(true);
     submit(fixture);
     http.expectOne(request => request.url === BASE)

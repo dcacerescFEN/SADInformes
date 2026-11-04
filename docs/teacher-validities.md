@@ -1,6 +1,6 @@
 # Profesores confirmados por cátedra
 
-`/postgrado/profesores-vigencias` reemplaza `ProfesoresVigencias.aspx`. Consulta
+`/postgraduate/teacher-validities` reemplaza `ProfesoresVigencias.aspx`. Consulta
 las vigencias confirmadas de profesores por año y exporta un XLSX real; no
 modifica datos ni usa SSRS.
 

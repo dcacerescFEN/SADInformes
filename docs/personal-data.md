@@ -1,6 +1,6 @@
 # Datos Personales Postgrado
 
-`/postgrado/datos-personales` reemplaza `DatosPersonalesPostgrado.aspx`. Es un
+`/postgraduate/personal-data` reemplaza `DatosPersonalesPostgrado.aspx`. Es un
 informe **export-only**: filtra por tipo, modalidad y año, y descarga un XLSX; no
 muestra los datos personales en pantalla.
 

@@ -19,11 +19,12 @@ const BASE = '/api/reports/postgraduate/student-requests';
         <h1 class="page-title"><i class="bi bi-file-earmark-text" aria-hidden="true"></i>Solicitudes alumno</h1>
         <p class="page-subtitle mb-0">Informe de solicitudes de alumnos por programa, modalidad, ingreso y estado.</p>
       </div>
-      <div class="page-header">
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
         <form [formGroup]="form" (ngSubmit)="download()">
           <div class="row g-3 align-items-end">
             @for (field of fields; track field.control) {
-              <div class="col-xl-3 col-md-6">
+              <div class="col-md-6" [class.col-xl-4]="field.control === 'studentType'" [class.col-xl-2]="field.control !== 'studentType'">
                 <div class="ng-select-container-custom">
                   <label class="floating-label" [for]="'student-requests-' + field.control">{{ field.label }}</label>
                   <ng-select [labelForId]="'student-requests-' + field.control" [formControlName]="field.control"

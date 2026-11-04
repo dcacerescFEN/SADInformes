@@ -1,6 +1,6 @@
 # Reporte de áreas y cátedras
 
-`/postgrado/alumnos-por-area` reemplaza `ReporteAreasCatedras.aspx`. Consulta
+`/postgraduate/area-courses` reemplaza `ReporteAreasCatedras.aspx`. Consulta
 cátedras y áreas para dos años y exporta un XLSX real; no modifica datos ni usa
 SSRS.
 

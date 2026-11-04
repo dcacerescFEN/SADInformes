@@ -1,6 +1,6 @@
 # Reporte Avances AFE
 
-`/postgrado/avances-afe` reemplaza `ReporteAFE.aspx`. Consulta el avance de tareas
+`/postgraduate/afe-report` reemplaza `ReporteAFE.aspx`. Consulta el avance de tareas
 AFE por período, tipo de alumno, modalidad, curso/sección y número de avance, y
 exporta el resultado en Excel.
 

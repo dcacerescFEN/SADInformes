@@ -1,6 +1,6 @@
 # Registro de Tesis Postgrado
 
-`/postgrado/registro-tesis` reemplaza `RegistroTesisPostgrado.aspx`. Es un
+`/postgraduate/thesis-registration` reemplaza `RegistroTesisPostgrado.aspx`. Es un
 informe **export-only**: filtra por tipo de alumno, modalidad y año de ingreso, y
 descarga un XLSX; la grilla legada estaba oculta y los datos no se muestran en
 pantalla.

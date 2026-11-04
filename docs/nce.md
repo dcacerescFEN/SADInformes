@@ -1,6 +1,6 @@
 # Informe Notificaciones Causal de Eliminación (NCE)
 
-`/postgrado/notificaciones-causal-eliminacion` migra **solo el informe** que vive
+`/postgraduate/nce` migra **solo el informe** que vive
 en Maestro. No incluye el listado administrable, `Bloquear/Activar`, el modal de
 email ni el iframe/cookie `AdminPermiso` del SAD legado.
 

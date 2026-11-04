@@ -24,6 +24,7 @@ const BASE = '/api/reports/postgraduate/entry-survey-statistics';
       </div>
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       <div class="form-section">
+        <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
         <div class="table-responsive">
           <table class="table table-hover align-middle app-table" aria-label="Diccionario de preguntas de la encuesta de entrada">
             <thead class="table-light"><tr><th>Código</th><th>Descripción</th></tr></thead>

@@ -145,6 +145,21 @@ describe('Informe Encuesta docente por curso', () => {
     expect(root.querySelector('[data-action="export"]')?.classList.contains('btn-create')).toBe(true);
   });
 
+  it('uses form-section and section-title for filters, results and glossary', async () => {
+    expect(root.querySelectorAll('.form-section')).toHaveLength(2);
+    expect(root.querySelectorAll('.section-title')).toHaveLength(2);
+    expect(root.textContent).toContain('Filtros');
+    expect(root.textContent).toContain('Glosa');
+
+    await completeFilters();
+    await submit();
+    http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [row()], total: 1 } });
+    await settle();
+    expect(root.querySelectorAll('.form-section')).toHaveLength(3);
+    expect(root.querySelectorAll('.section-title')).toHaveLength(3);
+    expect(root.textContent).toContain('Resultados');
+  });
+
   it('incluye la glosa de preguntas y la escala de respuestas del SAD', async () => {
     expect(root.textContent).toContain('Glosa');
     expect(root.textContent).toContain('El curso es un aporte para mi ejercicio profesional');
@@ -160,8 +175,8 @@ describe('Informe Encuesta docente por curso', () => {
     await submit();
     http.expectOne(REPORT + COMPLETE).flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
-    expect(root.querySelector('app-table table')).toBeNull();
-    expect(root.textContent).toContain('Sin resultados para los filtros seleccionados.');
+    expect(root.querySelector('app-table table')).not.toBeNull();
+    expect(root.textContent).toContain('No se encontraron registros');
   });
 
   it('muestra un aviso sanitizado y descarta datos previos si el informe falla', async () => {

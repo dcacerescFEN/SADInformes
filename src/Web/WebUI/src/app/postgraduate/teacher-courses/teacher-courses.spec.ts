@@ -101,7 +101,7 @@ describe('Postgraduate teacher courses', () => {
     http.expectOne(request => request.url === REPORT)
       .flush({ success: true, message: null, data: { rows: [], total: 0 } });
     await settle();
-    expect(root.textContent).toContain('No se encontraron evaluaciones');
+    expect(root.textContent).toContain('No se encontraron registros');
   });
 
   it('does not request the report until both filters are available', async () => {

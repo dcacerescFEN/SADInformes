@@ -1,6 +1,6 @@
 # Estadísticas ISS Postgrado
 
-`/postgrado/estadisticas-iss` reemplaza `EstadisticasISS/Resumen.aspx`. Muestra un
+`/postgraduate/iss-statistics` reemplaza `EstadisticasISS/Resumen.aspx`. Muestra un
 resumen estadístico de la evaluación ISS por período y cátedra/sección: la muestra,
 las categorías de preguntas con sus alternativas y las observaciones.
 

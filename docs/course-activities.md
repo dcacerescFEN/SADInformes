@@ -1,6 +1,6 @@
 # Actividades Cursos Postgrado
 
-`/postgrado/actividades-cursos` reemplaza `ActividadesCursosPostgrado.aspx`.
+`/postgraduate/course-activities` reemplaza `ActividadesCursosPostgrado.aspx`.
 Consulta las actividades de cursos de Postgrado por año y permite buscar y exportar
 las 22 columnas del legado.
 

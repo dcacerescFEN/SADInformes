@@ -1,6 +1,6 @@
 # Actualización datos SAD–VTI
 
-La ruta `/postgrado/actualizacion-datos-sad-vti` reemplaza
+La ruta `/postgraduate/sad-vti-updates` reemplaza
 `ActulizacionDatosSADVTI.aspx`: filtra auditoría por estado y fechas y descarga
 **AudiPostgradoAlumnosGuia.xlsx**. No ejecuta sincronizaciones ni modifica datos.
 No usa SSRS ni necesita credenciales/configuración de reportes.

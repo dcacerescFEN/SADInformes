@@ -1,6 +1,6 @@
 # Estadísticas Encuesta Entrada
 
-`/postgrado/estadisticas-encuesta-entrada` reemplaza
+`/postgraduate/entry-survey-statistics` reemplaza
 `EstadisticaEncuestaEntrada.aspx`. Es un informe **export-only**: muestra el
 diccionario de preguntas y descarga las respuestas crudas en Excel; no expone la
 grilla de datos personales en pantalla ni modifica datos.

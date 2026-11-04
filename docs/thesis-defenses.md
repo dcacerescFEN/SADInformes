@@ -1,6 +1,6 @@
 # Defensas de tesis Postgrado
 
-`/postgrado/defensas-tesis` reemplaza `ReporteProfesoresNuevo.aspx`. Consulta los
+`/postgraduate/thesis-defenses` reemplaza `ReporteProfesoresNuevo.aspx`. Consulta los
 dos formatos de comisiones de defensa y exporta cada uno a Excel; no modifica
 datos ni usa SSRS.
 

@@ -1,6 +1,6 @@
 # Inscripción masiva de Postgrado
 
-`/postgrado/inscripcion-masiva` permite consultar alumnos y registrar su inscripción
+`/postgraduate/mass-enrollment` permite consultar alumnos y registrar su inscripción
 administrativa real. A diferencia de los informes anteriores, esta pantalla escribe
 datos académicos y auditorías.
 

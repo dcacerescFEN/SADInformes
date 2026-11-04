@@ -54,7 +54,7 @@ describe('Inscripción masiva', () => {
   it('uses the existing report format and concrete cascading filters', () => {
     expect(root.querySelector('h1')?.textContent).toContain('Inscripción masiva');
     expect(root.querySelectorAll('ng-select')).toHaveLength(5);
-    expect(root.querySelectorAll('.page-header')).toHaveLength(2);
+    expect(root.querySelectorAll('.page-header')).toHaveLength(1);
     expect(fixture.componentInstance.form.getRawValue()).toEqual(selection);
     expect(root.textContent).not.toContain('Todos');
     expect(button('enroll').disabled).toBe(true);
