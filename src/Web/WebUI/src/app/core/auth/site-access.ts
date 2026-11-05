@@ -1,14 +1,14 @@
 const POLICIES = new Map<string, { module: string; permission?: string }>([
   ['NewSAD', { module: 'SAD', permission: 'SAD_ACCESS' }],
   ['SADAlumnos', { module: 'STUDENT', permission: 'STUDENT_ACCESS_STUDENT_MODULE' }],
-  ['SADInformes', { module: 'REPORT', permission: 'REPORT_ACCESS' }],
-  ['SADAdministracion', { module: 'ADMINISTRATION', permission: 'ADMINISTRATION_ACCESS' }],
-  ['SADProfesores', { module: 'TEACHER' }],
-  ['SADCursos', { module: 'COURSE' }],
-  ['SADExamenes', { module: 'EXAM' }],
-  ['SADActividades', { module: 'ACTIVITY' }],
-  ['SADAyudantes', { module: 'ASSISTANT' }],
-  ['SADProcesos', { module: 'PROCESS' }],
+  ['SADInformes', { module: 'REPORT', permission: 'REPORT_ACCESS_REPORT_MODULE' }],
+  ['SADAdministracion', { module: 'ADMINISTRATION', permission: 'ADMINISTRATION_ACCESS_ADMINISTRATION_MODULE' }],
+  ['SADProfesores', { module: 'TEACHER', permission: 'TEACHER_ACCESS_TEACHER_MODULE' }],
+  ['SADCursos', { module: 'COURSE', permission: 'COURSE_ACCESS_COURSE_MODULE' }],
+  ['SADExamenes', { module: 'EXAM', permission: 'EXAM_ACCESS_EXAM_MODULE' }],
+  ['SADActividades', { module: 'ACTIVITY', permission: 'ACTIVITY_ACCESS_ACTIVITY_MODULE' }],
+  ['SADAyudantes', { module: 'ASSISTANT', permission: 'ASSISTANT_ACCESS_ASSISTANT_MODULE' }],
+  ['SADProcesos', { module: 'PROCESS', permission: 'PROCESS_ACCESS_PROCESS_MODULE' }],
 ]);
 
 export function hasClientAccess(access: unknown, clientId: string): boolean {

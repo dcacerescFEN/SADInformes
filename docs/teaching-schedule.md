@@ -3,7 +3,7 @@
 Ruta: `/postgraduate/teaching-schedule`. La pantalla mantiene
 los filtros y las columnas del informe legado de
 `Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx`, dentro del catálogo
-Postgrado actual. Los 30 informes anteriores conservan rutas y referencias.
+Postgrado actual. Los 29 informes anteriores conservan rutas y referencias.
 
 ## Filtros y compatibilidad
 

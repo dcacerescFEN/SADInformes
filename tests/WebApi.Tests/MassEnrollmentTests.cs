@@ -92,7 +92,7 @@ public sealed class MassEnrollmentTests
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + Query)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + "/filters")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
-        foreach (var role in new[] { "PERMISSION_REPORT_ACCESS", "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY" })
+        foreach (var role in new[] { "PERMISSION_REPORT_ACCESS_REPORT_MODULE", "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY" })
         {
             using var denied = Client(factory, tokens, role);
             Assert.Equal(HttpStatusCode.Forbidden, (await denied.GetAsync(Route + Query)).StatusCode);

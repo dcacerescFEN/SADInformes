@@ -93,11 +93,34 @@ describe('Sesión Keycloak', () => {
     expect(adapter.logout).toHaveBeenCalledWith({ redirectUri: location.origin + '/' });
   });
 
+  for (const [client, module] of [
+    ['SADAlumnos', 'STUDENT'], ['SADInformes', 'REPORT'],
+    ['SADAdministracion', 'ADMINISTRATION'], ['SADProfesores', 'TEACHER'],
+    ['SADCursos', 'COURSE'], ['SADExamenes', 'EXAM'],
+    ['SADActividades', 'ACTIVITY'], ['SADAyudantes', 'ASSISTANT'],
+    ['SADProcesos', 'PROCESS'],
+  ]) {
+    for (const suffix of ['', '-iis']) {
+      const target = client + suffix;
+      it('accepts full entry permission and rejects short token for ' + target, async () => {
+        adapter.tokenParsed.resource_access = {
+          [target]: { roles: ['PERMISSION_' + module + '_ACCESS_' + module + '_MODULE'] },
+        };
+        await auth.initialize();
+        expect(auth.hasSiteAccess(target)).toBe(true);
+        expect(auth.hasSiteAccess(suffix ? client : client + '-iis')).toBe(false);
+        adapter.tokenParsed.resource_access = { [target]: { roles: ['PERMISSION_' + module + '_ACCESS'] } };
+        await auth.getValidToken();
+        expect(auth.hasSiteAccess(target)).toBe(false);
+      });
+    }
+  }
+
   it.each([
     ['SADAlumnos', { SADAlumnos: { roles: ['ROLE_STUDENT_ADMIN'] } }, true],
     ['SADAlumnos', { SADAlumnos: { roles: ['ROLE_STUDENT_SUPERADMIN'] } }, true],
     ['SADAlumnos', { SADAlumnos: { roles: ['PERMISSION_STUDENT_ACCESS_STUDENT_MODULE'] } }, true],
-    ['SADAdministracion', { SADAdministracion: { roles: ['PERMISSION_ADMINISTRATION_ACCESS'] } }, true],
+    ['SADAdministracion', { SADAdministracion: { roles: ['PERMISSION_ADMINISTRATION_ACCESS_ADMINISTRATION_MODULE'] } }, true],
     ['SADProfesores', { SADProfesores: { roles: ['ROLE_TEACHER_ADMIN'] } }, true],
     ['SADCursos', { SADCursos: { roles: ['ROLE_COURSE_SUPERADMIN'] } }, true],
     ['SADExamenes', { SADExamenes: { roles: ['ROLE_EXAM_ADMIN'] } }, true],
@@ -112,13 +135,13 @@ describe('Sesión Keycloak', () => {
     ['SADAlumnos-iis', { 'SADAlumnos-iis': { roles: ['ROLE_STUDENT_ADMIN'] } }, true],
     ['SADInformes', { SADInformes: { roles: ['ROLE_REPORT_ADMIN'] } }, true],
     ['SADInformes', { SADInformes: { roles: ['ROLE_REPORT_SUPERADMIN'] } }, true],
-    ['SADInformes', { SADInformes: { roles: ['PERMISSION_REPORT_ACCESS'] } }, true],
-    ['SADInformes-iis', { 'SADInformes-iis': { roles: ['PERMISSION_REPORT_ACCESS'] } }, true],
-    ['SADInformes', { SADInformes: { roles: ['REPORT_ACCESS', 'REPORT_ADMIN', 'administrator'] } }, false],
+    ['SADInformes', { SADInformes: { roles: ['PERMISSION_REPORT_ACCESS_REPORT_MODULE'] } }, true],
+    ['SADInformes-iis', { 'SADInformes-iis': { roles: ['PERMISSION_REPORT_ACCESS_REPORT_MODULE'] } }, true],
+    ['SADInformes', { SADInformes: { roles: ['REPORT_ACCESS_REPORT_MODULE', 'REPORT_ADMIN', 'administrator'] } }, false],
     ['SADInformes', { SADInformes: { roles: [] } }, false],
-    ['SADInformes', { SADAlumnos: { roles: ['PERMISSION_REPORT_ACCESS'] } }, false],
-    ['SADInformes', { 'SADInformes-iis': { roles: ['PERMISSION_REPORT_ACCESS'] } }, false],
-    ['SADInformes-iis', { SADInformes: { roles: ['PERMISSION_REPORT_ACCESS'] } }, false],
+    ['SADInformes', { SADAlumnos: { roles: ['PERMISSION_REPORT_ACCESS_REPORT_MODULE'] } }, false],
+    ['SADInformes', { 'SADInformes-iis': { roles: ['PERMISSION_REPORT_ACCESS_REPORT_MODULE'] } }, false],
+    ['SADInformes-iis', { SADInformes: { roles: ['PERMISSION_REPORT_ACCESS_REPORT_MODULE'] } }, false],
     ['SADOtro', { SADOtro: { roles: ['ROLE_REPORT_ADMIN'] } }, false],
     ['SADProfesores', { SADProfesores: { roles: ['PERMISSION_TEACHER_ACCESS'] } }, false],
     ['SADAlumnos', { SADAlumnos: { roles: 'ROLE_STUDENT_ADMIN' } }, false],

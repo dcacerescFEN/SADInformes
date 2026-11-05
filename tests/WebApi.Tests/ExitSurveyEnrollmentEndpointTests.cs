@@ -43,8 +43,8 @@ public sealed class ExitSurveyEnrollmentEndpointTests
     [Theory]
     [InlineData(null, "/filters", 401)]
     [InlineData(null, "", 401)]
-    [InlineData("PERMISSION_REPORT_ACCESS", "/filters", 403)]
-    [InlineData("PERMISSION_REPORT_ACCESS", "", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", "/filters", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", "", 403)]
     public async Task Listing_requires_its_specific_view_permission(string? role, string suffix, int status)
     {
         var (factory, tokens) = Create(new()); using var host = factory; using var signing = tokens; using var client = factory.CreateClient();

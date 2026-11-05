@@ -54,7 +54,7 @@ public sealed class CoursesByStudentsTests
     }
 
     [Theory]
-    [InlineData("PERMISSION_REPORT_ACCESS")]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE")]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY")]
     public async Task Entry_permission_alone_cannot_read_report_data(string role)
     {
