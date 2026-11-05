@@ -43,7 +43,7 @@ tratarlo como un ensamblado .NET.
 | Configuración SQL | DbContext scoped directo; sin lector intermedio | DbContext directo | DbContext directo y configuración académica adicional | DbContext directo |
 | Estado del menú | `SiteSettings` singleton por aplicación, publicación única | `ConfigSite` estático | `SiteSettings` estático | `ConfigSite` estático |
 | Respuesta de site | `ApiResponse<SiteConfigDTO>` | `ApiResponse<SiteConfigDTO>` | `ApiResponse<SiteConfigDTO>` con menú y datos académicos | `ApiResponse<SiteConfigDTO>` |
-| Autorización Config/site | `REPORT_ACCESS` del cliente físico exacto | Política SAD_Access | Política SADStudentsEnter | Política ADMINISTRATION_ACCESS |
+| Autorización Config/site | `REPORT_ACCESS_REPORT_MODULE` del cliente físico exacto | Política SAD_Access | Política SADStudentsEnter | Política ADMINISTRATION_ACCESS_ADMINISTRATION_MODULE |
 | Permisos funcionales | Solo entrada REPORT; por informe pendiente | Proveedor de políticas y permisos SAD | Permisos STUDENT | Permisos ADMINISTRATION |
 | Suplantación | No incorporada | Infraestructura de suplantación | Infraestructura de suplantación | Infraestructura de suplantación |
 | DbContexts | AppConfig | AppConfig | AppConfig, Sad, Justificaciones | AppConfig, Sad |
@@ -97,7 +97,7 @@ un cambio puramente interno. No se cambió silenciosamente el contrato.
 
 ## Faltantes reales y decisiones futuras
 
-1. **Autorización funcional por informe:** `REPORT_ACCESS` habilita la entrada y la
+1. **Autorización funcional por informe:** `REPORT_ACCESS_REPORT_MODULE` habilita la entrada y la
    configuración del sitio, pero cada informe necesita su propio permiso antes de
    exponer datos o mutaciones. No importar permisos STUDENT/SAD/ADMINISTRATION por copia.
 2. **Infraestructura funcional:** todavía no hay SadContext, repositorios, SP ni

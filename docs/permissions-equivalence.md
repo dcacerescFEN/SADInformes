@@ -21,15 +21,15 @@ roles ni asignaciones**.
 
 | Permiso SAD legado | Equivalente en SADInformes | Observación |
 | --- | --- | --- |
-| `Viñeta Informes` | `PERMISSION_REPORT_ACCESS` | Muestra el destino Informes en la navbar. |
-| `ver Postgrado` | `PERMISSION_REPORT_ACCESS` | Habilita la sección Postgrado; ya no es un permiso independiente. |
+| `Viñeta Informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Muestra el destino Informes en la navbar. |
+| `ver Postgrado` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Habilita la sección Postgrado; ya no es un permiso independiente. |
 | `consulta alumnos` | — | En el SAD expulsaba al módulo de alumnos. No se migra como permiso de informes. |
-| `solo informes` | `PERMISSION_REPORT_ACCESS` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
-| `informes acreditación` | `PERMISSION_REPORT_ACCESS` | Era un requisito adicional en varias páginas de Postgrado. |
-| `cuadro de honor` | `PERMISSION_REPORT_ACCESS` | Requisito adicional de rankings; hoy lo cubre el permiso del informe. |
+| `solo informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
+| `informes acreditación` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Era un requisito adicional en varias páginas de Postgrado. |
+| `cuadro de honor` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Requisito adicional de rankings; hoy lo cubre el permiso del informe. |
 | `ver Postgrado` + `encuesta egresados` (Estadísticas encuesta salida) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
-| `reporte proximas licenciaturas` | `PERMISSION_REPORT_ACCESS` | Solo controlaba la visibilidad del enlace. |
-| `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS` | El acceso real lo define cada sistema externo. |
+| `reporte proximas licenciaturas` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo controlaba la visibilidad del enlace. |
+| `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | El acceso real lo define cada sistema externo. |
 | `INFORMES - MANTENEDORES POSTGRADO CONSTANCIAS` | — | Permiso de una aplicación externa; sigue en su sistema. |
 | `INFORMES - MANTENEDORES POSTGRADO D Y C` | — | Permiso de una aplicación externa; sigue en su sistema. |
 | `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; sigue en Maestro. |
@@ -99,7 +99,7 @@ resto antes de ejecutar el informe. El usuario no se elige desde el cliente.
 ## Cómo asignar acceso
 
 1. Crear en Keycloak, dentro del cliente `SADInformes`, el rol
-   `PERMISSION_REPORT_ACCESS` y los permisos `PERMISSION_REPORT_*` que existan.
+   `PERMISSION_REPORT_ACCESS_REPORT_MODULE` y los permisos `PERMISSION_REPORT_*` que existan.
 2. Asignar a cada usuario o grupo solo los permisos de los informes que necesita.
 3. Verificar con un token real que `resource_access.SADInformes.roles` los incluye;
    sin eso la API responde 403 aunque la navbar muestre el destino.

@@ -39,7 +39,7 @@ public sealed class StudentRequestsTests
 
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("PERMISSION_REPORT_ACCESS", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES", 403)]
     public async Task Permission_is_required_on_both_routes(string? role, int status)
     {

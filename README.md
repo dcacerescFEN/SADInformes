@@ -87,7 +87,7 @@ un usuario del realm y que el administrador haya registrado estas URLs.
 ## Menú central de AppConfig
 
 `GET /api/config/site` requiere un Bearer de SADInformes y la política
-`REPORT_ACCESS` (permiso de entrada o rol administrativo REPORT) y devuelve únicamente
+`REPORT_ACCESS_REPORT_MODULE` (permiso de entrada o rol administrativo REPORT) y devuelve únicamente
 `{ success: true, message: null, data: { ... } }`, con los 18 campos de
 `SiteConfigDTO` de NewSAD dentro de `data`. Lee registros activos de aplicación **SADInformes** y
 ambiente **DEV**; también exige aplicación y ambiente activos.
@@ -184,24 +184,28 @@ mezclan con los del cliente sin sufijo. Se admiten los roles nuevos
 | --- | --- | --- |
 | NewSAD | SAD | PERMISSION_SAD_ACCESS |
 | SADAlumnos | STUDENT | PERMISSION_STUDENT_ACCESS_STUDENT_MODULE |
-| SADAdministracion | ADMINISTRATION | PERMISSION_ADMINISTRATION_ACCESS |
-| SADProfesores | TEACHER | — |
-| SADCursos | COURSE | — |
-| SADExamenes | EXAM | — |
-| SADActividades | ACTIVITY | — |
-| SADAyudantes | ASSISTANT | — |
-| SADProcesos | PROCESS | — |
-| SADInformes | REPORT | PERMISSION_REPORT_ACCESS |
+| SADAdministracion | ADMINISTRATION | PERMISSION_ADMINISTRATION_ACCESS_ADMINISTRATION_MODULE |
+| SADProfesores | TEACHER | PERMISSION_TEACHER_ACCESS_TEACHER_MODULE |
+| SADCursos | COURSE | PERMISSION_COURSE_ACCESS_COURSE_MODULE |
+| SADExamenes | EXAM | PERMISSION_EXAM_ACCESS_EXAM_MODULE |
+| SADActividades | ACTIVITY | PERMISSION_ACTIVITY_ACCESS_ACTIVITY_MODULE |
+| SADAyudantes | ASSISTANT | PERMISSION_ASSISTANT_ACCESS_ASSISTANT_MODULE |
+| SADProcesos | PROCESS | PERMISSION_PROCESS_ACCESS_PROCESS_MODULE |
+| SADInformes | REPORT | PERMISSION_REPORT_ACCESS_REPORT_MODULE |
 
 Un destino sin clientId, desconocido, sin cliente en el token o con roles antiguos
 se oculta. Informes aparece antes de Administración y requiere en su cliente
-físico `ROLE_REPORT_ADMIN`, `ROLE_REPORT_SUPERADMIN` o `PERMISSION_REPORT_ACCESS`,
-con el mismo criterio de los demás destinos. `REPORT_ACCESS` es el nombre lógico
-confirmado; no se renombra. La marca lleva al inicio del sistema actual.
+físico `ROLE_REPORT_ADMIN`, `ROLE_REPORT_SUPERADMIN` o `PERMISSION_REPORT_ACCESS_REPORT_MODULE`,
+con el mismo criterio de los demás destinos. `REPORT_ACCESS_REPORT_MODULE` es el permiso de entrada estándar;
+los permisos cortos anteriores ya no se admiten. La marca lleva al inicio del sistema actual.
 
 En despliegues IIS, configurar `ReportsMenuClientId` con el cliente físico destino
 (por ejemplo `SADInformes-iis`); no se mezclan permisos entre variantes.
 Estos cambios no crean ni modifican filas de AppConfig automáticamente.
+Antes del despliegue, el operador debe crear/asignar los permisos completos en
+el cliente físico correspondiente de Keycloak y renovar las sesiones. No se
+migran automáticamente las asignaciones; `PERMISSION_REPORT_ACCESS` y
+`PERMISSION_ADMINISTRATION_ACCESS` no son alias de los permisos completos.
 
 Las URLs deben ser HTTP(S) absolutas, sin credenciales, espacios ni caracteres
 de control. Si existe acceso pero falta una URL válida, el enlace queda sin
@@ -244,7 +248,7 @@ de SADAlumnos.
 registra automáticamente los handlers de esa capa mediante Scrutor 7.0.0.
 `AddWebApiServices` reúne autenticación y documentación de API.
 
-`/api/config/site` aplica `REPORT_ACCESS` y devuelve `ApiResponse<SiteConfigDTO>`: success, message y data,
+`/api/config/site` aplica `REPORT_ACCESS_REPORT_MODULE` y devuelve `ApiResponse<SiteConfigDTO>`: success, message y data,
 sin el anterior objeto raíz menu. Se adaptó el consumidor Angular en conjunto.
 Los fallos de AppConfig siguen respondiendo 503 sin detalles privados.
 `/api/config/keycloak` sigue público, lee IConfiguration directamente como NewSAD
@@ -259,7 +263,7 @@ La API no requiere una base de informes funcional para estas fichas.
 
 La política REPORT sigue el patrón `PermissionPolicyProvider` de NewSAD, con
 alcance al cliente físico exacto configurado en `Keycloak:ClientId`. Acepta
-`PERMISSION_REPORT_ACCESS`, `ROLE_REPORT_ADMIN` o `ROLE_REPORT_SUPERADMIN` dentro
+`PERMISSION_REPORT_ACCESS_REPORT_MODULE`, `ROLE_REPORT_ADMIN` o `ROLE_REPORT_SUPERADMIN` dentro
 de su `resource_access`. No mezcla `SADInformes` con `SADInformes-iis`, no toma
 roles de otros clientes ni acepta nombres parciales. Sin token devuelve 401;
 con token válido sin acceso devuelve 403, sin configuración. Health y configuración
@@ -302,7 +306,7 @@ almacenamiento persistente.
 
 La sesión determina el montaje de navbar/sidebar; al perderla se elimina
 también cualquier panel abierto. El nombre proviene de la claim pública
-`name`, con fallback al username. No se cambian tokens, guards, REPORT_ACCESS
+`name`, con fallback al username. No se cambian tokens, guards, REPORT_ACCESS_REPORT_MODULE
 ni autorización backend.
 
 El shell mantiene un único `RouterOutlet`, header con altura automática y
@@ -316,7 +320,7 @@ para conservar sus usos anteriores.
 
 Las secciones ajenas a Postgrado muestran **Pendiente de migración** al
 expandirse; todavía no tienen pantallas funcionales ni rutas nuevas.
-Postgrado muestra 31 funcionalidades: las 30 principales de `SAD/Informes/Postgrado`,
+Postgrado muestra 30 funcionalidades: las 29 principales de `SAD/Informes/Postgrado`,
 incluidas Estadísticas ISS y Encuesta Salida. Cada opción abre una ruta autenticada
 `/postgraduate/<opción>` con título, descripción, referencia al archivo legado y
 estado **Pendiente de migración**. Un catálogo compartido define menú y rutas.
@@ -330,7 +334,7 @@ anteriores se conservan.
 Las fichas no consultan APIs ni bases de datos, no abren aplicaciones externas y
 no permiten inscribir, registrar pagos, administrar firmas ni exportar informes.
 No se agregan permisos por informe: mostrar una ficha no autoriza la operación
-futura. REPORT_ACCESS controla la configuración de entrada al módulo, no sustituye
+futura. REPORT_ACCESS_REPORT_MODULE controla la configuración de entrada al módulo, no sustituye
 los permisos de consulta o modificación que requiera cada informe. La migración de cada funcionalidad y sus permisos se decidirá después.
 Las rutas desconocidas siguen redirigiendo a Inicio.
 
@@ -369,7 +373,7 @@ SAD, tabla de resultados, total y exportación CSV.
 | Conexión | `ConnectionStrings:Sad`, definida fuera del repositorio con una cuenta de solo lectura |
 | Acceso a datos | `SadContext` + `ISadContextProcedures`, igual que SADAlumnos y SADAdministracion |
 
-`REPORT_ACCESS` habilita la entrada y la configuración del sitio, pero **no** concede
+`REPORT_ACCESS_REPORT_MODULE` habilita la entrada y la configuración del sitio, pero **no** concede
 este informe: sin el permiso específico la API responde 403. Los roles de otro cliente,
 incluida la variante `-iis` no configurada, no sirven para autorizar.
 

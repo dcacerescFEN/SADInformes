@@ -53,7 +53,7 @@ public sealed class AreaCoursesEndpointTests
 
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("PERMISSION_REPORT_ACCESS", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {

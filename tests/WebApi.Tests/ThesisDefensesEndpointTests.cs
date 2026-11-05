@@ -53,7 +53,7 @@ public sealed class ThesisDefensesEndpointTests
 
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("PERMISSION_REPORT_ACCESS", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {

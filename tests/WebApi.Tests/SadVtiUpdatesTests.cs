@@ -38,7 +38,7 @@ public sealed class SadVtiUpdatesTests
 
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("PERMISSION_REPORT_ACCESS", 403)]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_STUDENT_REQUESTS", 403)]
     public async Task Both_routes_require_report_permission_before_reading_data(string? role, int status)
     {

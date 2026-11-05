@@ -59,7 +59,7 @@ public sealed class TeacherSurveyTests
         var (factory, tokens) = Create(new FakeTeacherSurveyProcedures());
         using var _factory = factory;
         using var tokensScope = tokens;
-        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_ACCESS");
+        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_ACCESS_REPORT_MODULE");
         var response = await client.GetAsync(Route + "?periodo=2024A&tipoAlumno=MBA&modalidad=PT");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal("", await response.Content.ReadAsStringAsync());

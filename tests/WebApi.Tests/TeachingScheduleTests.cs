@@ -50,7 +50,7 @@ public sealed class TeachingScheduleTests
     }
 
     [Theory]
-    [InlineData("PERMISSION_REPORT_ACCESS")]
+    [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE")]
     [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY")]
     public async Task Entry_and_sibling_report_permissions_do_not_grant_access(string role)
     {

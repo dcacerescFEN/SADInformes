@@ -178,16 +178,18 @@ public sealed class AuthenticationTests : IDisposable
     }
 
     [Theory]
-    [InlineData("SADInformes", "SADInformes", "PERMISSION_REPORT_ACCESS", true)]
+    [InlineData("SADInformes", "SADInformes", "PERMISSION_REPORT_ACCESS_REPORT_MODULE", true)]
+    [InlineData("SADInformes", "SADInformes", "PERMISSION_REPORT_ACCESS", false)]
+    [InlineData("SADInformes-iis", "SADInformes-iis", "PERMISSION_REPORT_ACCESS", false)]
     [InlineData("SADInformes", "SADInformes", "ROLE_REPORT_ADMIN", true)]
     [InlineData("SADInformes", "SADInformes", "ROLE_REPORT_SUPERADMIN", true)]
-    [InlineData("SADInformes-iis", "SADInformes-iis", "PERMISSION_REPORT_ACCESS", true)]
+    [InlineData("SADInformes-iis", "SADInformes-iis", "PERMISSION_REPORT_ACCESS_REPORT_MODULE", true)]
     [InlineData("SADInformes-iis", "SADInformes-iis", "ROLE_REPORT_ADMIN", true)]
     [InlineData("SADInformes-iis", "SADInformes-iis", "ROLE_REPORT_SUPERADMIN", true)]
-    [InlineData("SADInformes", "SADAlumnos", "PERMISSION_REPORT_ACCESS", false)]
-    [InlineData("SADInformes", "SADInformes-iis", "PERMISSION_REPORT_ACCESS", false)]
-    [InlineData("SADInformes-iis", "SADInformes", "PERMISSION_REPORT_ACCESS", false)]
-    [InlineData("SADInformes", "SADInformes", "REPORT_ACCESS", false)]
+    [InlineData("SADInformes", "SADAlumnos", "PERMISSION_REPORT_ACCESS_REPORT_MODULE", false)]
+    [InlineData("SADInformes", "SADInformes-iis", "PERMISSION_REPORT_ACCESS_REPORT_MODULE", false)]
+    [InlineData("SADInformes-iis", "SADInformes", "PERMISSION_REPORT_ACCESS_REPORT_MODULE", false)]
+    [InlineData("SADInformes", "SADInformes", "REPORT_ACCESS_REPORT_MODULE", false)]
     [InlineData("SADInformes", "SADInformes", "ROLE_STUDENT_SUPERADMIN", false)]
     [InlineData("SADInformes", "SADInformes", "ROLE_REPORT_ADMIN_EXTRA", false)]
     [InlineData("SADInformes", "SADInformes", "PERMISSION_REPORT_ACCESS_EXTRA", false)]
@@ -219,7 +221,7 @@ public sealed class AuthenticationTests : IDisposable
     [InlineData("[]")]
     [InlineData("null")]
     [InlineData("\"not-json\"")]
-    [InlineData("{\"SADInformes\":{\"roles\":\"PERMISSION_REPORT_ACCESS\"}}")]
+    [InlineData("{\"SADInformes\":{\"roles\":\"PERMISSION_REPORT_ACCESS_REPORT_MODULE\"}}")]
     [InlineData("{\"SADInformes\":{\"roles\":[1,null]}}")]
     public async Task Report_access_rejects_missing_or_malformed_roles_without_data(string access)
     {
@@ -490,7 +492,7 @@ public sealed class AuthenticationTests : IDisposable
             claims: [new Claim("sub", "test-user"), new Claim("preferred_username", "usuario-prueba"),
                 new Claim("resource_access", resourceAccess ?? JsonSerializer.Serialize(new Dictionary<string, object>
                 {
-                    [_clientId] = new { roles = new[] { "PERMISSION_REPORT_ACCESS" } },
+                    [_clientId] = new { roles = new[] { "PERMISSION_REPORT_ACCESS_REPORT_MODULE" } },
                 }), JsonClaimValueTypes.Json)],
             notBefore: defect == "future" ? now.AddMinutes(5) : now.AddMinutes(-10),
             expires: defect == "expired" ? now.AddMinutes(-5) : now.AddMinutes(10),
