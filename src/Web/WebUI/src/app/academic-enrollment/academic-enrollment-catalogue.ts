@@ -10,7 +10,7 @@ function entry(slug: string, title: string, description: string, page: string,
     : { slug, title, description, legacyPath };
 }
 
-export const INSCRIPCION_ACADEMICA_REPORTS: readonly PostgraduateReport[] = [
+export const ACADEMIC_ENROLLMENT_REPORTS: readonly PostgraduateReport[] = [
   {
     slug: 'electives-without-common-plan',
     title: 'Electivos de mención que no están en el plan común',
@@ -18,8 +18,13 @@ export const INSCRIPCION_ACADEMICA_REPORTS: readonly PostgraduateReport[] = [
     legacyPath: 'Informes/Inscripcion/ElectivosMencionSinPlanComun.aspx',
     available: true,
   },
-  entry('students-without-priority', 'Alumnos sin prioridad',
-    'Alumnos que pueden postular y no tienen prioridad o su prioridad es 0.', 'AlumnosSinPrioridad.aspx'),
+  {
+    slug: 'students-without-priority',
+    title: 'Alumnos que pueden postular y no tienen prioridad',
+    description: 'Alumnos de IC, IICG y CA que pueden postular y tienen prioridad 0.',
+    legacyPath: 'Informes/Inscripcion/AlumnosSinPrioridad.aspx',
+    available: true,
+  },
   entry('postulation-results-by-course', 'Resultados postulación por curso',
     'Resultados por curso del procesamiento de la postulación.', 'ResPostulaAgregaXCurso.aspx?origen=INSCRIPCION'),
   entry('permutation-results-by-student', 'Resultados permuta por alumno',

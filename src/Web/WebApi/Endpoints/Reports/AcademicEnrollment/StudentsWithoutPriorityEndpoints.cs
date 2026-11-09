@@ -1,20 +1,20 @@
 using Application.Common.Mediator;
-using Application.Reports.InscripcionAcademica.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
+using Application.Reports.AcademicEnrollment.StudentsWithoutPriority.Queries.GetStudentsWithoutPriority;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
 using WebApi.Extension;
 
-namespace WebApi.Endpoints.Reports.InscripcionAcademica;
+namespace WebApi.Endpoints.Reports.AcademicEnrollment;
 
-public sealed class ElectivesWithoutCommonPlanEndpoints : IEndpoint
+public sealed class StudentsWithoutPriorityEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/reports/academic-enrollment/electives-without-common-plan")
+        var group = app.MapGroup("/api/reports/academic-enrollment/students-without-priority")
             .RequireAuthorization(Permission.REPORT_ACCESS)
-            .WithTags("Reports/InscripcionAcademica");
+            .WithTags("Reports/AcademicEnrollment");
         group.MapGet("/report", GetReport)
-            .WithSummary("Electivos de mención que no están en el plan común");
+            .WithSummary("Alumnos que pueden postular y no tienen prioridad");
     }
 
     private static async Task<IResult> GetReport(
@@ -23,7 +23,7 @@ public sealed class ElectivesWithoutCommonPlanEndpoints : IEndpoint
         context.Response.Headers.CacheControl = "no-store";
         try
         {
-            return Results.Ok(await sender.Send(new GetElectivesWithoutCommonPlan(), cancellationToken));
+            return Results.Ok(await sender.Send(new GetStudentsWithoutPriority(), cancellationToken));
         }
         catch (Exception error) when (error is SqlException or InvalidOperationException or TimeoutException)
         {

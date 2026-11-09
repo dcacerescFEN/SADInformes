@@ -2,7 +2,7 @@ using Application.Common.Interfaces;
 using Application.Common.Mediator;
 using Domain.Common;
 
-namespace Application.Reports.InscripcionAcademica.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
+namespace Application.Reports.AcademicEnrollment.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
 
 public sealed record GetElectivesWithoutCommonPlan : IRequest<ApiResponse<ElectivesWithoutCommonPlanReportDTO>>;
 

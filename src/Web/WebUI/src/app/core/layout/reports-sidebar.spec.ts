@@ -5,7 +5,7 @@ import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { ReportsSidebar, migrateFavoriteSlugs } from './reports-sidebar';
 import { POSTGRADUATE_REPORTS } from '../../postgraduate/postgraduate-catalogue';
-import { INSCRIPCION_ACADEMICA_REPORTS } from '../../inscripcion-academica/inscripcion-academica-catalogue';
+import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 
 @Component({ template: '' })
 class TestPage {}
@@ -26,7 +26,7 @@ describe('Sidebar de Informes', () => {
       provideRouter([
         { path: '', component: TestPage }, { path: 'otra', component: TestPage },
         ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgraduate/' + report.slug, component: TestPage })),
-        ...INSCRIPCION_ACADEMICA_REPORTS.map(report => ({ path: 'academic-enrollment/' + report.slug, component: TestPage })),
+        ...ACADEMIC_ENROLLMENT_REPORTS.map(report => ({ path: 'academic-enrollment/' + report.slug, component: TestPage })),
       ]),
       { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba' } },
     ] }).compileComponents();
@@ -109,10 +109,10 @@ describe('Sidebar de Informes', () => {
     await settle();
     expect(toggles[0].getAttribute('aria-expanded')).toBe('true');
     const enrollmentLinks = [...root.querySelectorAll<HTMLAnchorElement>(
-      '[data-section-content="inscripcion-academica"] .sidebar-report')];
+      '[data-section-content="academic-enrollment"] .sidebar-report')];
     expect(enrollmentLinks.map(link => link.textContent?.trim()))
-      .toEqual(INSCRIPCION_ACADEMICA_REPORTS.map(report => report.title));
-    expect(enrollmentLinks[0].getAttribute('href')).toBe('/academic-enrollment/' + INSCRIPCION_ACADEMICA_REPORTS[0].slug);
+      .toEqual(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.title));
+    expect(enrollmentLinks[0].getAttribute('href')).toBe('/academic-enrollment/' + ACADEMIC_ENROLLMENT_REPORTS[0].slug);
     toggles[0].click();
     await settle();
     expect(toggles[0].getAttribute('aria-expanded')).toBe('false');

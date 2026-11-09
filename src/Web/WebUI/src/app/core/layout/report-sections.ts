@@ -1,5 +1,5 @@
 import { POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
-import { INSCRIPCION_ACADEMICA_REPORTS } from '../../inscripcion-academica/inscripcion-academica-catalogue';
+import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 
 export interface ReportSection {
   readonly id: string;
@@ -11,7 +11,7 @@ export interface ReportSection {
 
 // Section names and order follow SAD/Informes/default.aspx; Postgrado and Inscripción académica have local routes.
 export const REPORT_SECTIONS: readonly ReportSection[] = [
-  { id: 'inscripcion-academica', title: 'Inscripción académica', icon: 'bi-journal-check', routePrefix: '/academic-enrollment', reports: INSCRIPCION_ACADEMICA_REPORTS },
+  { id: 'academic-enrollment', title: 'Inscripción académica', icon: 'bi-journal-check', routePrefix: '/academic-enrollment', reports: ACADEMIC_ENROLLMENT_REPORTS },
   { id: 'solicitudes', title: 'Solicitudes', icon: 'bi-inbox', reports: [] },
   { id: 'aplicacion-reglamento', title: 'Aplicación de reglamento', icon: 'bi-journal-text', reports: [] },
   { id: 'certificados', title: 'Certificados', icon: 'bi-file-earmark-check', reports: [] },

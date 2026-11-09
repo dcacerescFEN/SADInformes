@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Application.Common.Interfaces;
-using Application.Reports.InscripcionAcademica.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
+using Application.Reports.AcademicEnrollment.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Infrastructure.Data;

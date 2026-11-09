@@ -8,9 +8,9 @@ import { NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { REPORT_SECTIONS, ReportSection } from './report-sections';
 import { LEGACY_POSTGRADUATE_SLUGS, POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
-import { INSCRIPCION_ACADEMICA_REPORTS } from '../../inscripcion-academica/inscripcion-academica-catalogue';
+import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 
-const ALL_REPORTS = [...POSTGRADUATE_REPORTS, ...INSCRIPCION_ACADEMICA_REPORTS];
+const ALL_REPORTS = [...POSTGRADUATE_REPORTS, ...ACADEMIC_ENROLLMENT_REPORTS];
 
 const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
 

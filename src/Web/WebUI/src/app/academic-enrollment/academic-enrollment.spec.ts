@@ -5,7 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { routes } from '../app.routes';
 import { AuthService } from '../core/auth/auth-service';
-import { INSCRIPCION_ACADEMICA_REPORTS } from './inscripcion-academica-catalogue';
+import { ACADEMIC_ENROLLMENT_REPORTS } from './academic-enrollment-catalogue';
 
 describe('Navegación de Inscripción académica', () => {
   const auth = {
@@ -25,13 +25,15 @@ describe('Navegación de Inscripción académica', () => {
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
   it('incluye las 22 opciones visibles sin duplicar slugs', () => {
-    expect(INSCRIPCION_ACADEMICA_REPORTS).toHaveLength(22);
-    expect(new Set(INSCRIPCION_ACADEMICA_REPORTS.map(report => report.slug)).size).toBe(22);
-    expect(INSCRIPCION_ACADEMICA_REPORTS.every(report =>
+    expect(ACADEMIC_ENROLLMENT_REPORTS).toHaveLength(22);
+    expect(new Set(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.slug)).size).toBe(22);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.every(report =>
       report.legacyPath.startsWith('Informes/Inscripcion/'))).toBe(true);
-    expect(INSCRIPCION_ACADEMICA_REPORTS.find(report => report.slug === 'electives-without-common-plan')?.available)
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'electives-without-common-plan')?.available)
       .toBe(true);
-    expect(INSCRIPCION_ACADEMICA_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'students-without-priority')?.available)
+      .toBe(true);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
       .toBe('/postgraduate/teaching-schedule');
   });
 
@@ -52,9 +54,26 @@ describe('Navegación de Inscripción académica', () => {
     expect(root.textContent).not.toContain('Pendiente de migración');
   });
 
+  it('carga el informe funcional de alumnos sin prioridad', async () => {
+    const harness = await RouterTestingHarness.create(
+      '/academic-enrollment/students-without-priority');
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne('/api/reports/academic-enrollment/students-without-priority/report')
+      .flush({ success: true, data: { rows: [
+        { studentCode: 'A/1', name: 'Ana Pérez', academicStatus: 'Regular', studentType: 'IC' },
+      ], total: 1 } });
+    await harness.detectChanges();
+    const root = harness.routeNativeElement!;
+    expect(root.querySelector('h1')?.textContent?.trim())
+      .toBe('Alumnos que pueden postular y no tienen prioridad');
+    expect(root.querySelectorAll('app-table tbody tr')).toHaveLength(1);
+    expect(root.textContent).toContain('Ana Pérez');
+    expect(root.textContent).not.toContain('Pendiente de migración');
+  });
+
   it('cada opción pendiente abre su ficha local sin formularios ni solicitudes HTTP', async () => {
     const harness = await RouterTestingHarness.create();
-    for (const report of INSCRIPCION_ACADEMICA_REPORTS.filter(item => !item.routePath && item.available !== true)) {
+    for (const report of ACADEMIC_ENROLLMENT_REPORTS.filter(item => !item.routePath && item.available !== true)) {
       await harness.navigateByUrl('/academic-enrollment/' + report.slug);
       const root = harness.routeNativeElement!;
       expect(root.querySelector('h1')?.textContent?.trim()).toBe(report.title);

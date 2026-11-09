@@ -1,4 +1,4 @@
-namespace Application.Reports.InscripcionAcademica.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
+namespace Application.Reports.AcademicEnrollment.ElectivesWithoutCommonPlan.Queries.GetElectivesWithoutCommonPlan;
 
 public sealed record ElectivesWithoutCommonPlanRowDTO(
     string Decree,

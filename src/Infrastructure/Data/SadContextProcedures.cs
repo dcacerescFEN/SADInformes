@@ -1406,4 +1406,15 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecAlumnosSinPrioridadResult>?> SpRec_AlumnosSinPrioridadAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var result = await context.SqlQueryAsync<SpRecAlumnosSinPrioridadResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosSinPrioridad]",
+            [parameterreturnValue], cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }
