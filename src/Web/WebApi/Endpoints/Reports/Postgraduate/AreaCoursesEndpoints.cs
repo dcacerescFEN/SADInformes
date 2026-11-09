@@ -13,7 +13,7 @@ public sealed class AreaCoursesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/area-courses")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_AREA_COURSES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años del reporte de áreas y cátedras");
         group.MapGet("/", GetReport).WithSummary("Cátedras y áreas para dos años");

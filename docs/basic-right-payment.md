@@ -32,8 +32,8 @@ SADInformes.
 | `GET /report?studentType=&modality=&entryYear=&paymentYear=&paymentStatus=` | monto, filas y `canManage` |
 | `GET /download?...` | XLSX de 7 columnas |
 | `PUT /payments` | `{ paymentYear, rows: [{ studentCode, paid }] }` |
-| Permiso de lectura | `REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT` |
-| Permiso de gestión | `REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT` |
+| Permiso de lectura | `REPORT_VIEW_POSTGRADUATE` |
+| Permiso de gestión | `REPORT_VIEW_POSTGRADUATE` |
 
 La escritura exige ambos permisos y usa la identidad del servidor, no un usuario
 enviado por el cliente. El lote se guarda en una transacción Serializable mediante

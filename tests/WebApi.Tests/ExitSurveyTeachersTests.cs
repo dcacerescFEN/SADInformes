@@ -21,7 +21,7 @@ public sealed class ExitSurveyTeachersTests
 {
     private const string Route = "/api/reports/postgraduate/exit-survey-statistics";
     private const string Query = "?period=2024A&studentType=MBA&modality=PT";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     [Fact]
     public async Task Teachers_map_I_theoretical_II_practical_and_III_formative()
@@ -91,7 +91,7 @@ public sealed class ExitSurveyTeachersTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_teacher_and_detail_routes_require_the_statistics_permission(string? role, int status)
     {
         var (factory, tokens) = Create(new Procedures()); using var host = factory; using var signing = tokens; using var client = factory.CreateClient();

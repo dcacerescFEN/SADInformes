@@ -22,63 +22,66 @@ roles ni asignaciones**.
 | Permiso SAD legado | Equivalente en SADInformes | Observación |
 | --- | --- | --- |
 | `Viñeta Informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Muestra el destino Informes en la navbar. |
-| `ver Postgrado` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Habilita la sección Postgrado; ya no es un permiso independiente. |
+| `ver Postgrado` | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Permiso único para todos los informes de Postgrado; reemplaza los permisos específicos por informe. |
 | `consulta alumnos` | — | En el SAD expulsaba al módulo de alumnos. No se migra como permiso de informes. |
 | `solo informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
 | `informes acreditación` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Era un requisito adicional en varias páginas de Postgrado. |
 | `cuadro de honor` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Requisito adicional de rankings; hoy lo cubre el permiso del informe. |
-| `ver Postgrado` + `encuesta egresados` (Estadísticas encuesta salida) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `encuesta egresados` (Estadísticas encuesta salida) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
 | `reporte proximas licenciaturas` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo controlaba la visibilidad del enlace. |
 | `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | El acceso real lo define cada sistema externo. |
 | `INFORMES - MANTENEDORES POSTGRADO CONSTANCIAS` | — | Permiso de una aplicación externa; sigue en su sistema. |
 | `INFORMES - MANTENEDORES POSTGRADO D Y C` | — | Permiso de una aplicación externa; sigue en su sistema. |
 | `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; sigue en Maestro. |
-| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE` | Implementado; el listado y el informe requieren este permiso |
+| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; el listado y el informe requieren este permiso |
 
 ## Informes migrados
 
+Todos los informes de Postgrado usan el mismo permiso `PERMISSION_REPORT_VIEW_POSTGRADUATE`.
+El permiso anterior `PERMISSION_REPORT_ACCESS_REPORT_MODULE` solo habilita la entrada al módulo.
+
 | Permiso SAD legado | Equivalente en SADInformes | Estado |
 | --- | --- | --- |
-| `ver Postgrado` + `informes acreditación` (Encuesta docente por curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` | Implementado |
-| `ver Postgrado` + `informes acreditación` (Alumnos sin contestar encuesta docente) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `informes acreditación` (Cursos vs alumnos) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSES_BY_STUDENT` | Implementado; requiere asignación en Keycloak |
-| Sin validación propia en el code-behind legado (Cursos Profesores Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Inscripción masiva: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT` | Implementado |
-| Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` | Implementado; exige también el permiso de consulta |
-| `ver Postgrado` + `cuadro de honor` (Inscripción encuesta salida: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` | Implementado; requiere asignación en Keycloak |
-| Inscripción encuesta salida: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` | Implementado; exige también el permiso de consulta |
-| `ver Postgrado` + `cuadro de honor` (Ranking notas ponderado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_WEIGHTED_RANKING` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Alumnos matriculados MBA) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ENROLLED_STUDENTS` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Profesores confirmados por cátedra) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_VALIDITIES` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Reporte áreas y cátedras) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_AREA_COURSES` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Reporte Vista SAD Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Defensas de tesis) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Ayudantías Postgrado Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Estadísticas encuesta entrada) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Evaluación docente/curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_TEACHER_EVALUATION` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Datos personales Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_PERSONAL_DATA` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Registro de tesis Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_REGISTRATION` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Estadísticas ISS Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ISS_STATISTICS` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Estadísticas Encuesta Alumni) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `informes acreditación` (Avances AFE) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_AFE_REPORT` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Próximas Licenciaturas Pregrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` (Actividades Cursos Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES` | Implementado; requiere asignación en Keycloak |
-| `ver Postgrado` + `cuadro de honor` (Pago Derecho Básico: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT` | Implementado; requiere asignación en Keycloak |
-| Pago Derecho Básico: Guardar (antes sin permiso separado) | `PERMISSION_REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT` | Implementado; exige también el permiso de consulta |
-| `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE_RANKING` (propuesto) | Pendiente |
-| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE` | Implementado; reemplaza el iframe/cookie de Maestro |
+| `ver Postgrado` + `informes acreditación` (Encuesta docente por curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado |
+| `ver Postgrado` + `informes acreditación` (Alumnos sin contestar encuesta docente) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `informes acreditación` (Cursos vs alumnos) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| Sin validación propia en el code-behind legado (Cursos Profesores Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Inscripción masiva: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado |
+| Inscripción masiva: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; exige también el permiso de consulta |
+| `ver Postgrado` + `cuadro de honor` (Inscripción encuesta salida: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| Inscripción encuesta salida: botón Inscribir (antes sin permiso separado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; exige también el permiso de consulta |
+| `ver Postgrado` + `cuadro de honor` (Ranking notas ponderado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Alumnos matriculados MBA) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Profesores confirmados por cátedra) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Reporte áreas y cátedras) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Reporte Vista SAD Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Defensas de tesis) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Ayudantías Postgrado Sigma) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Estadísticas encuesta entrada) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Evaluación docente/curso) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Datos personales Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Registro de tesis Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Estadísticas ISS Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Estadísticas Encuesta Alumni) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `informes acreditación` (Avances AFE) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Próximas Licenciaturas Pregrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` (Actividades Cursos Postgrado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| `ver Postgrado` + `cuadro de honor` (Pago Derecho Básico: consulta) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
+| Pago Derecho Básico: Guardar (antes sin permiso separado) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; exige también el permiso de consulta |
+| `ver Postgrado` + `cuadro de honor` (Rankings) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` (propuesto) | Pendiente |
+| `INFORMES - POSTGRADO I NCE POSTGRADO` | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; reemplaza el iframe/cookie de Maestro |
 | `INFORMES - MANTENEDORES POSTGRADO NCE POSTGRADO` | — | Gestión no migrada; `Bloquear/Activar` sigue en Maestro. |
 
 Los nombres propuestos **no existen todavía** en Keycloak: se definen al migrar
 cada informe, con su prueba de autorización.
 
 Programación Docente Postgrado X Programa y Modalidad agrega el permiso
-`PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE`. Su página legada no
+`PERMISSION_REPORT_VIEW_POSTGRADUATE`. Su página legada no
 incluye una validación específica en el code-behind; la migración protege tanto
 el catálogo como el listado con este permiso o los roles administrativos REPORT.
 No se crean roles ni asignaciones de Keycloak automáticamente.
 
-Cursos Profesores Postgrado agrega `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES`.
+Cursos Profesores Postgrado agrega `PERMISSION_REPORT_VIEW_POSTGRADUATE`.
 Además del permiso, el alcance de datos depende del usuario SAD configurado en
 AppConfig (`PostgraduateUser`, con `mvenegas` como valor nulo predeterminado):
 la API solo devuelve los departamentos visibles para ese usuario y rechaza el

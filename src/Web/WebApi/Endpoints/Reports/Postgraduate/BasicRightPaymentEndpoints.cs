@@ -15,13 +15,13 @@ public sealed class BasicRightPaymentEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/basic-right-payment")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", Filters).WithSummary("Filtros de pago derecho básico");
         group.MapGet("/report", Report).WithSummary("Alumnos y estado de pago");
         group.MapGet("/download", Download).WithSummary("Pago derecho básico en Excel");
         group.MapPut("/payments", Save)
-            .RequireAuthorization(Permission.REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithSummary("Guarda cambios de pago");
     }
 
@@ -36,7 +36,7 @@ public sealed class BasicRightPaymentEndpoints : IEndpoint
         Execute(false, async () => Results.Ok(await sender.Send(new GetBasicRightPayments(
             studentType, modality, entryYear, paymentYear, paymentStatus,
             (await authorization.AuthorizeAsync(context.User,
-                Permission.REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT)).Succeeded), ct)));
+                Permission.REPORT_VIEW_POSTGRADUATE)).Succeeded), ct)));
 
     private static Task<IResult> Download(HttpContext context, IRequestDispatcher sender,
         string? studentType, string? modality, string? entryYear, string? paymentYear, string? paymentStatus,

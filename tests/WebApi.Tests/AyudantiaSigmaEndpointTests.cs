@@ -15,7 +15,7 @@ namespace WebApi.Tests;
 public sealed class AyudantiaSigmaEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/ayudantias-sigma";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory, SadContext Sad, SigmaRemuneracionesContext Sigma)
         Create(AyudantiaSigmaTests.Procedures procedures)
@@ -61,7 +61,7 @@ public sealed class AyudantiaSigmaEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {
         var (factory, tokens, sad, sigma) = Create(new AyudantiaSigmaTests.Procedures());

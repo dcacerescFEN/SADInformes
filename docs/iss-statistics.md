@@ -22,7 +22,7 @@ la tenía. Los datos se muestran en pantalla.
 | --- | --- |
 | `GET /filters?period=2024A` | `{ periods, courseSections }`; sin período usa el primero |
 | `GET /summary?period=...&courseSection=ENECO775%2F1` | `{ sample, categories, observations }` |
-| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE_ISS_STATISTICS` |
+| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 filtros inválidos o curso/sección mal formado; 401 sin sesión; 403 sin permiso; 503 sanitizado |
 
 Sin respuestas, `sample` es `null` y las categorías/observaciones quedan vacías; es

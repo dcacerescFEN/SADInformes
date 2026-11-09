@@ -15,7 +15,7 @@ public sealed class ThesisDefensesEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/thesis-defenses";
     private const string Query = "?defenseYear=Todos&studentType=MBA&modality=Todos&entryYear=Todos";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(ThesisDefensesTests.Procedures procedures)
     {
@@ -54,7 +54,7 @@ public sealed class ThesisDefensesEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {
         var (factory, tokens) = Create(new ThesisDefensesTests.Procedures());

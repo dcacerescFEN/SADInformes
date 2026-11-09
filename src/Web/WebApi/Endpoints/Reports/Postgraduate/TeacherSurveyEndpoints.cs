@@ -13,7 +13,7 @@ public sealed class TeacherSurveyEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/teacher-survey")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
 
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos del informe Encuesta docente por curso");

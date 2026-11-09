@@ -12,7 +12,7 @@ public sealed class EntrySurveyStatisticsEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/entry-survey-statistics")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/", GetReport).WithSummary("Respuestas de la encuesta de entrada");
         group.MapGet("/download", Download).WithSummary("Encuesta de entrada en Excel");

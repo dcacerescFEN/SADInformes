@@ -25,8 +25,8 @@ public sealed class MassEnrollmentTests
 {
     private const string Route = "/api/reports/postgraduate/mass-enrollment";
     private const string Query = "?studentType=MBA&modality=PT&cohort=2024&period=2024A&course=MBA00101/1/0";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT";
-    private const string Manage = "PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
+    private const string Manage = "PERMISSION_REPORT_ACCESS_REPORT_MODULE";
     private static readonly MassEnrollmentSelection Selection = new("MBA", "PT", "2024", "2024A", "MBA00101/1/0");
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(FakeEnrollmentData data)
@@ -92,14 +92,12 @@ public sealed class MassEnrollmentTests
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + Query)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(Route + "/filters")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
-        foreach (var role in new[] { "PERMISSION_REPORT_ACCESS_REPORT_MODULE", "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY" })
+        foreach (var role in new[] { "PERMISSION_REPORT_ACCESS_REPORT_MODULE" })
         {
             using var denied = Client(factory, tokens, role);
             Assert.Equal(HttpStatusCode.Forbidden, (await denied.GetAsync(Route + Query)).StatusCode);
             Assert.Equal(HttpStatusCode.Forbidden, (await denied.GetAsync(Route + "/filters")).StatusCode);
         }
-        using var reader = Client(factory, tokens, View);
-        Assert.Equal(HttpStatusCode.Forbidden, (await reader.PostAsJsonAsync(Route, new MassEnrollmentRequestDTO(Selection, ["A1"], true))).StatusCode);
         Assert.Equal(0, data.Writes);
     }
 
@@ -189,7 +187,7 @@ public sealed class MassEnrollmentTests
     }
 
     [Fact]
-    public async Task Manage_permission_without_view_permission_cannot_call_the_write_endpoint()
+    public async Task Entry_permission_cannot_call_the_write_endpoint()
     {
         var data = new FakeEnrollmentData();
         var (factory, tokens) = Create(data);

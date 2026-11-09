@@ -17,7 +17,7 @@ namespace WebApi.Tests;
 public sealed class StudentRequestsTests
 {
     private const string Route = "/api/reports/postgraduate/student-requests";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_STUDENT_REQUESTS";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
     private static (WebApplicationFactory<Program>, TokenFactory) Create(Renderer renderer, Procedures? procedures = null)
     {
         var tokens = new TokenFactory();
@@ -40,7 +40,7 @@ public sealed class StudentRequestsTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task Permission_is_required_on_both_routes(string? role, int status)
     {
         var renderer = new Renderer();

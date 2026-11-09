@@ -13,7 +13,7 @@ public sealed class EnrolledStudentsEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/enrolled-students")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_ENROLLED_STUDENTS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters)
             .WithSummary("Modalidades fijas y años de alumnos matriculados MBA");

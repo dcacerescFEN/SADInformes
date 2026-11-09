@@ -15,12 +15,12 @@ public sealed class ExitSurveyEnrollmentEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/exit-survey-enrollment")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", Filters).WithSummary("Filtros de inscripción a encuesta de salida");
         group.MapGet("/", Listing).WithSummary("Alumnos de encuesta de salida por tipo, modalidad y año");
         group.MapPost("/", Enroll)
-            .RequireAuthorization(Permission.REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithSummary("Inscribe un lote confirmado en la encuesta de salida");
     }
 
@@ -32,7 +32,7 @@ public sealed class ExitSurveyEnrollmentEndpoints : IEndpoint
         Execute(context, false, async () =>
         {
             var canEnroll = (await authorization.AuthorizeAsync(context.User,
-                Permission.REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT)).Succeeded;
+                Permission.REPORT_VIEW_POSTGRADUATE)).Succeeded;
             return Results.Ok(await sender.Send(new GetExitSurveyEnrollment(studentType, modality, year, canEnroll), ct));
         });
 

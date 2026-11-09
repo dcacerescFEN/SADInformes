@@ -13,7 +13,7 @@ public sealed class PersonalDataEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/personal-data")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_PERSONAL_DATA)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos de datos personales");
         group.MapGet("/download", Download).WithSummary("Datos personales en Excel");

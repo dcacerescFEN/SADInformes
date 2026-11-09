@@ -13,7 +13,7 @@ public sealed class ThesisRegistrationEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/thesis-registration")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_THESIS_REGISTRATION)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos de registro de tesis");
         group.MapGet("/download", Download).WithSummary("Registro de tesis en Excel");

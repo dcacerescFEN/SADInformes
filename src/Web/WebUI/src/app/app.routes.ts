@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth-guard';
 import { POSTGRADUATE_REPORTS } from './postgraduate/postgraduate-catalogue';
+import { INSCRIPCION_ACADEMICA_REPORTS } from './inscripcion-academica/inscripcion-academica-catalogue';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    canActivate: [authGuard],
-    loadComponent: () => import('./home').then((module) => module.Home),
+    redirectTo: '/academic-enrollment/electives-without-common-plan',
   },
   ...POSTGRADUATE_REPORTS.map(report => ({
     path: 'postgraduate/' + report.slug,
@@ -71,5 +71,14 @@ export const routes: Routes = [
         ? import('./postgraduate/teacher-survey/teacher-survey').then((module) => module.TeacherSurvey)
         : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
-  { path: '**', redirectTo: '' },
+  ...INSCRIPCION_ACADEMICA_REPORTS.filter(report => !report.routePath).map(report => ({
+    path: 'academic-enrollment/' + report.slug,
+    canActivate: [authGuard],
+    data: { report },
+    loadComponent: () => report.slug === 'electives-without-common-plan'
+      ? import('./inscripcion-academica/electives-without-common-plan/electives-without-common-plan')
+        .then((module) => module.ElectivesWithoutCommonPlan)
+      : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+  })),
+  { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

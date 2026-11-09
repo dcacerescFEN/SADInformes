@@ -24,7 +24,7 @@ Entrega Real, Evaluación, Fecha Evaluación y Obs. Evaluación.
 | `GET /advances?period=&course=COD/SECC` | avances AFE del curso; `Todos` si hay más de uno |
 | `GET /report?period=&course=&advance=` | filas del reporte |
 | `GET /download?period=&course=&advance=` | XLSX `Reporte nivel curso AFE - coordinacion.xlsx` |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_AFE_REPORT` |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 filtros/curso/avance inválidos; 401/403; 503 sanitizado |
 
 ## Dependencias

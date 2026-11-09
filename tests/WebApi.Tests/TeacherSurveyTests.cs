@@ -72,7 +72,7 @@ public sealed class TeacherSurveyTests
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
-        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY");
+        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE");
         var response = await client.GetAsync(Route + "?periodo=2024A&tipoAlumno=MBA&modalidad=PT");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -106,7 +106,7 @@ public sealed class TeacherSurveyTests
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
-        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY");
+        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE");
         var response = await client.GetAsync(Route + query);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Null(reader.LastPeriod);
@@ -119,7 +119,7 @@ public sealed class TeacherSurveyTests
         var (factory, tokens) = Create(reader);
         using var _factory = factory;
         using var tokensScope = tokens;
-        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY");
+        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE");
         var response = await client.GetAsync(Route + "/filters?tipoAlumno=MBA");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -136,7 +136,7 @@ public sealed class TeacherSurveyTests
         var (factory, tokens) = Create(new FakeTeacherSurveyProcedures { Failure = new InvalidOperationException("private-sql-detail") });
         using var _factory = factory;
         using var tokensScope = tokens;
-        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY");
+        using var client = Authorized(factory, tokens, "PERMISSION_REPORT_VIEW_POSTGRADUATE");
         var response = await client.GetAsync(Route + "?periodo=2024A&tipoAlumno=MBA&modalidad=PT");
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         var body = await response.Content.ReadAsStringAsync();

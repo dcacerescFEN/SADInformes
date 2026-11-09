@@ -19,7 +19,7 @@ pantalla.
 | --- | --- |
 | `GET /filters?studentType=MBA` | `{ studentTypes, modalities, years }` |
 | `GET /download?studentType=Todos&modality=Todos&year=Todos` | XLSX de 21 columnas |
-| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE_THESIS_REGISTRATION` |
+| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 filtros inválidos o exportación vacía; 401 sin sesión; 403 sin permiso; 503 sanitizado |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

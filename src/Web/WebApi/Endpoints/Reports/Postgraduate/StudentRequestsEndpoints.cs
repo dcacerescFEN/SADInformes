@@ -14,7 +14,7 @@ public sealed class StudentRequestsEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/student-requests")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_STUDENT_REQUESTS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Filtros de Solicitudes alumnos Postgrado");
         group.MapGet("/", GetReport).WithSummary("Descarga Excel SSRS de Solicitudes alumnos Postgrado");

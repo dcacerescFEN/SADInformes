@@ -33,7 +33,7 @@ no se consolidan. Si ambos resultados están vacíos se muestra **Sin Datos**.
 | `GET /?defenseYear=Todos&studentType=MBA&modality=Todos&entryYear=Todos` | `{ coordination, treasury, coordinationTotal, treasuryTotal }` |
 | `GET /download/coordination` con los cuatro filtros | XLSX, hoja `InformeComision`, 20 columnas |
 | `GET /download/treasury` con los cuatro filtros | XLSX, hoja `InformeTesorería`, 17 columnas |
-| Permiso de las cuatro rutas | `REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES`; administradores existentes conservados |
+| Permiso de las cuatro rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 filtros inválidos o exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; los archivos llevan

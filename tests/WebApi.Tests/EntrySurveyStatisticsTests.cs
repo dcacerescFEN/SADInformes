@@ -59,7 +59,7 @@ public sealed class EntrySurveyStatisticsTests
             });
         });
         using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/entry-survey-statistics/download");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("EncuestaEntradaPostgrado.xlsx", response.Content.Headers.ContentDisposition!.ToString());

@@ -100,7 +100,7 @@ public sealed class IssStatisticsTests
         using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/iss-statistics/summary?period=2024A&courseSection=ENECO775%2F1")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_ISS_STATISTICS"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(
             "/api/reports/postgraduate/iss-statistics/summary?period=2024A&courseSection=ENECO775%2F1");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

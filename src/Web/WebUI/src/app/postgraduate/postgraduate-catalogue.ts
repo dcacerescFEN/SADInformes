@@ -3,6 +3,8 @@ export interface PostgraduateReport {
   readonly title: string;
   readonly description: string;
   readonly legacyPath: string;
+  /** Ruta ya migrada cuando la opción reutiliza otra pantalla. */
+  readonly routePath?: string;
   /** true cuando la pantalla ya está migrada y no usa la ficha pendiente. */
   readonly available?: boolean;
 }

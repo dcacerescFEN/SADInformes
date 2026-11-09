@@ -29,8 +29,8 @@ si fallan, se usa su imagen de perfil predeterminada.
 
 | Operación | Permiso en el cliente físico configurado |
 | --- | --- |
-| Catálogos y listado | `PERMISSION_REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT` |
-| Inscripción | El anterior más `PERMISSION_REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT` |
+| Catálogos y listado | `PERMISSION_REPORT_VIEW_POSTGRADUATE` |
+| Inscripción | El anterior más `PERMISSION_REPORT_VIEW_POSTGRADUATE` |
 
 Se conservan los roles globales REPORT ADMIN/SUPERADMIN. El permiso de entrada al
 módulo o el de otro informe no permiten consultar o inscribir por sí solos.

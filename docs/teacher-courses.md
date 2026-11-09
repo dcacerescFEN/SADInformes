@@ -46,7 +46,7 @@ protección contra fórmulas de planilla.
 | `GET /api/reports/postgraduate/teacher-courses/filters` | Años y departamentos disponibles |
 | `GET /api/reports/postgraduate/teacher-courses?periodo=2024&departamento=Ingeniería` | Filas del informe |
 
-Ambas rutas exigen `REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES` (o los roles
+Ambas rutas exigen `REPORT_VIEW_POSTGRADUATE` (o los roles
 `ROLE_REPORT_ADMIN` / `ROLE_REPORT_SUPERADMIN`). Los errores de entrada responden `400`
 y los fallos de almacenamiento `503`, ambos sin detalles SQL.
 

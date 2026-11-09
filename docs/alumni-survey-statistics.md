@@ -17,7 +17,7 @@ No hay filtros, igual que el legado.
 | Ruta base: `/api/reports/postgraduate/alumni-survey-statistics` | Resultado |
 | --- | --- |
 | `GET /download` | XLSX de 32 columnas |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS` |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 sin datos; 401 sin sesión; 403 sin permiso; 503 sanitizado |
 
 La respuesta usa `Cache-Control: no-store`; el archivo lleva

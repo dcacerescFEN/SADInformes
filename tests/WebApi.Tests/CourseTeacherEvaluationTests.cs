@@ -75,7 +75,7 @@ public sealed class CourseTeacherEvaluationTests
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/course-teacher-evaluation/download?year=2024&type=EX")).StatusCode);
         client.SetBearer(tokens.CreateToken("SADInformes",
-            "PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_TEACHER_EVALUATION"));
+            "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(
             "/api/reports/postgraduate/course-teacher-evaluation/download?year=2024&type=EX");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

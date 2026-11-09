@@ -15,8 +15,8 @@ public sealed class ExitSurveyEnrollmentEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/exit-survey-enrollment";
     private const string Query = "?studentType=Todos&modality=Todos&year=2024";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT";
-    private const string Manage = "PERMISSION_REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
+    private const string Manage = "PERMISSION_REPORT_ACCESS_REPORT_MODULE";
     private static (WebApplicationFactory<Program>, TokenFactory) Create(ExitSurveyEnrollmentTests.FakeData data)
     {
         var tokens = new TokenFactory();
@@ -54,7 +54,7 @@ public sealed class ExitSurveyEnrollmentEndpointTests
     }
 
     [Fact]
-    public async Task View_can_read_but_cannot_enroll_and_manage_requires_view_as_well()
+    public async Task View_permission_grants_read_and_enroll_but_entry_alone_cannot_read()
     {
         var data = new ExitSurveyEnrollmentTests.FakeData();
         var (factory, tokens) = Create(data); using var host = factory; using var signing = tokens;
@@ -62,9 +62,7 @@ public sealed class ExitSurveyEnrollmentEndpointTests
         var viewList = await viewOnly.GetAsync(Route + Query);
         Assert.Equal(HttpStatusCode.OK, viewList.StatusCode);
         using (var json = JsonDocument.Parse(await viewList.Content.ReadAsStringAsync()))
-            Assert.False(json.RootElement.GetProperty("data").GetProperty("canEnroll").GetBoolean());
-        Assert.Equal(HttpStatusCode.Forbidden, (await viewOnly.PostAsJsonAsync(Route,
-            new CreateExitSurveyEnrollmentRequestDTO("Todos", "Todos", "2024", ["100-20241"], true))).StatusCode);
+            Assert.True(json.RootElement.GetProperty("data").GetProperty("canEnroll").GetBoolean());
         using var manageOnly = Client(factory, tokens, Manage);
         Assert.Equal(HttpStatusCode.Forbidden, (await manageOnly.GetAsync(Route + Query)).StatusCode);
         Assert.Empty(data.InsertedCodes);

@@ -33,7 +33,7 @@ columnas Sigma quedan en `NO`/vacías.
 | `GET /filters` | `{ success, message, data: { years } }` |
 | `GET /?year=2024` | `{ success, message, data: { rows, total } }` |
 | `GET /download?year=2024` | XLSX, hoja `ReporteAyudantiaSigma`, 25 columnas |
-| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS`; administradores existentes conservados |
+| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 año inválido o exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

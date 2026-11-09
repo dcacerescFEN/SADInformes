@@ -15,12 +15,17 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 
 var app = builder.Build();
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
 await app.InitialiseConfigurationAsync(builder.Configuration);
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapEndpoints();
+
 app.MapDevelopmentDocumentation();
 // Solo GET/HEAD llegan al fallback: las rutas reservadas y los métodos no soportados conservan 404/405.
 app.MapFallback(SpaHosting.ServeIndex)

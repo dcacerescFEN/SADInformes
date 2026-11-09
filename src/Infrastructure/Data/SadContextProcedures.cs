@@ -1395,4 +1395,15 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
             "EXEC [dbo].[spCre_AlumnosXPago_Derecho_Basico] @Cod_Alumno = @Cod_Alumno, @Año = @Año, @Pago = @Pago, @Usuario = @Usuario",
             sqlParameters, cancellationToken ?? default);
     }
+
+    public virtual async Task<List<SpRecElectivosDeMencionSinPlanComunResult>?> SpRec_ElectivosDeMencionSinPlanComunAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var result = await context.SqlQueryAsync<SpRecElectivosDeMencionSinPlanComunResult>(
+            "EXEC @returnValue = [dbo].[spRec_ElectivosDeMencionSinPlanComun]",
+            [parameterreturnValue], cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }

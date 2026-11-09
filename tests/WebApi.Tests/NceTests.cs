@@ -39,7 +39,7 @@ public sealed class NceTests
         using var signing = tokens; using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/nce/download")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/nce/download");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var bytes = new MemoryStream(await response.Content.ReadAsByteArrayAsync());
@@ -59,7 +59,7 @@ public sealed class NceTests
         using var signing = tokens; using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/nce/download/pdf")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/nce/download/pdf");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("application/pdf", response.Content.Headers.ContentType!.MediaType);
@@ -75,7 +75,7 @@ public sealed class NceTests
         var tokens = new TokenFactory();
         using var factory = Factory(context, tokens);
         using var signing = tokens; using var client = factory.CreateClient();
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_NCE"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/nce/download");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

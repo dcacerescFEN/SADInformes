@@ -89,7 +89,7 @@ public sealed class AfeReportTests
         using var signing = tokens; using var client = factory.CreateClient();
         const string url = "/api/reports/postgraduate/afe-report/download?period=2024A&course=ENECO775%2F1&advance=-1";
         Assert.Equal((int)HttpStatusCode.Unauthorized, (int)(await client.GetAsync(url)).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_AFE_REPORT"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(url);
         var errorBody = await response.Content.ReadAsStringAsync();
         Assert.True(response.StatusCode == HttpStatusCode.OK, errorBody);

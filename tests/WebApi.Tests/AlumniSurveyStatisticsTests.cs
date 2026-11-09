@@ -50,7 +50,7 @@ public sealed class AlumniSurveyStatisticsTests
         using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/alumni-survey-statistics/download")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/alumni-survey-statistics/download");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("EncuestaAlumniPostgrado.xlsx",
@@ -70,7 +70,7 @@ public sealed class AlumniSurveyStatisticsTests
         using var factory = CreateFactory(procedures, out var tokens);
         using var signing = tokens;
         using var client = factory.CreateClient();
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/alumni-survey-statistics/download");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

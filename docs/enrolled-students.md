@@ -26,7 +26,7 @@ inválidos se rechazan antes de llamar al procedimiento.
 | --- | --- |
 | `GET /filters` | `{ success, message, data: { modalities, years } }` |
 | `GET /download?modality=SUNRISE&year=2024` | XLSX real con 15 columnas |
-| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE_ENROLLED_STUDENTS`; administradores existentes conservados |
+| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 filtros inválidos o exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

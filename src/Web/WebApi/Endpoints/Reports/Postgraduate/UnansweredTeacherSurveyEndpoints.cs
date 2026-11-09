@@ -13,7 +13,7 @@ public sealed class UnansweredTeacherSurveyEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/unanswered-teacher-survey")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
 
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos del informe Alumnos sin contestar encuesta docente");

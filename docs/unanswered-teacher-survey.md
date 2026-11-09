@@ -39,7 +39,7 @@ seleccionado, el catálogo devuelve modalidades vacías. Se reutilizan
 `spRec_TiposAlumno` (IncluirTodos=NO) y `spRec_TiposAlumnosModalidades`.
 
 Ambas rutas requieren
-`PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY` en el cliente
+`PERMISSION_REPORT_VIEW_POSTGRADUATE` en el cliente
 físico configurado. Los roles REPORT ADMIN/SUPERADMIN existentes también permiten
 consultar. El permiso de entrada o el de otro informe no bastan. La aplicación
 no crea roles ni asignaciones en Keycloak.

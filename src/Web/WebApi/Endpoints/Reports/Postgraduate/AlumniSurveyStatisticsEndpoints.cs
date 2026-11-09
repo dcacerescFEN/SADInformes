@@ -11,7 +11,7 @@ public sealed class AlumniSurveyStatisticsEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app) =>
         app.MapGroup("/api/reports/postgraduate/alumni-survey-statistics")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_ALUMNI_SURVEY_STATISTICS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate")
             .MapGet("/download", Download).WithSummary("Estadísticas encuesta Alumni en Excel");
 

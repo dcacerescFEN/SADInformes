@@ -13,7 +13,7 @@ public sealed class SadSigmaEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/sad-sigma")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_SAD_SIGMA)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años del reporte SAD Sigma");
         group.MapGet("/", GetReport).WithSummary("Cátedras, pagos y estado en Sigma");

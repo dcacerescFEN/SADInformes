@@ -19,9 +19,11 @@ import { PostgraduateReport } from './postgraduate-catalogue';
               </h1>
               <p class="page-subtitle mb-0">{{ report.description }}</p>
             </div>
-            <a class="btn btn-outline-secondary" routerLink="/">
-              <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Volver al inicio
-            </a>
+            @if (report.slug !== 'electives-without-common-plan') {
+              <a class="btn btn-outline-secondary" routerLink="/">
+                <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Volver al inicio
+              </a>
+            }
           </div>
         </div>
 

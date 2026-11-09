@@ -25,7 +25,7 @@ El estado se envía correctamente: el código heredado enviaba por error el año
 | `GET /api/reports/postgraduate/student-requests` | Descarga Excel (xlsx) predeterminada |
 | Parámetros HTTP | `studentType`, `modality`, `cohort`, `state`; `format` opcional solo admite `EXCEL` |
 | Formato SSRS | `EXCELOPENXML`; PDF, Word y CSV son rechazados con 400 para este informe |
-| Permiso específico | `REPORT_VIEW_POSTGRADUATE_STUDENT_REQUESTS` (roles administradores existentes conservados) |
+| Permiso específico | `REPORT_VIEW_POSTGRADUATE` (roles administradores existentes conservados) |
 | Errores | 400 selección inválida, 401 sin sesión, 403 sin permiso, 503 indisponible sin detalles internos |
 
 Application valida catálogos y fija el reporte y los únicos parámetros SSRS permitidos:

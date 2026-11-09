@@ -82,7 +82,7 @@ public sealed class PersonalDataTests
         using var host = factory; using var signing = tokens; using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/personal-data/download?studentType=Todos&modality=Todos&year=Todos")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_PERSONAL_DATA"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(
             "/api/reports/postgraduate/personal-data/download?studentType=Todos&modality=Todos&year=Todos");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

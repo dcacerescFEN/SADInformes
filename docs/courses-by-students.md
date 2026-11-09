@@ -23,7 +23,7 @@ devuelve `{ success, message, data: { rows, total } }`. Los filtros incompletos 
 comodines responden 400 antes de consultar datos; los errores de almacenamiento
 responden 503 sin detalles SQL. Sin sesión responde 401; sin permiso responde 403.
 
-Ambas rutas requieren `PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSES_BY_STUDENT`
+Ambas rutas requieren `PERMISSION_REPORT_VIEW_POSTGRADUATE`
 en el cliente físico configurado; también se admiten los roles administrativos
 REPORT existentes. El permiso de entrada o el de Encuesta docente no bastan.
 No se crean roles ni se asignan accesos en Keycloak automáticamente.

@@ -21,7 +21,7 @@ comportamiento.
 | --- | --- |
 | `GET /` | `{ success, message, data: { rows, total } }` |
 | `GET /download` | XLSX con 44 columnas visibles |
-| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE_ENTRY_SURVEY_STATISTICS` |
+| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible sanitizado |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

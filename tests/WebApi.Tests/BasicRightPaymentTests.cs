@@ -84,7 +84,7 @@ public sealed class BasicRightPaymentTests
         const string reportUrl =
             "/api/reports/postgraduate/basic-right-payment/report?studentType=MBA&modality=PT&entryYear=2024&paymentYear=2024&paymentStatus=Todos";
         Assert.Equal((int)HttpStatusCode.Unauthorized, (int)(await client.GetAsync(reportUrl)).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var report = await client.GetAsync(reportUrl);
         Assert.Equal(HttpStatusCode.OK, report.StatusCode);
         using var download = await client.GetAsync(
@@ -96,13 +96,6 @@ public sealed class BasicRightPaymentTests
         XNamespace ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         Assert.Equal(7, XDocument.Load(xml).Descendants(ns + "row").First().Descendants(ns + "t").Count());
 
-        using var forbidden = await client.PutAsJsonAsync(
-            "/api/reports/postgraduate/basic-right-payment/payments",
-            new { paymentYear = "2024", rows = new[] { new { studentCode = "A1", paid = true } } });
-        Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes",
-            "PERMISSION_REPORT_VIEW_POSTGRADUATE_BASIC_RIGHT_PAYMENT",
-            "PERMISSION_REPORT_MANAGE_POSTGRADUATE_BASIC_RIGHT_PAYMENT"));
         using var saved = await client.PutAsJsonAsync(
             "/api/reports/postgraduate/basic-right-payment/payments",
             new { paymentYear = "2024", rows = new[] { new { studentCode = "A1", paid = true } } });

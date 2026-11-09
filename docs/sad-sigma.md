@@ -41,7 +41,7 @@ se agrupa por los `COD` del resultado para evitar el N+1 del legado.
 | `GET /filters` | `{ success, message, data: { years } }` |
 | `GET /?year=2024` | `{ success, message, data: { rows, total } }` |
 | `GET /download?year=2024` | XLSX con 38 columnas |
-| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE_SAD_SIGMA`; administradores existentes conservados |
+| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 año inválido o exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

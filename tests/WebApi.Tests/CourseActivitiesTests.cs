@@ -50,7 +50,7 @@ public sealed class CourseActivitiesTests
         using var signing = tokens; using var client = factory.CreateClient();
         const string url = "/api/reports/postgraduate/course-activities/download?year=2024";
         Assert.Equal((int)HttpStatusCode.Unauthorized, (int)(await client.GetAsync(url)).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(url);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Reporte Actividades Cursos Postgrado - 2024.xlsx",
@@ -69,7 +69,7 @@ public sealed class CourseActivitiesTests
         var tokens = new TokenFactory();
         using var factory = CreateFactory(new Procedures { NoData = true }, tokens);
         using var signing = tokens; using var client = factory.CreateClient();
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync(
             "/api/reports/postgraduate/course-activities/download?year=2024");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

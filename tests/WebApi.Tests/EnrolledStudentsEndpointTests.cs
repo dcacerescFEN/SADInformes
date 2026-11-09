@@ -15,7 +15,7 @@ public sealed class EnrolledStudentsEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/enrolled-students";
     private const string Query = "?modality=SUNRISE&year=2024";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_ENROLLED_STUDENTS";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(EnrolledStudentsTests.Procedures procedures)
     {
@@ -55,7 +55,7 @@ public sealed class EnrolledStudentsEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_enrolled_students_permission(string? role, int status)
     {
         var procedures = new EnrolledStudentsTests.Procedures();

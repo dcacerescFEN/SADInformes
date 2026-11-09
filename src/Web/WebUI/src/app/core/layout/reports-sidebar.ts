@@ -4,23 +4,31 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgbDropdownModule, NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { REPORT_SECTIONS, ReportSection } from './report-sections';
 import { LEGACY_POSTGRADUATE_SLUGS, POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
+import { INSCRIPCION_ACADEMICA_REPORTS } from '../../inscripcion-academica/inscripcion-academica-catalogue';
+
+const ALL_REPORTS = [...POSTGRADUATE_REPORTS, ...INSCRIPCION_ACADEMICA_REPORTS];
 
 const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
+
+interface FavoriteReport {
+  readonly report: PostgraduateReport;
+  readonly routePrefix: string;
+}
 
 export function migrateFavoriteSlugs(slugs: readonly string[]): string[] {
   const migrated = slugs.map(slug =>
     LEGACY_POSTGRADUATE_SLUGS[slug as keyof typeof LEGACY_POSTGRADUATE_SLUGS] ?? slug);
   return [...new Set(migrated)]
-    .filter(slug => POSTGRADUATE_REPORTS.some(report => report.slug === slug));
+    .filter(slug => ALL_REPORTS.some(report => report.slug === slug));
 }
 
 @Component({
   selector: 'app-reports-sidebar',
-  imports: [NgTemplateOutlet, RouterLink, RouterLinkActive, NgbDropdownModule],
+  imports: [NgTemplateOutlet, RouterLink, RouterLinkActive],
   host: { '[class.collapsed]': 'collapsed()', '(window:resize)': 'closeDrawerOnDesktop()' },
   template: `
     <aside id="reports-sidebar" class="sidebar" [class.sidebar--collapsed]="collapsed()" aria-label="Informes">
@@ -52,14 +60,14 @@ export function migrateFavoriteSlugs(slugs: readonly string[]): string[] {
         @if (favoriteReports().length > 0 && (!collapsed() || mobile)) {
           <div class="sidebar-group sidebar-favorites" data-favorites>
             <div class="sidebar-section-label">Favoritos</div>
-            @for (report of favoriteReports(); track report.slug) {
+            @for (favorite of favoriteReports(); track favorite.report.slug) {
               <div class="sidebar-report-row">
-                <a class="sidebar-link sidebar-report" [routerLink]="['/postgraduate', report.slug]"
+                <a class="sidebar-link sidebar-report" [routerLink]="reportRoute(favorite.report, favorite.routePrefix)"
                   routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-                  ariaCurrentWhenActive="page" [title]="report.title" [attr.aria-label]="report.title"
-                  (click)="closeMobile()">{{ report.title }}</a>
+                  ariaCurrentWhenActive="page" [title]="favorite.report.title" [attr.aria-label]="favorite.report.title"
+                  (click)="closeMobile()">{{ favorite.report.title }}</a>
                 <button class="sidebar-favorite-toggle is-active" type="button"
-                  aria-label="Quitar de favoritos" (click)="toggleFavorite(report.slug)">
+                  aria-label="Quitar de favoritos" (click)="toggleFavorite(favorite.report.slug)">
                   <i class="bi bi-star-fill" aria-hidden="true"></i>
                 </button>
               </div>
@@ -68,17 +76,38 @@ export function migrateFavoriteSlugs(slugs: readonly string[]): string[] {
         }
         @for (section of visibleSections(); track section.id) {
           @if (collapsed() && !mobile) {
-            <div ngbDropdown placement="end-top" container="body" class="sidebar-group" #menu="ngbDropdown">
-              <button ngbDropdownToggle type="button" class="sidebar-link sidebar-section-toggle"
-                [class.active]="isActive(section)" [attr.data-section]="section.id"
-                [title]="section.title" [attr.aria-label]="section.title">
+            <div class="sidebar-group sidebar-collapsed-section" [attr.data-collapsed-section]="section.id"
+              (mouseenter)="setCollapsedSectionHover(section.id)"
+              (mouseleave)="clearCollapsedSectionHover()"
+              (focusin)="setCollapsedSectionHover(section.id)"
+              (focusout)="handleCollapsedSectionFocusOut($event)">
+              <button type="button" class="sidebar-link sidebar-section-toggle sidebar-icon-button"
+                [class.active]="isActive(section)" [class.is-open]="isCollapsedSectionOpen(section.id)"
+                [attr.data-section]="section.id" [attr.aria-expanded]="isCollapsedSectionOpen(section.id)"
+                aria-haspopup="menu" [title]="section.title" [attr.aria-label]="section.title">
                 <i class="bi" [class]="'bi ' + section.icon" aria-hidden="true"></i>
               </button>
-              <div ngbDropdownMenu class="reports-flyout" [attr.aria-label]="section.title">
-                <h2 class="h6 px-3 pt-2">{{ section.title }}</h2>
-                <ng-container [ngTemplateOutlet]="sectionItems"
-                  [ngTemplateOutletContext]="{ $implicit: section, menu: menu }" />
-              </div>
+              @if (isCollapsedSectionOpen(section.id)) {
+                <div class="reports-flyout" role="menu" [attr.aria-label]="section.title"
+                  (mouseenter)="setCollapsedSectionHover(section.id)"
+                  (mouseleave)="clearCollapsedSectionHover()"
+                  (focusin)="setCollapsedSectionHover(section.id)"
+                  (focusout)="handleCollapsedSectionFocusOut($event)">
+                  <div class="reports-flyout__header">{{ section.title }}</div>
+                  <div class="reports-flyout__items">
+                    @for (report of section.reports; track report.slug) {
+                      <a class="reports-flyout__item"
+                        [routerLink]="reportRoute(report, section.routePrefix)"
+                        routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+                        ariaCurrentWhenActive="page" [title]="report.title"
+                        [attr.aria-label]="report.title"
+                        (click)="closeCollapsedFlyout(); closeMobile()">{{ report.title }}</a>
+                    } @empty {
+                      <p class="reports-flyout__empty">Pendiente de migración</p>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           } @else {
             <div class="sidebar-group">
@@ -114,13 +143,13 @@ export function migrateFavoriteSlugs(slugs: readonly string[]): string[] {
         </div>
       </div>
     </ng-template>
-    <ng-template #sectionItems let-section let-menu="menu">
+    <ng-template #sectionItems let-section>
       @for (report of section.reports; track report.slug) {
         <div class="sidebar-report-row">
-          <a class="sidebar-link sidebar-report" [routerLink]="['/postgraduate', report.slug]"
+          <a class="sidebar-link sidebar-report" [routerLink]="reportRoute(report, section.routePrefix)"
             routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
             ariaCurrentWhenActive="page" [title]="report.title" [attr.aria-label]="report.title"
-            (click)="menu?.close(); closeMobile()">{{ report.title }}</a>
+            (click)="closeCollapsedFlyout(); closeMobile()">{{ report.title }}</a>
           <button class="sidebar-favorite-toggle" type="button"
             [class.is-active]="isFavorite(report.slug)"
             [attr.aria-label]="isFavorite(report.slug) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
@@ -151,6 +180,8 @@ export class ReportsSidebar {
   private readonly offcanvas = inject(NgbOffcanvas);
   private readonly drawer = viewChild.required<TemplateRef<unknown>>('drawer');
   private drawerRef?: NgbOffcanvasRef;
+  private hoverCloseTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  protected readonly hoveredCollapsedSection = signal<string | null>(null);
   protected readonly username = computed(() => this.auth.username()?.trim() || 'Usuario');
   protected readonly name = computed(() => this.auth.name()?.trim() || this.username());
   protected readonly initials = computed(() => this.username().slice(0, 2).toUpperCase());
@@ -171,7 +202,16 @@ export class ReportsSidebar {
         // Sin almacenamiento disponible los favoritos viven solo en la sesión.
       }
     });
-    inject(DestroyRef).onDestroy(() => this.closeMobile());
+    effect(() => {
+      if (!this.collapsed()) {
+        this.cancelPendingHoverClose();
+        this.hoveredCollapsedSection.set(null);
+      }
+    });
+    inject(DestroyRef).onDestroy(() => {
+      this.closeMobile();
+      this.cancelPendingHoverClose();
+    });
   }
 
   protected updateSearch(query: string): void {
@@ -201,26 +241,70 @@ export class ReportsSidebar {
     });
   });
 
-  protected readonly favoriteReports = computed<PostgraduateReport[]>(() => {
+  protected readonly favoriteReports = computed<FavoriteReport[]>(() => {
     const query = this.searchQuery().trim().toLocaleLowerCase('es');
     const slugs = this.favorites();
-    return this.sections.flatMap(section => section.reports)
-      .filter(report => slugs.includes(report.slug))
-      .filter(report => !query || report.title.toLocaleLowerCase('es').includes(query));
+    return this.sections.flatMap(section =>
+      section.reports.map(report => ({ report, routePrefix: section.routePrefix ?? '/postgraduate' })))
+      .filter(({ report }) => slugs.includes(report.slug))
+      .filter(({ report }) => !query || report.title.toLocaleLowerCase('es').includes(query));
   });
+
+  protected reportRoute(report: PostgraduateReport, routePrefix?: string): string {
+    return report.routePath ?? `${routePrefix ?? '/postgraduate'}/${report.slug}`;
+  }
 
   protected toggleSection(id: string): void {
     this.expanded.update(ids => ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]);
   }
 
   protected isActive(section: ReportSection): boolean {
-    return section.id === 'postgrado' && this.currentUrl().startsWith('/postgraduate/');
+    return !!section.routePrefix && this.currentUrl().startsWith(section.routePrefix + '/');
+  }
+
+  protected setCollapsedSectionHover(id: string): void {
+    if (!this.collapsed()) return;
+    this.cancelPendingHoverClose();
+    this.hoveredCollapsedSection.set(id);
+  }
+
+  protected clearCollapsedSectionHover(): void {
+    this.cancelPendingHoverClose();
+    this.hoverCloseTimeoutId = setTimeout(() => {
+      this.hoveredCollapsedSection.set(null);
+      this.hoverCloseTimeoutId = null;
+    }, 120);
+  }
+
+  protected handleCollapsedSectionFocusOut(event: FocusEvent): void {
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && event.currentTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
+      return;
+    }
+    this.clearCollapsedSectionHover();
+  }
+
+  protected isCollapsedSectionOpen(id: string): boolean {
+    return this.hoveredCollapsedSection() === id;
+  }
+
+  protected closeCollapsedFlyout(): void {
+    this.cancelPendingHoverClose();
+    this.hoveredCollapsedSection.set(null);
+  }
+
+  private cancelPendingHoverClose(): void {
+    if (this.hoverCloseTimeoutId === null) return;
+    clearTimeout(this.hoverCloseTimeoutId);
+    this.hoverCloseTimeoutId = null;
   }
 
   private updateNavigation(url: string): void {
     this.currentUrl.set(url);
-    if (url.startsWith('/postgraduate/') && !this.expanded().includes('postgrado')) {
-      this.expanded.update(ids => [...ids, 'postgrado']);
+    const active = this.sections.find(section =>
+      section.routePrefix && url.startsWith(section.routePrefix + '/'));
+    if (active && !this.expanded().includes(active.id)) {
+      this.expanded.update(ids => [...ids, active.id]);
     }
   }
 
@@ -245,7 +329,7 @@ export class ReportsSidebar {
         .filter((slug): slug is string => typeof slug === 'string')
         .map(slug => LEGACY_POSTGRADUATE_SLUGS[slug as keyof typeof LEGACY_POSTGRADUATE_SLUGS] ?? slug);
       const favorites = [...new Set(migrated)]
-        .filter(slug => POSTGRADUATE_REPORTS.some(report => report.slug === slug));
+        .filter(slug => ALL_REPORTS.some(report => report.slug === slug));
       if (stored && JSON.stringify(parsed) !== JSON.stringify(favorites))
         localStorage.setItem(FAVORITE_ROUTES_STORAGE_KEY, JSON.stringify(favorites));
       return favorites;

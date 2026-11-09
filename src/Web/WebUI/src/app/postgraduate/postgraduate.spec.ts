@@ -461,17 +461,21 @@ describe('Navegación visual de Postgrado', () => {
     expect(routes.some(route => route.path?.startsWith('postgrado'))).toBe(false);
   });
 
-  it('conserva Inicio y redirige las opciones desconocidas al inicio', async () => {
+  it('redirige las opciones desconocidas al primer informe de Inscripción académica', async () => {
     const harness = await RouterTestingHarness.create('/postgraduate/no-existe');
-    expect(TestBed.inject(Router).url).toBe('/');
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('SADInformes');
+    const http = TestBed.inject(HttpTestingController);
+    expect(TestBed.inject(Router).url).toBe('/academic-enrollment/electives-without-common-plan');
+    http.expectOne('/api/reports/academic-enrollment/electives-without-common-plan/report')
+      .flush({ success: true, data: { rows: [], total: 0 } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim())
+      .toBe('Electivos de mención que no están en el plan común');
   });
 
   it('no permite abrir una ficha sin sesión e inicia el login', async () => {
     auth.isAuthenticated.mockReturnValue(false);
-    const harness = await RouterTestingHarness.create();
     const target = '/postgraduate/' + POSTGRADUATE_REPORTS[0].slug;
-    await harness.navigateByUrl(target);
+    const harness = await RouterTestingHarness.create(target);
     expect(auth.login).toHaveBeenCalledExactlyOnceWith(target);
     expect(harness.routeNativeElement?.querySelector('h1')).toBeFalsy();
   });

@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
@@ -19,6 +21,7 @@ describe('Base de SADInformes', () => {
     name = signal('Usuario Prueba');
     TestBed.configureTestingModule({ imports: [App], providers: [
       provideRouter(routes),
+      provideHttpClient(), provideHttpClientTesting(),
       { provide: NavigationService, useValue: { links: signal([]), error: signal(''), load: vi.fn() } },
       { provide: ThemeStore, useValue: { preference: signal('auto'), resolvedTheme: () => 'light', setPreference: vi.fn() } },
       { provide: AuthService, useValue: {
@@ -28,6 +31,8 @@ describe('Base de SADInformes', () => {
     ] });
     TestBed.inject(NgbConfig).animation = false;
   });
+
+  afterEach(() => TestBed.inject(HttpTestingController).verify());
 
   it('crea el contenedor standalone', () => {
     const fixture = TestBed.createComponent(App);
@@ -84,17 +89,28 @@ describe('Base de SADInformes', () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it('muestra la página inicial autenticada sin funciones de alumnos', async () => {
+  it('abre el primer informe de Inscripción académica como página inicial', async () => {
     const harness = await RouterTestingHarness.create('/');
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('SADInformes');
-    expect(harness.routeNativeElement?.textContent).toContain('Base del sistema de informes.');
-    expect(harness.routeNativeElement?.querySelector('nav, aside, form')).toBeNull();
-    expect(harness.routeNativeElement?.textContent).toContain('Sesión iniciada: usuario');
-    expect(harness.routeNativeElement?.querySelector('button')).toBeNull();
+    const http = TestBed.inject(HttpTestingController);
+    expect(TestBed.inject(Router).url).toBe('/academic-enrollment/electives-without-common-plan');
+    http.expectOne('/api/reports/academic-enrollment/electives-without-common-plan/report')
+      .flush({ success: true, data: { rows: [], total: 0 } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim())
+      .toBe('Electivos de mención que no están en el plan común');
+    expect(harness.routeNativeElement?.textContent).toContain('Los electivos en esta situación');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Sesión iniciada');
+    expect(harness.routeNativeElement?.querySelector('aside, form')).toBeNull();
   });
 
-  it('redirige las rutas desconocidas al inicio', async () => {
+  it('redirige las rutas desconocidas al primer informe', async () => {
     const harness = await RouterTestingHarness.create('/ruta-inexistente');
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('SADInformes');
+    const http = TestBed.inject(HttpTestingController);
+    expect(TestBed.inject(Router).url).toBe('/academic-enrollment/electives-without-common-plan');
+    http.expectOne('/api/reports/academic-enrollment/electives-without-common-plan/report')
+      .flush({ success: true, data: { rows: [], total: 0 } });
+    await harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent?.trim())
+      .toBe('Electivos de mención que no están en el plan común');
   });
 });

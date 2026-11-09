@@ -15,7 +15,7 @@ public sealed class AreaCoursesEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/area-courses";
     private const string Query = "?year1=2024&year2=2026";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_AREA_COURSES";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(AreaCoursesTests.Procedures procedures)
     {
@@ -54,7 +54,7 @@ public sealed class AreaCoursesEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {
         var procedures = new AreaCoursesTests.Procedures();

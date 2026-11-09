@@ -23,7 +23,7 @@ sólo las usaba para exportar; se conserva ese comportamiento.
 | `GET /filters` | `{ years, types }` con `EX` y `FT` |
 | `GET /download?year=2024&type=EX` | XLSX de 31 columnas para Executive |
 | `GET /download?year=2024&type=FT` | XLSX de 50 columnas para Full Time |
-| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE_COURSE_TEACHER_EVALUATION` |
+| Permiso de ambas rutas | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 año/tipo inválido o exportación vacía; 401 sin sesión; 403 sin permiso; 503 sanitizado |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

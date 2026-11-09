@@ -26,7 +26,7 @@ los años descarta resultados, búsqueda y página, y cancela consultas/descarga
 | `GET /filters` | `{ success, message, data: { years } }` |
 | `GET /?year1=2024&year2=2026` | `{ success, message, data: { rows, total } }` |
 | `GET /download?year1=2024&year2=2026` | XLSX con las 28 columnas |
-| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE_AREA_COURSES`; administradores existentes conservados |
+| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 años inválidos o exportación vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas usan `Cache-Control: no-store`; el archivo lleva

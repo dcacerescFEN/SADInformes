@@ -14,12 +14,12 @@ public sealed class MassEnrollmentEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/mass-enrollment")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_MASS_ENROLLMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", Filters).WithSummary("Filtros de inscripción masiva");
         group.MapGet("/", Candidates).WithSummary("Alumnos disponibles para inscripción masiva");
         group.MapPost("/", Enroll)
-            .RequireAuthorization(Permission.REPORT_MANAGE_POSTGRADUATE_MASS_ENROLLMENT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithSummary("Inscribir el lote confirmado de alumnos");
     }
 

@@ -22,7 +22,7 @@ La pantalla mantiene el flujo de exportación original: no agrega tabla ni visor
 | --- | --- |
 | `GET /api/reports/postgraduate/sad-vti-updates/filters` | `{ success, message, data: { states: [{ value, text }] } }` |
 | `GET /api/reports/postgraduate/sad-vti-updates/download?state=-1&from=2026-10-01&to=2026-10-31` | Excel OOXML real, no HTML/CSV con extensión falsa |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES` y administradores existentes |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` y administradores existentes |
 | Fechas API | `yyyy-MM-dd`, sin depender de la cultura del servidor |
 | Errores | 400 fechas/estado inválidos o sin filas; 401 sin sesión; 403 sin permiso; 503 almacenamiento/exportación indisponible |
 

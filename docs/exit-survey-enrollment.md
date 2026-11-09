@@ -29,8 +29,8 @@ cancela la consulta anterior y descarta selecciones.
 | `GET /filters?studentType=MBA` | Tipos (incluye Todos), modalidades dependientes del tipo y años |
 | `GET /?studentType=Todos&modality=Todos&year=2024` | `{ rows, total, canEnroll }` |
 | `POST /` | Inscripción confirmada; cuerpo con filtros, códigos y `confirmed: true` |
-| Permiso de lectura | `REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` |
-| Permiso de escritura | `REPORT_MANAGE_POSTGRADUATE_EXIT_SURVEY_ENROLLMENT` |
+| Permiso de lectura | `REPORT_VIEW_POSTGRADUATE` |
+| Permiso de escritura | `REPORT_VIEW_POSTGRADUATE` |
 | Respuestas | 400 validación (incluye códigos duplicados), 401 sin sesión, 403 sin permiso, 409 selección obsoleta/no listada, 503 fallo saneado |
 | Caché | `Cache-Control: no-store` en catálogos, listado y escritura |
 

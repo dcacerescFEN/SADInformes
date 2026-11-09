@@ -33,7 +33,7 @@ informe no concede acceso a SADAlumnos.
 | `GET /filters?studentType=MBA` | `{ success, message, data: { studentTypes, modalities, years } }` |
 | `GET /?studentType=MBA&modality=PT&cohort=2024&year=2026` | `{ success, message, data: { rows, total } }` |
 | `GET /download` con los mismos cuatro filtros | XLSX real; archivo sin fotos |
-| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE_WEIGHTED_RANKING`; administradores existentes conservados |
+| Permiso de las tres rutas | `REPORT_VIEW_POSTGRADUATE`; administradores existentes conservados |
 | Errores | 400 filtros inválidos/fuera de catálogo o descarga vacía; 401 sin sesión; 403 sin permiso; 503 indisponible, sin datos SQL privados |
 
 Las respuestas autenticadas de filtros, reporte y Excel usan `Cache-Control: no-store`.

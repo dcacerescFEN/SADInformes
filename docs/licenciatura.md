@@ -19,7 +19,7 @@ además el número de fila, igual que el legado.
 | --- | --- |
 | `GET /report` | filas y total |
 | `GET /download` | XLSX de 5 columnas |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_LICENCIATURA` |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 sin datos al exportar; 401/403; 503 sanitizado |
 
 Las respuestas usan `Cache-Control: no-store`; el archivo lleva

@@ -16,7 +16,7 @@ public sealed class SadVtiUpdatesTests
 {
     private const string Route = "/api/reports/postgraduate/sad-vti-updates";
     private const string Query = "?state=-1&from=2026-10-01&to=2026-10-01";
-    private const string Permission = "PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES";
+    private const string Permission = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
     private static async Task<(WebApplicationFactory<Program>, TokenFactory)> Create(bool unavailable = false)
     {
         var options = unavailable ? new DbContextOptions<SadContext>() : SadVtiUpdatesQueryTests.Options();
@@ -39,7 +39,7 @@ public sealed class SadVtiUpdatesTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_STUDENT_REQUESTS", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task Both_routes_require_report_permission_before_reading_data(string? role, int status)
     {
         var (factory, tokens) = await Create(unavailable: true);

@@ -17,6 +17,7 @@ Estadísticas ISS Postgrado: [muestra, categorías y observaciones](docs/iss-sta
 Estadísticas Encuesta Alumni: [diccionario y exportación](docs/alumni-survey-statistics.md).
 Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
 Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
+Electivos de mención sin plan común: [consulta de inscripción académica](docs/electives-without-common-plan.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -291,10 +292,12 @@ repositorios académicos, tareas periódicas ni estado global estático de NewSA
 ## Sidebar de informes
 
 Se adapta el componente de SADAdministracion: panel de 280 px expandido y 76 px
-colapsado, con perfil del usuario y temas de la aplicación. Conserva **Inicio**
-e incorpora las 14 secciones de Informes del SAD como dropdowns con flecha,
-submenú y estado activo. En escritorio colapsado, cada icono abre un flyout
-mediante clic o teclado, sin quedar recortado por el scroll. En móvil se mantiene
+colapsado, con perfil del usuario y temas de la aplicación. La raíz abre
+directamente el primer informe de Inscripción académica e incorpora las 14
+secciones de Informes del SAD como dropdowns con flecha,
+submenú y estado activo. En escritorio colapsado, cada icono de 44 × 44 abre
+su flyout al pasar el mouse, al recibir foco o por teclado, sin quedar recortado
+por el scroll y con el mismo tratamiento visual de SADAlumnos. En móvil se mantiene
 el panel con backdrop. No copia períodos académicos, gestión de usuarios ni
 permisos administrativos.
 
@@ -318,7 +321,7 @@ para conservar sus usos anteriores.
 
 ### Postgrado: etapa visual
 
-Las secciones ajenas a Postgrado muestran **Pendiente de migración** al
+Las secciones sin catálogo propio muestran **Pendiente de migración** al
 expandirse; todavía no tienen pantallas funcionales ni rutas nuevas.
 Postgrado muestra 30 funcionalidades: las 29 principales de `SAD/Informes/Postgrado`,
 incluidas Estadísticas ISS y Encuesta Salida. Cada opción abre una ruta autenticada
@@ -331,12 +334,29 @@ Programación Docente Postgrado X Programa y Modalidad se incorpora desde
 `SAD/Informes/Inscripcion/ProgramacionXProgramaModalidad.aspx`; las 30 rutas
 anteriores se conservan.
 
-Las fichas no consultan APIs ni bases de datos, no abren aplicaciones externas y
-no permiten inscribir, registrar pagos, administrar firmas ni exportar informes.
+### Inscripción académica: fichas locales
+
+La sección **Inscripción académica** expone las 22 opciones visibles del tab
+legado `SAD/Informes/default.aspx` en rutas
+`/academic-enrollment/<opción>`. **Electivos de mención que no están en el plan
+común** ya es funcional: carga automáticamente el procedimiento
+`spRec_ElectivosDeMencionSinPlanComun` y muestra las columnas **Decreto**,
+**Código** y **Nombre**. Las demás opciones muestran la ficha local
+**Pendiente de migración**, su descripción y la referencia al archivo legado; no
+abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
+ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
+legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
+incorporan.
+
+Las fichas pendientes no consultan APIs ni bases de datos, no abren aplicaciones
+externas y no permiten inscribir, registrar pagos, administrar firmas ni exportar
+informes.
 No se agregan permisos por informe: mostrar una ficha no autoriza la operación
 futura. REPORT_ACCESS_REPORT_MODULE controla la configuración de entrada al módulo, no sustituye
 los permisos de consulta o modificación que requiera cada informe. La migración de cada funcionalidad y sus permisos se decidirá después.
-Las rutas desconocidas siguen redirigiendo a Inicio.
+Contrato del primer informe en
+[`docs/electives-without-common-plan.md`](docs/electives-without-common-plan.md).
+Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
 las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
@@ -346,7 +366,7 @@ las pruebas automatizadas verifican fichas, sesión, rutas y navegación móvil.
 Ruta: `/postgraduate/teaching-schedule`. Conserva los cinco
 filtros y las siete columnas del SAD. Promoción sigue mostrando `Promocion` y
 enviando `Descripcion`, sin corregir el binding ni cambiar el parámetro SQL de 7
-caracteres. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE`.
+caracteres. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE`.
 Contrato, compatibilidad y pruebas en [`docs/teaching-schedule.md`](docs/teaching-schedule.md).
 
 ### Alumnos sin contestar encuesta docente
@@ -354,7 +374,7 @@ Contrato, compatibilidad y pruebas en [`docs/teaching-schedule.md`](docs/teachin
 La ruta `/postgraduate/unanswered-teacher-survey` ya abre el informe real:
 período, tipo y modalidad concretos, tabla con las cinco columnas del SAD y CSV
 seguro. Usa el SP existente `spRec_Alumnos_Sin_Evaluacion_Docente`, sin cambios de
-base. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY`;
+base. Requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE`;
 el permiso de entrada no concede acceso a los datos. El contrato, la semántica
 exacta de las evaluaciones pendientes y la verificación están en
 [`docs/unanswered-teacher-survey.md`](docs/unanswered-teacher-survey.md).
@@ -368,7 +388,7 @@ SAD, tabla de resultados, total y exportación CSV.
 | Elemento | Valor |
 | --- | --- |
 | Endpoints | `GET /api/reports/postgraduate/teacher-survey/filters` y `GET /api/reports/postgraduate/teacher-survey` |
-| Permiso | `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY` en el cliente físico configurado |
+| Permiso | `PERMISSION_REPORT_VIEW_POSTGRADUATE` en el cliente físico configurado |
 | Datos | SP existentes `spRec_Encuesta_DocenteXCurso`, `spRec_PeriodosAcademicosProgramacion`, `spRec_TiposAlumno` y `spRec_TiposAlumnosModalidades` |
 | Conexión | `ConnectionStrings:Sad`, definida fuera del repositorio con una cuenta de solo lectura |
 | Acceso a datos | `SadContext` + `ISadContextProcedures`, igual que SADAlumnos y SADAdministracion |
@@ -418,7 +438,7 @@ Con `dotnet run` el frontend de desarrollo está en 4200; la API y Scalar, en 70
 Una consulta real requiere la conexión de solo lectura y los roles de Keycloak;
 ninguna credencial se guarda en el repositorio.
 
-El acceso requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHER_SURVEY`. La
+El acceso requiere `PERMISSION_REPORT_VIEW_POSTGRADUATE`. La
 equivalencia con los servicios del SAD legado y los permisos aún propuestos están en
 [docs/permissions-equivalence.md](docs/permissions-equivalence.md).
 
@@ -512,7 +532,7 @@ pnpm test
 Las pruebas .NET usan claves RSA efímeras y metadatos OIDC locales al proceso:
 validan tokens por HTTP sin usuarios ni acceso al servidor Keycloak real.
 Las pruebas Node comprueban estructura, dependencias y arranque HTTP real de la API.
-Las pruebas Angular comprueban contenedor, página inicial, dropdowns, flyouts,
+Las pruebas Angular comprueban contenedor, informe inicial, dropdowns, flyouts,
 fichas de Postgrado, panel móvil y redirección de rutas. Las pruebas HTTP .NET
 comprueban también el despacho de Config y Scalar/OpenAPI por ambiente.
 La restauración de paquetes advierte vulnerabilidades transitivas en

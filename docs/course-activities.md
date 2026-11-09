@@ -24,7 +24,7 @@ Fecha_Suspención, Usuario_Suspención y Observaciones.
 | `GET /filters` | años disponibles |
 | `GET /report?year=2024` | filas y total |
 | `GET /download?year=2024` | XLSX de 22 columnas |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES` |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 año inválido o exportación vacía; 401/403; 503 sanitizado |
 
 Las respuestas usan `Cache-Control: no-store`; el archivo lleva

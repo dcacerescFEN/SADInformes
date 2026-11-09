@@ -13,7 +13,7 @@ public sealed class WeightedRankingEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/weighted-ranking")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_WEIGHTED_RANKING)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters)
             .WithSummary("Filtros concretos del ranking de notas ponderadas");

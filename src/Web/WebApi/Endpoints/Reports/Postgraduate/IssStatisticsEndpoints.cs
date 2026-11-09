@@ -12,7 +12,7 @@ public sealed class IssStatisticsEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/iss-statistics")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_ISS_STATISTICS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos de estadísticas ISS");
         group.MapGet("/summary", GetSummary).WithSummary("Resumen de estadísticas ISS");

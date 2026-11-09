@@ -49,12 +49,12 @@ test('Report uses the configured SAD user for the department scope and keeps the
 
 test('Endpoint requires its own report permission and sanitizes storage failures', () => {
   const endpoint = read('src/Web/WebApi/Endpoints/Reports/Postgraduate/TeacherCoursesEndpoints.cs');
-  assert.match(endpoint, /REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES/);
+  assert.match(endpoint, /REPORT_VIEW_POSTGRADUATE/);
   assert.match(endpoint, /statusCode: 400/);
   assert.match(endpoint, /statusCode: 503/);
   assert.doesNotMatch(endpoint, /private-sql|Exception\.Message/);
   const permission = read('src/Domain/Constants/Permission.cs');
-  assert.match(permission, /REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES = "REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES"/);
+  assert.match(permission, /REPORT_VIEW_POSTGRADUATE = "REPORT_VIEW_POSTGRADUATE"/);
 });
 
 test('Procedure wrappers keep canonical types from the SAD mapping', () => {

@@ -13,7 +13,7 @@ public sealed class CourseTeacherEvaluationEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/course-teacher-evaluation")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_COURSE_TEACHER_EVALUATION)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años y tipos de evaluación");
         group.MapGet("/download", Download).WithSummary("Evaluación docente/curso en Excel");

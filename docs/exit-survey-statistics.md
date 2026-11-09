@@ -32,7 +32,7 @@ etapa carga su primer tab y cancela las consultas de la etapa anterior.
   anterior y no permiten que una respuesta vieja reemplace la nueva.
 - Tabs de las 14 secciones sobre un shell único; las fases P2-P6 incorporaron
   el contenido de cada sección.
-- Permiso de solo lectura `REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS`.
+- Permiso de solo lectura `REPORT_VIEW_POSTGRADUATE`.
   Las respuestas autenticadas llevan `Cache-Control: no-store`.
 
 ## P2 entregado

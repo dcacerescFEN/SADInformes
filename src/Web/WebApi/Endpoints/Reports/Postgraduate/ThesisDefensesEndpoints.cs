@@ -13,7 +13,7 @@ public sealed class ThesisDefensesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/thesis-defenses")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_THESIS_DEFENSES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters)
             .WithSummary("Años, tipos de alumno y modalidades de defensas de tesis");

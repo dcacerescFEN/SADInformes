@@ -19,7 +19,7 @@ public sealed class ExitSurveyStatisticsEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/exit-survey-statistics")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_EXIT_SURVEY_STATISTICS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", Filters).WithSummary("Filtros de estadísticas de encuesta de salida");
         group.MapGet("/sample", Sample).WithSummary("Muestra y avance de la encuesta de salida");

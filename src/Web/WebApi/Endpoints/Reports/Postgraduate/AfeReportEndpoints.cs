@@ -14,7 +14,7 @@ public sealed class AfeReportEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/afe-report")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_AFE_REPORT)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos de avances AFE");
         group.MapGet("/advances", GetAdvances).WithSummary("Avances AFE por curso");

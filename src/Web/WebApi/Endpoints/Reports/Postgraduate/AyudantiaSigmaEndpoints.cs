@@ -13,7 +13,7 @@ public sealed class AyudantiaSigmaEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/ayudantias-sigma")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_SIGMA_TUTORSHIPS)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años de ayudantías Sigma");
         group.MapGet("/", GetReport).WithSummary("Ayudantías postgrado con estado Sigma");

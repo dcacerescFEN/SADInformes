@@ -13,7 +13,7 @@ public sealed class TeacherCoursesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/teacher-courses")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_TEACHER_COURSES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
 
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos del informe Cursos Profesores Postgrado");

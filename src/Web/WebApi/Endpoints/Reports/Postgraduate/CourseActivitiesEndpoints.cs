@@ -13,7 +13,7 @@ public sealed class CourseActivitiesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/course-activities")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_COURSE_ACTIVITIES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años de actividades de cursos");
         group.MapGet("/report", GetReport).WithSummary("Actividades de cursos de Postgrado");

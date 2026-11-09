@@ -13,7 +13,7 @@ public sealed class TeachingScheduleEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/teaching-schedule")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
 
         group.MapGet("/filters", GetFilters).WithSummary("Catálogos del informe Programación Docente Postgrado X Programa y Modalidad");

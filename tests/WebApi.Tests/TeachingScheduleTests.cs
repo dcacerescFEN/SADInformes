@@ -17,7 +17,7 @@ public sealed class TeachingScheduleTests
 {
     private const string Route = "/api/reports/postgraduate/teaching-schedule";
     private const string Query = "?tipoPeriodo=PER%C3%8DODO&periodo=2024B&tipoAlumno=MBA&modalidad=PT&promocion=Todas";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(ISadContextProcedures? procedures = null)
     {
@@ -51,7 +51,7 @@ public sealed class TeachingScheduleTests
 
     [Theory]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE")]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_UNANSWERED_TEACHER_SURVEY")]
+    [InlineData("PERMISSION_REPORT_UNRELATED")]
     public async Task Entry_and_sibling_report_permissions_do_not_grant_access(string role)
     {
         var (factory, tokens) = Create();

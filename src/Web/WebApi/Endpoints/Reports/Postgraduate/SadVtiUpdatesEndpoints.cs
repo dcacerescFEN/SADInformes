@@ -13,7 +13,7 @@ public sealed class SadVtiUpdatesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/sad-vti-updates")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Estados de actualización SAD–VTI");
         group.MapGet("/download", Download).WithSummary("Descarga Excel de auditoría SAD–VTI por estado y fechas inclusivas");

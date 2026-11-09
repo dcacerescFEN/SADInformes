@@ -37,7 +37,7 @@ public sealed class LicenciaturaTests
         using var signing = tokens; using var client = factory.CreateClient();
         Assert.Equal((int)HttpStatusCode.Unauthorized,
             (int)(await client.GetAsync("/api/reports/postgraduate/licenciatura-pregrado/download")).StatusCode);
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/licenciatura-pregrado/download");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("ProximasLicenciatura.xlsx",
@@ -56,7 +56,7 @@ public sealed class LicenciaturaTests
         var tokens = new TokenFactory();
         using var factory = CreateFactory(new Procedures { NoData = true }, tokens);
         using var signing = tokens; using var client = factory.CreateClient();
-        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE_LICENCIATURA"));
+        client.SetBearer(tokens.CreateToken("SADInformes", "PERMISSION_REPORT_VIEW_POSTGRADUATE"));
         using var response = await client.GetAsync("/api/reports/postgraduate/licenciatura-pregrado/download");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

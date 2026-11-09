@@ -12,7 +12,7 @@ public sealed class LicenciaturaEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/licenciatura-pregrado")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_LICENCIATURA)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/report", GetReport).WithSummary("Alumnos próximos a licenciatura");
         group.MapGet("/download", Download).WithSummary("Próximas licenciaturas en Excel");

@@ -5,6 +5,7 @@ import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/auth-service';
 import { ReportsSidebar, migrateFavoriteSlugs } from './reports-sidebar';
 import { POSTGRADUATE_REPORTS } from '../../postgraduate/postgraduate-catalogue';
+import { INSCRIPCION_ACADEMICA_REPORTS } from '../../inscripcion-academica/inscripcion-academica-catalogue';
 
 @Component({ template: '' })
 class TestPage {}
@@ -25,6 +26,7 @@ describe('Sidebar de Informes', () => {
       provideRouter([
         { path: '', component: TestPage }, { path: 'otra', component: TestPage },
         ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgraduate/' + report.slug, component: TestPage })),
+        ...INSCRIPCION_ACADEMICA_REPORTS.map(report => ({ path: 'academic-enrollment/' + report.slug, component: TestPage })),
       ]),
       { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba' } },
     ] }).compileComponents();
@@ -106,25 +108,34 @@ describe('Sidebar de Informes', () => {
     toggles[0].click();
     await settle();
     expect(toggles[0].getAttribute('aria-expanded')).toBe('true');
-    expect(root.querySelector('[data-section-content="inscripcion-academica"]')?.textContent)
-      .toContain('Pendiente de migración');
+    const enrollmentLinks = [...root.querySelectorAll<HTMLAnchorElement>(
+      '[data-section-content="inscripcion-academica"] .sidebar-report')];
+    expect(enrollmentLinks.map(link => link.textContent?.trim()))
+      .toEqual(INSCRIPCION_ACADEMICA_REPORTS.map(report => report.title));
+    expect(enrollmentLinks[0].getAttribute('href')).toBe('/academic-enrollment/' + INSCRIPCION_ACADEMICA_REPORTS[0].slug);
     toggles[0].click();
     await settle();
     expect(toggles[0].getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('muestra un flyout navegable al pulsar Postgrado en modo colapsado', async () => {
+  it('muestra un flyout navegable al pasar el mouse por Postgrado en modo colapsado', async () => {
     fixture.componentRef.setInput('collapsed', true);
     await settle();
-    fixture.nativeElement.querySelector('[data-section="postgrado"]').click();
+    const root: HTMLElement = fixture.nativeElement;
+    const group = root.querySelector<HTMLElement>('[data-collapsed-section="postgrado"]')!;
+    group.dispatchEvent(new MouseEvent('mouseenter'));
     await settle();
-    const menu = document.querySelector<HTMLElement>('.dropdown-menu.show')!;
+    const button = group.querySelector<HTMLButtonElement>('[data-section="postgrado"]')!;
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    const menu = group.querySelector<HTMLElement>('.reports-flyout')!;
+    expect(menu.querySelector('.reports-flyout__header')?.textContent?.trim()).toBe('Postgrado');
+    expect(menu.querySelectorAll('.reports-flyout__item')).toHaveLength(POSTGRADUATE_REPORTS.length);
     expect(menu.querySelectorAll('a')).toHaveLength(POSTGRADUATE_REPORTS.length);
     expect(menu.textContent).toContain(POSTGRADUATE_REPORTS[0].title);
     menu.querySelector<HTMLAnchorElement>('a')!.click();
     await settle();
     expect(TestBed.inject(Router).url).toBe('/postgraduate/' + POSTGRADUATE_REPORTS[0].slug);
-    expect(document.querySelector('.dropdown-menu.show')).toBeNull();
+    expect(group.querySelector('.reports-flyout')).toBeNull();
   });
 
   it('busca secciones y opciones y avisa cuando no hay coincidencias', async () => {

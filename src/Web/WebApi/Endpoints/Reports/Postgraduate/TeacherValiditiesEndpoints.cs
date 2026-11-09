@@ -13,7 +13,7 @@ public sealed class TeacherValiditiesEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/teacher-validities")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_TEACHER_VALIDITIES)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/filters", GetFilters).WithSummary("Años del informe de vigencias");
         group.MapGet("/", GetReport).WithSummary("Profesores confirmados por cátedra y año");

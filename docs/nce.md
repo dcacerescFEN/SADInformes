@@ -25,7 +25,7 @@ Los botones de exportación usan clases y tokens compartidos: Excel verde
 | `GET /report` | filas del informe |
 | `GET /download` | XLSX del informe |
 | `GET /download/pdf` | PDF del informe |
-| Permiso | `REPORT_VIEW_POSTGRADUATE_NCE` |
+| Permiso | `REPORT_VIEW_POSTGRADUATE` |
 | Errores | 400 sin datos al exportar; 401/403; 503 sanitizado |
 
 Las respuestas usan `Cache-Control: no-store`; el archivo lleva

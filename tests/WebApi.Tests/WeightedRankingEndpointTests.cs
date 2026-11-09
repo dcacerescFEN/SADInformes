@@ -15,7 +15,7 @@ public sealed class WeightedRankingEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/weighted-ranking";
     private const string Query = "?studentType=MBA&modality=PT&cohort=2024&year=2026";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_WEIGHTED_RANKING";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(WeightedRankingTests.Procedures procedures)
     {
@@ -54,7 +54,7 @@ public sealed class WeightedRankingEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_weighted_ranking_permission(string? role, int status)
     {
         var procedures = new WeightedRankingTests.Procedures();

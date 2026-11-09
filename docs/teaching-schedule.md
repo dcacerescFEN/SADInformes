@@ -53,7 +53,7 @@ opcionales y `Todas` del contrato legado. No se aplica la validación genérica 
 selecciones concretas de otros informes a estos filtros.
 
 Ambas rutas requieren
-`PERMISSION_REPORT_VIEW_POSTGRADUATE_TEACHING_SCHEDULE` en el cliente físico
+`PERMISSION_REPORT_VIEW_POSTGRADUATE` en el cliente físico
 configurado, o los roles REPORT ADMIN/SUPERADMIN existentes. El permiso de entrada
 y el de otros informes no conceden acceso. La aplicación no crea ni asigna roles.
 Sin sesión devuelve 401; sin permiso, 403; filtros inválidos, 400 antes de leer;

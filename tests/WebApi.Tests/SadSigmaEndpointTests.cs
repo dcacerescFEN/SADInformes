@@ -14,7 +14,7 @@ namespace WebApi.Tests;
 public sealed class SadSigmaEndpointTests
 {
     private const string Route = "/api/reports/postgraduate/sad-sigma";
-    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_SIGMA";
+    private const string View = "PERMISSION_REPORT_VIEW_POSTGRADUATE";
 
     private static (WebApplicationFactory<Program>, TokenFactory) Create(
         SadSigmaTests.Procedures procedures, ISigmaRemuneracionesContext? sigma = null)
@@ -58,7 +58,7 @@ public sealed class SadSigmaEndpointTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("PERMISSION_REPORT_ACCESS_REPORT_MODULE", 403)]
-    [InlineData("PERMISSION_REPORT_VIEW_POSTGRADUATE_SAD_VTI_UPDATES", 403)]
+    [InlineData("PERMISSION_REPORT_UNRELATED", 403)]
     public async Task All_routes_require_the_report_permission(string? role, int status)
     {
         var procedures = new SadSigmaTests.Procedures();

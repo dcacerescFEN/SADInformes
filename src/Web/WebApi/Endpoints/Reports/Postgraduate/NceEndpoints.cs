@@ -12,7 +12,7 @@ public sealed class NceEndpoints : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/reports/postgraduate/nce")
-            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE_NCE)
+            .RequireAuthorization(Permission.REPORT_VIEW_POSTGRADUATE)
             .WithTags("Reports/Postgraduate");
         group.MapGet("/report", Report).WithSummary("Informe de notificaciones NCE");
         group.MapGet("/download", Download).WithSummary("Informe NCE en Excel");
