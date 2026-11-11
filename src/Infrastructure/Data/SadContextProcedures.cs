@@ -1467,4 +1467,23 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecResPermutaXAlumnoResult>?> SpRec_ResPermutaXAlumnoAsync(
+        string? periodo, DateTime? desde, DateTime? hasta,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Desde", Value = desde ?? (object)DBNull.Value, SqlDbType = SqlDbType.DateTime },
+            new SqlParameter { ParameterName = "Hasta", Value = hasta ?? (object)DBNull.Value, SqlDbType = SqlDbType.DateTime },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecResPermutaXAlumnoResult>(
+            "EXEC @returnValue = [dbo].[spRec_ResPermutaXAlumno] @Periodo = @Periodo, @Desde = @Desde, @Hasta = @Hasta",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }

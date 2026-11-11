@@ -84,7 +84,10 @@ export const routes: Routes = [
         : report.slug === 'postulation-results-by-course'
           ? import('./academic-enrollment/postulation-results-by-course/postulation-results-by-course')
             .then((module) => module.PostulationResultsByCourse)
-          : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+          : report.slug === 'permutation-results-by-student'
+            ? import('./academic-enrollment/permutation-results-by-student/permutation-results-by-student')
+              .then((module) => module.PermutationResultsByStudent)
+            : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

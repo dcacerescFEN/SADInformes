@@ -39,7 +39,7 @@ test('Las capas .NET 10 solo referencian capas interiores, sin paquetes funciona
     } else if (layer === 'Application') {
       assert.match(project, /PackageReference Include="Scrutor" Version="7.0.0"/);
     } else if (layer === 'Infrastructure') {
-      assert.match(project, /PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12"/);
+      assert.match(project, /PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.15"/);
     } else {
       assert.doesNotMatch(project, /<PackageReference/);
     }
