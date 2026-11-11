@@ -1518,4 +1518,20 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecAlumnosCompletaronElectivosResult>?> SpRec_AlumnosCompletaronElectivosAsync(
+        string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnosCompletaronElectivosResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosCompletaronElectivos] @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }
