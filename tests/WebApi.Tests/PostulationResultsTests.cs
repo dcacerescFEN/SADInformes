@@ -38,6 +38,18 @@ public sealed class PostulationResultsTests
     }
 
     [Fact]
+    public async Task Query_accepts_the_agrega_origin()
+    {
+        var response = await new GetPostulationResultsByCourseHandler(
+            new Procedures(), new ApiResponseService())
+            .Handle(new GetPostulationResultsByCourse("2024A", "AGREGA",
+                "2024-01-01T08:00", "2024-01-05T18:00"), default);
+
+        Assert.Equal("AGREGA", response.Data.Origin);
+        Assert.Single(response.Data.Rows);
+    }
+
+    [Fact]
     public async Task Endpoints_require_report_access_and_return_the_three_catalogs()
     {
         var tokens = new TokenFactory();

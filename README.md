@@ -19,7 +19,7 @@ Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
 Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
 Electivos de mención sin plan común: [consulta de inscripción académica](docs/electives-without-common-plan.md).
 Alumnos sin prioridad: [consulta de inscripción académica](docs/students-without-priority.md).
-Resultados de postulación por curso: [filtros de período, rango y fechas](docs/postulation-results-by-course.md).
+Resultados de postulación y agrega por curso: [filtros de período, rango y fechas](docs/postulation-results-by-course.md).
 Resultados de permuta por alumno: [filtros de período, rango y fechas](docs/permutation-results-by-student.md).
 Permutas rechazadas por vacantes: [filtro de período](docs/permutation-rejections-by-course.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
@@ -344,7 +344,7 @@ La sección **Inscripción académica** expone las 22 opciones visibles del tab
 legado `SAD/Informes/default.aspx` en rutas
 `/academic-enrollment/<opción>`. **Electivos de mención que no están en el plan
 común**, **Alumnos que pueden postular y no tienen prioridad**, **Resultados de
-postulación por curso**, **Resultados de permuta por alumno** y **Permutas
+postulación y agrega por curso**, **Resultados de permuta por alumno** y **Permutas
 rechazadas por vacantes** ya son funcionales: cargan sus catálogos y
 procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
 ficha local **Pendiente de migración**, su descripción y la referencia al archivo

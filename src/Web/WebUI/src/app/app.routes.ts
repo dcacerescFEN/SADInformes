@@ -74,7 +74,7 @@ export const routes: Routes = [
   ...ACADEMIC_ENROLLMENT_REPORTS.filter(report => !report.routePath).map(report => ({
     path: 'academic-enrollment/' + report.slug,
     canActivate: [authGuard],
-    data: { report },
+    data: { report, origin: report.slug === 'add-results-by-course' ? 'AGREGA' : 'INSCRIPCION' },
     loadComponent: () => report.slug === 'electives-without-common-plan'
       ? import('./academic-enrollment/electives-without-common-plan/electives-without-common-plan')
         .then((module) => module.ElectivesWithoutCommonPlan)
@@ -84,7 +84,10 @@ export const routes: Routes = [
         : report.slug === 'postulation-results-by-course'
           ? import('./academic-enrollment/postulation-results-by-course/postulation-results-by-course')
             .then((module) => module.PostulationResultsByCourse)
-          : report.slug === 'permutation-results-by-student'
+          : report.slug === 'add-results-by-course'
+            ? import('./academic-enrollment/postulation-results-by-course/postulation-results-by-course')
+              .then((module) => module.PostulationResultsByCourse)
+            : report.slug === 'permutation-results-by-student'
             ? import('./academic-enrollment/permutation-results-by-student/permutation-results-by-student')
               .then((module) => module.PermutationResultsByStudent)
             : report.slug === 'permutation-rejections-by-course'

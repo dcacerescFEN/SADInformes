@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Search } from '../../shared/components/search';
@@ -29,7 +30,6 @@ interface Row {
 }
 
 const BASE = '/api/reports/academic-enrollment/postulation-results-by-course';
-const ORIGIN = 'INSCRIPCION';
 const COLUMNS: readonly TableColumn[] = [
   { key: 'course', name: 'Curso', sortable: true },
   { key: 'courseName', name: 'Cátedra', sortable: true },
@@ -61,10 +61,11 @@ const COLUMNS: readonly TableColumn[] = [
           <div>
             <h1 class="page-title">
               <i class="bi bi-diagram-3" aria-hidden="true"></i>
-              Resultados Procesamiento Masivo Postulación
+              Resultados Procesamiento Masivo {{ origin === 'AGREGA' ? 'Agrega' : 'Postulación' }}
             </h1>
             <p class="page-subtitle mb-0">
-              Resultados por curso del procesamiento de postulación
+              Resultados por curso del procesamiento de
+              {{ origin === 'AGREGA' ? 'agrega' : 'postulación' }}
               @if (periodLabel()) { · {{ periodLabel() }} }.
             </p>
           </div>
@@ -143,6 +144,8 @@ const COLUMNS: readonly TableColumn[] = [
 export class PostulationResultsByCourse {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  protected readonly origin = (this.route?.snapshot.data['origin'] as string) ?? 'INSCRIPCION';
   readonly form = inject(FormBuilder).nonNullable.group({
     period: '', process: '', from: '', to: '',
   });
@@ -210,7 +213,7 @@ export class PostulationResultsByCourse {
     this.processes.set([]);
     this.error.set('');
     this.http.get<{ success: boolean; data: { processes: ProcessOption[] } }>(BASE + '/processes', {
-      params: { origin: ORIGIN, period },
+      params: { origin: this.origin, period },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: result => {
         if (revision !== this.processRevision) return;
@@ -239,7 +242,7 @@ export class PostulationResultsByCourse {
     this.error.set('');
     this.searchTerm.set('');
     this.http.get<{ success: boolean; data: { rows: Row[]; total: number } }>(BASE + '/report', {
-      params: { origin: ORIGIN, period, from, to },
+      params: { origin: this.origin, period, from, to },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: result => {
         this.loading.set(false);

@@ -1,12 +1,15 @@
-# Resultados de postulación por curso
+# Resultados de postulación y agrega por curso
 
-Migración de `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx?origen=INSCRIPCION` a la ruta
-`/academic-enrollment/postulation-results-by-course`.
+Migración de `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx` en sus dos
+variantes:
+
+- `origen=INSCRIPCION`: `/academic-enrollment/postulation-results-by-course`
+- `origen=AGREGA`: `/academic-enrollment/add-results-by-course`
 
 ## Comportamiento
 
 - Carga los períodos activos de toma de ramos.
-- Al seleccionar un período carga los rangos de proceso de postulación.
+- Al seleccionar un período carga los rangos del proceso correspondiente.
 - Al seleccionar un rango completa **Desde** y **Hasta** con las fechas del proceso.
 - Permite ajustar las fechas antes de actualizar.
 - Conserva las 17 columnas visibles del SAD, incluidos los encabezados repetidos
@@ -26,10 +29,10 @@ Migración de `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx?origen=INSCR
 | Períodos | `spRec_PeriodosActivosTomaRamos` |
 | Rangos | `spRec_ProcesosPeriodos` |
 
-El origen se normaliza a `INSCRIPCION` o `AGREGA`; esta pantalla usa
-`INSCRIPCION`. Las fechas se envían con hora (`yyyy-MM-ddTHH:mm`) para conservar
-el rango del proceso. Los errores de validación responden `400`; los fallos de
-SQL, timeout o configuración responden `503` sin exponer detalles.
+El origen se normaliza a `INSCRIPCION` o `AGREGA`. Las fechas se envían con hora
+(`yyyy-MM-ddTHH:mm`) para conservar el rango del proceso. Los errores de
+validación responden `400`; los fallos de SQL, timeout o configuración responden
+`503` sin exponer detalles.
 
 ## Pendiente
 

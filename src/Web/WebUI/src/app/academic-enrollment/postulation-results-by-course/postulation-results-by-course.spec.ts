@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
 import { PostulationResultsByCourse } from './postulation-results-by-course';
 
 const BASE = '/api/reports/academic-enrollment/postulation-results-by-course';
@@ -14,34 +15,40 @@ const row = {
 
 describe('Resultados de postulación por curso', () => {
   let http: HttpTestingController;
+  let route: { snapshot: { data: { origin: string } } };
 
   beforeEach(() => {
+    route = { snapshot: { data: { origin: 'INSCRIPCION' } } };
     TestBed.configureTestingModule({
       imports: [PostulationResultsByCourse],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(), provideHttpClientTesting(),
+        { provide: ActivatedRoute, useValue: route },
+      ],
     });
     http = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => { http.verify(); TestBed.resetTestingModule(); });
 
-  async function loadReport(fixture: { detectChanges: () => void; whenStable: () => Promise<unknown> }) {
+  async function loadReport(fixture: { detectChanges: () => void; whenStable: () => Promise<unknown> },
+    origin = 'INSCRIPCION') {
     fixture.detectChanges();
     http.expectOne(BASE + '/filters').flush({
       success: true, data: { periods: [{ value: '2024A', text: '2024 Primer Semestre' }] },
     });
     fixture.detectChanges();
     http.expectOne(request => request.url === BASE + '/processes'
-      && request.params.get('origin') === 'INSCRIPCION'
+      && request.params.get('origin') === origin
       && request.params.get('period') === '2024A').flush({
       success: true,
       data: { processes: [
-        { value: '1', text: 'Postulación', start: '2024-01-01T08:00', end: '2024-01-05T18:00' },
+        { value: '1', text: origin === 'AGREGA' ? 'Agrega' : 'Postulación', start: '2024-01-01T08:00', end: '2024-01-05T18:00' },
       ] },
     });
     fixture.detectChanges();
     http.expectOne(request => request.url === BASE + '/report'
-      && request.params.get('origin') === 'INSCRIPCION'
+      && request.params.get('origin') === origin
       && request.params.get('period') === '2024A'
       && request.params.get('from') === '2024-01-01T08:00'
       && request.params.get('to') === '2024-01-05T18:00').flush({
@@ -64,6 +71,16 @@ describe('Resultados de postulación por curso', () => {
     expect(root.textContent).toContain('Total: 1');
     expect(root.textContent).toContain('Rec. Otros incluye');
     expect(root.querySelectorAll('app-table tbody td.cell-warning-highlight')).toHaveLength(2);
+  });
+
+  it('loads the AGREGA variant with its own origin', async () => {
+    route.snapshot.data.origin = 'AGREGA';
+    const fixture = TestBed.createComponent(PostulationResultsByCourse);
+    await loadReport(fixture, 'AGREGA');
+    const root: HTMLElement = fixture.nativeElement;
+    expect(root.querySelector('h1')?.textContent?.trim())
+      .toContain('Resultados Procesamiento Masivo Agrega');
+    expect(root.querySelectorAll('app-table tbody tr')).toHaveLength(1);
   });
 
   it('shows the empty state and keeps the results section', async () => {

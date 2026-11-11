@@ -1,12 +1,12 @@
 # Inscripción académica: resultados de postulación por curso
 
-Migrar `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx?origen=INSCRIPCION`.
+Migrar `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx` en sus dos variantes.
 
 ## Specs
 
-- **S1:** La ruta `/academic-enrollment/postulation-results-by-course` deja de ser una ficha pendiente y muestra el informe de postulación.
+- **S1:** Las rutas `/academic-enrollment/postulation-results-by-course` y `/academic-enrollment/add-results-by-course` dejan de ser fichas pendientes y muestran el informe funcional.
 - **S2:** Conservar período, rango de proceso, fechas y las 17 columnas legadas; los datos provienen de `spRec_ResPostulaAgregaXCurso`, con períodos de `spRec_PeriodosActivosTomaRamos` y rangos de `spRec_ProcesosPeriodos`.
-- **S3:** La variante `AGREGA` no forma parte de esta solicitud y permanece pendiente.
+- **S3:** Soportar `INSCRIPCION` y `AGREGA` mediante el origen de la ruta.
 - **S4:** No agregar exportación. Usar `page-header`, `form-section`, `ng-select`, fechas, `app-table` y búsqueda compartida.
 
 ## Tasks
@@ -19,5 +19,5 @@ Migrar `SAD/Informes/Inscripcion/ResPostulaAgregaXCurso.aspx?origen=INSCRIPCION`
 
 L1. Solicitud del usuario: «ahora migrar Informes/Inscripcion/ResPostulaAgregaXCurso.aspx?origen=INSCRIPCION».
 L2. Legacy: período, rango de proceso y fechas; SP `spRec_ResPostulaAgregaXCurso`; 17 columnas visibles. El detalle emergente `ResPostulaAgregaXCursoAlumnos.aspx` queda fuera de esta unidad.
-L3. Implementado `/academic-enrollment/postulation-results-by-course` para origen `INSCRIPCION`; la variante `AGREGA` conserva su ficha pendiente.
-L4. Verificación: backend `PostulationResultsTests` 3/3 y suite WebApi 540/540; Angular enfocado 12/12; suite completa 343/348 con los 5 fallos preexistentes de `localStorage`; Node 38/38; build Angular correcto. Sin verificación SQL/navegador real.
+L3. Implementado `/academic-enrollment/postulation-results-by-course` para `INSCRIPCION` y `/academic-enrollment/add-results-by-course` para `AGREGA`, compartiendo el componente.
+L4. Verificación: backend `PostulationResultsTests` 4/4 y suite WebApi 547/547; Angular enfocado 13/13; suite completa 355/355; Node 38/38; build Angular correcto. Sin verificación SQL/navegador real.
