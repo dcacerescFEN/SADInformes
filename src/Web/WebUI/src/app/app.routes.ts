@@ -102,7 +102,10 @@ export const routes: Routes = [
                   : report.slug === 'automatic-mention-changes'
                     ? import('./academic-enrollment/automatic-mention-changes/automatic-mention-changes')
                       .then((module) => module.AutomaticMentionChanges)
-                    : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                    : report.slug === 'enrolled-approved-courses'
+                      ? import('./academic-enrollment/enrolled-approved-courses/enrolled-approved-courses')
+                        .then((module) => module.EnrolledApprovedCourses)
+                      : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

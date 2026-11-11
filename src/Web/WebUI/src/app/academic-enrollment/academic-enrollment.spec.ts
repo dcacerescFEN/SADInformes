@@ -47,6 +47,8 @@ describe('Navegación de Inscripción académica', () => {
       .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'automatic-mention-changes')?.available)
       .toBe(true);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'enrolled-approved-courses')?.available)
+      .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
       .toBe('/postgraduate/teaching-schedule');
   });

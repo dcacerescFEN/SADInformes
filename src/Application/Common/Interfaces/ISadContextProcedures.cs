@@ -172,4 +172,6 @@ public partial interface ISadContextProcedures
     Task<List<SpRecAlumnosCompletaronElectivosResult>?> SpRec_AlumnosCompletaronElectivosAsync(string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
     Task<List<SpRecAlumnosCambioMencionAutomaticoResult>?> SpRec_AlumnosCambioMencionAutomaticoAsync(string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecInscritasYaAprobadasResult>?> SpRec_InscritasYaAprobadasAsync(string? periodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }
