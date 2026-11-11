@@ -99,7 +99,10 @@ export const routes: Routes = [
                 : report.slug === 'students-completed-electives'
                   ? import('./academic-enrollment/students-completed-electives/students-completed-electives')
                     .then((module) => module.StudentsCompletedElectives)
-                  : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                  : report.slug === 'automatic-mention-changes'
+                    ? import('./academic-enrollment/automatic-mention-changes/automatic-mention-changes')
+                      .then((module) => module.AutomaticMentionChanges)
+                    : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];
