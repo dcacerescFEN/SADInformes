@@ -1,4 +1,8 @@
+@use "variables" as vars;
+
 :root {
+  --warning-yellow: #{vars.$warning-yellow};
+  --dark-gray: #{vars.$dark-gray};
   --primary-blue: #003b7a;
   --primary-blue-deep: #06245a;
   --layout-background: #f4f7fb;
@@ -318,6 +322,25 @@ body {
   color: var(--layout-text);
   border-color: var(--layout-border-color);
 }
+
+.app-table tbody td.cell-warning-highlight {
+  background-color: var(--warning-yellow) !important;
+  color: var(--dark-gray) !important;
+}
+
+.app-table.table-hover tbody tr:hover td.cell-warning-highlight {
+  background-color: var(--warning-yellow) !important;
+  color: var(--dark-gray) !important;
+}
+
+// Solo en oscuro: al hacer hover, la celda vuelve al color normal de la fila
+// y el texto usa el color de texto del tema.
+:root[data-theme='dark'] .app-table.table-hover tbody tr:hover td.cell-warning-highlight {
+  background-color: var(--table-row-hover-background) !important;
+  color: var(--layout-text) !important;
+}
+
+
 
 // Selectores ng-select con etiqueta flotante, igual que las referencias.
 .ng-select-container-custom {

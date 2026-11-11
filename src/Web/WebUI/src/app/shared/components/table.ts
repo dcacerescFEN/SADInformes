@@ -15,6 +15,7 @@ export interface TableColumn {
   alternateActionVisible?: (row: object) => boolean;
   badges?: boolean;
   emphasized?: boolean;
+  cellClass?: string;
   link?: (row: object) => string | null;
 }
 
@@ -269,7 +270,7 @@ export interface TableAction {
                         />
                       </td>
                     } @else {
-                      <td>
+                      <td [ngClass]="column.cellClass">
                         {{ getCellValue(row, column.key) }}
                       </td>
                     }

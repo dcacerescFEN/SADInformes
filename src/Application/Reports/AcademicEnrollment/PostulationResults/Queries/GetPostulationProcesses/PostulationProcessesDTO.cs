@@ -1,0 +1,3 @@
+namespace Application.Reports.AcademicEnrollment.PostulationResults.Queries.GetPostulationProcesses;
+
+public sealed record PostulationProcessesDTO(PostulationProcessOptionDTO[] Processes);

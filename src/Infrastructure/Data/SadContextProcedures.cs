@@ -1417,4 +1417,54 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         returnValue?.SetValue(parameterreturnValue.Value);
         return result;
     }
+
+    public virtual async Task<List<SpRecPeriodosActivosTomaRamosResult>?> SpRec_PeriodosActivosTomaRamosAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var result = await context.SqlQueryAsync<SpRecPeriodosActivosTomaRamosResult>(
+            "EXEC @returnValue = [dbo].[spRec_PeriodosActivosTomaRamos]",
+            [parameterreturnValue], cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecProcesosPeriodosResult>?> SpRec_ProcesosPeriodosAsync(
+        string? tipoProceso, string? periodo, int? idProcesoPeriodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "TipoProceso", Size = 50, Value = tipoProceso ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "IdProcesoPeriodo", Value = idProcesoPeriodo ?? 0, SqlDbType = SqlDbType.Int },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecProcesosPeriodosResult>(
+            "EXEC @returnValue = [dbo].[spRec_ProcesosPeriodos] @TipoProceso = @TipoProceso, @Periodo = @Periodo, @IdProcesoPeriodo = @IdProcesoPeriodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecResPostulaAgregaXCursoResult>?> SpRec_ResPostulaAgregaXCursoAsync(
+        string? periodo, string? origen, DateTime? desde, DateTime? hasta,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Origen", Size = 50, Value = origen ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Desde", Value = desde ?? (object)DBNull.Value, SqlDbType = SqlDbType.DateTime },
+            new SqlParameter { ParameterName = "Hasta", Value = hasta ?? (object)DBNull.Value, SqlDbType = SqlDbType.DateTime },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecResPostulaAgregaXCursoResult>(
+            "EXEC @returnValue = [dbo].[spRec_ResPostulaAgregaXCurso] @Periodo = @Periodo, @Origen = @Origen, @Desde = @Desde, @Hasta = @Hasta",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
 }

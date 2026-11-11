@@ -19,6 +19,7 @@ Avances AFE: [filtros en cascada y exportación](docs/afe-report.md).
 Próximas Licenciaturas Pregrado: [búsqueda y exportación](docs/licenciatura.md).
 Electivos de mención sin plan común: [consulta de inscripción académica](docs/electives-without-common-plan.md).
 Alumnos sin prioridad: [consulta de inscripción académica](docs/students-without-priority.md).
+Resultados de postulación por curso: [filtros de período, rango y fechas](docs/postulation-results-by-course.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -340,11 +341,11 @@ anteriores se conservan.
 La sección **Inscripción académica** expone las 22 opciones visibles del tab
 legado `SAD/Informes/default.aspx` en rutas
 `/academic-enrollment/<opción>`. **Electivos de mención que no están en el plan
-común** y **Alumnos que pueden postular y no tienen prioridad** ya son
-funcionales: cargan automáticamente sus procedimientos y muestran sus columnas
-legadas. Las demás opciones muestran la ficha local **Pendiente de migración**,
-su descripción y la referencia al archivo legado; no abren el SAD ni ejecutan
-consultas. **Programación Docente Postgrado** reutiliza la
+común**, **Alumnos que pueden postular y no tienen prioridad** y **Resultados de
+postulación por curso** ya son funcionales: cargan sus catálogos y procedimientos
+y muestran sus columnas legadas. Las demás opciones muestran la ficha local
+**Pendiente de migración**, su descripción y la referencia al archivo legado; no
+abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
 ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
 legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
 incorporan.
@@ -356,8 +357,9 @@ No se agregan permisos por informe: mostrar una ficha no autoriza la operación
 futura. REPORT_ACCESS_REPORT_MODULE controla la configuración de entrada al módulo, no sustituye
 los permisos de consulta o modificación que requiera cada informe. La migración de cada funcionalidad y sus permisos se decidirá después.
 Contrato de los informes funcionales en
-[`docs/electives-without-common-plan.md`](docs/electives-without-common-plan.md)
-y [`docs/students-without-priority.md`](docs/students-without-priority.md).
+[`docs/electives-without-common-plan.md`](docs/electives-without-common-plan.md),
+[`docs/students-without-priority.md`](docs/students-without-priority.md)
+y [`docs/postulation-results-by-course.md`](docs/postulation-results-by-course.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;

@@ -156,4 +156,10 @@ public partial interface ISadContextProcedures
     Task<List<SpRecElectivosDeMencionSinPlanComunResult>?> SpRec_ElectivosDeMencionSinPlanComunAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
     Task<List<SpRecAlumnosSinPrioridadResult>?> SpRec_AlumnosSinPrioridadAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecPeriodosActivosTomaRamosResult>?> SpRec_PeriodosActivosTomaRamosAsync(OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecProcesosPeriodosResult>?> SpRec_ProcesosPeriodosAsync(string? tipoProceso, string? periodo, int? idProcesoPeriodo, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecResPostulaAgregaXCursoResult>?> SpRec_ResPostulaAgregaXCursoAsync(string? periodo, string? origen, DateTime? desde, DateTime? hasta, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 }
