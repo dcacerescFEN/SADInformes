@@ -22,6 +22,7 @@ Alumnos sin prioridad: [consulta de inscripción académica](docs/students-witho
 Resultados de postulación y agrega por curso: [filtros de período, rango y fechas](docs/postulation-results-by-course.md).
 Resultados de permuta por alumno: [filtros de período, rango y fechas](docs/permutation-results-by-student.md).
 Permutas rechazadas por vacantes: [filtro de período](docs/permutation-rejections-by-course.md).
+Alumnos que completaron libres: [filtro de período](docs/students-completed-free-courses.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -344,11 +345,11 @@ La sección **Inscripción académica** expone las 22 opciones visibles del tab
 legado `SAD/Informes/default.aspx` en rutas
 `/academic-enrollment/<opción>`. **Electivos de mención que no están en el plan
 común**, **Alumnos que pueden postular y no tienen prioridad**, **Resultados de
-postulación y agrega por curso**, **Resultados de permuta por alumno** y **Permutas
-rechazadas por vacantes** ya son funcionales: cargan sus catálogos y
-procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
-ficha local **Pendiente de migración**, su descripción y la referencia al archivo
-legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
+postulación y agrega por curso**, **Resultados de permuta por alumno**, **Permutas
+rechazadas por vacantes** y **Alumnos que completaron libres** ya son funcionales:
+cargan sus catálogos y procedimientos y muestran sus columnas legadas. Las demás
+opciones muestran la ficha local **Pendiente de migración**, su descripción y la
+referencia al archivo legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
 ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
 legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
 incorporan.
@@ -364,7 +365,8 @@ Contrato de los informes funcionales en
 [`docs/students-without-priority.md`](docs/students-without-priority.md)
 y [`docs/postulation-results-by-course.md`](docs/postulation-results-by-course.md)
 y [`docs/permutation-results-by-student.md`](docs/permutation-results-by-student.md)
-y [`docs/permutation-rejections-by-course.md`](docs/permutation-rejections-by-course.md).
+y [`docs/permutation-rejections-by-course.md`](docs/permutation-rejections-by-course.md)
+y [`docs/students-completed-free-courses.md`](docs/students-completed-free-courses.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
