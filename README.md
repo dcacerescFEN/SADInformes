@@ -26,6 +26,7 @@ Alumnos que completaron libres: [filtro de período](docs/students-completed-fre
 Alumnos que completaron electivos: [filtro de período](docs/students-completed-electives.md).
 Cambios automáticos de mención: [filtro de período](docs/automatic-mention-changes.md).
 Cátedras inscritas ya aprobadas: [filtro de período](docs/enrolled-approved-courses.md).
+Cátedras inscritas sin requisitos: [filtro de período](docs/enrolled-without-requirements.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -351,10 +352,11 @@ común**, **Alumnos que pueden postular y no tienen prioridad**, **Resultados de
 postulación y agrega por curso**, **Resultados de permuta por alumno**, **Permutas
 rechazadas por vacantes**, **Alumnos que completaron libres**, **Alumnos que
 completaron electivos**, **Cambios automáticos de mención** y **Cátedras
-inscritas ya aprobadas** ya son funcionales: cargan sus catálogos y
-procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
-ficha local **Pendiente de migración**, su descripción y la referencia al archivo
-legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
+inscritas ya aprobadas** y **Cátedras inscritas sin requisitos** ya son
+funcionales: cargan sus catálogos y procedimientos y muestran sus columnas
+legadas. Las demás opciones muestran la ficha local **Pendiente de migración**,
+su descripción y la referencia al archivo legado; no abren el SAD ni ejecutan
+consultas. **Programación Docente Postgrado** reutiliza la
 ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
 legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
 incorporan.
@@ -374,7 +376,8 @@ y [`docs/permutation-rejections-by-course.md`](docs/permutation-rejections-by-co
 y [`docs/students-completed-free-courses.md`](docs/students-completed-free-courses.md)
 y [`docs/students-completed-electives.md`](docs/students-completed-electives.md)
 y [`docs/automatic-mention-changes.md`](docs/automatic-mention-changes.md)
-y [`docs/enrolled-approved-courses.md`](docs/enrolled-approved-courses.md).
+y [`docs/enrolled-approved-courses.md`](docs/enrolled-approved-courses.md)
+y [`docs/enrolled-without-requirements.md`](docs/enrolled-without-requirements.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
