@@ -79,13 +79,13 @@ const COLUMNS: readonly TableColumn[] = [
       </div>
       @if (filtersLoading()) { <p role="status">Cargando filtros…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
-      @if (loaded() && !error()) {
+      @if ((loaded() || loading()) && !error()) {
         <div class="form-section">
           <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex justify-content-end mb-3">
             <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
           </div>
-          <app-table aria-label="Actividades de cursos de Postgrado" [data]="rows()" [columns]="columns"
+          <app-table [loading]="loading() || !loaded()" aria-label="Actividades de cursos de Postgrado" [data]="rows()" [columns]="columns"
             [searchTerm]="searchTerm()" [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
         </div>

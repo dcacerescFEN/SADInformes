@@ -252,4 +252,21 @@ describe('Table sorting and filtering', () => {
     disabledAction.click();
     expect(events).toEqual([{ id: 'F-1', actionKey: 'review' }]);
   });
+
+  it('renders skeleton rows and suppresses the empty state while loading', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: { value: signal(columns) },
+      data: { value: signal([]) },
+      loading: { value: signal(true) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+
+    const root: HTMLElement = fixture.nativeElement;
+    expect(root.querySelector('table')?.getAttribute('aria-busy')).toBe('true');
+    expect(root.querySelectorAll('tbody .table-skeleton-row')).toHaveLength(5);
+    expect(root.querySelector('.empty-state')).toBeNull();
+    expect(root.querySelectorAll('tbody .skeleton').length).toBeGreaterThan(0);
+  });
 });

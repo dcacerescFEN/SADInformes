@@ -33,7 +33,7 @@ export interface TableAction {
   template: `
     <div class="table-container">
       <div class="table-responsive">
-        <table class="table table-hover align-middle app-table">
+        <table class="table table-hover align-middle app-table" [attr.aria-busy]="loading()">
           <thead class="table-light">
             <tr>
               @if (selectionEnabled()) {
@@ -75,6 +75,24 @@ export interface TableAction {
             </tr>
           </thead>
           <tbody>
+            @if (loading()) {
+              @for (skeleton of skeletonRows; track skeleton) {
+                <tr class="table-skeleton-row" aria-hidden="true">
+                  @if (selectionEnabled()) {
+                    <td><span class="skeleton skeleton--check"></span></td>
+                  }
+                  @if (showRowNumber()) {
+                    <td><span class="skeleton skeleton--number"></span></td>
+                  }
+                  @for (column of columns(); track column; let i = $index) {
+                    <td><span class="skeleton" [style.width.%]="skeletonWidth(i)"></span></td>
+                  }
+                  @if (actions().length > 0) {
+                    <td><span class="skeleton skeleton--action"></span></td>
+                  }
+                </tr>
+              }
+            } @else {
             @if (getPaginatedData().length === 0) {
               <tr>
                 <td
@@ -308,6 +326,7 @@ export interface TableAction {
                 }
               </tr>
             }
+            }
           </tbody>
         </table>
       </div>
@@ -366,6 +385,7 @@ export class Table {
   readonly showRowNumber = input<boolean>(true);
   readonly selectionEnabled = input<boolean>(false);
   readonly selectionLabel = input<string>('Seleccionar');
+  readonly loading = input<boolean>(false);
   readonly actionEvent = output<{
     id: string | number | null | undefined;
     actionKey: string;
@@ -377,6 +397,7 @@ export class Table {
   public readonly sortColumn = signal<string | null>(null);
   public readonly sortDirection = signal<'asc' | 'desc'>('asc');
   public readonly itemsPerPage = 10;
+  protected readonly skeletonRows = [0, 1, 2, 3, 4];
   public maxPagesToShow = 5; // Máximo de páginas a mostrar a la izquierda y derecha
 
   constructor() {
@@ -385,6 +406,10 @@ export class Table {
       this.searchTerm();
       this.currentPage.set(1);
     });
+  }
+
+  protected skeletonWidth(index: number): number {
+    return 55 + ((index * 13) % 30);
   }
 
   public setPage(pageNumber: number | string) {

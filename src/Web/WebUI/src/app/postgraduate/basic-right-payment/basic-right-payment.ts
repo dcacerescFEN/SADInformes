@@ -112,7 +112,7 @@ const COLUMNS: readonly TableColumn[] = [
       @if (loading()) { <p role="status">Cargando pagos…</p> }
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (notice()) { <p class="text-body-secondary" role="status">{{ notice() }}</p> }
-      @if (loaded()) {
+      @if (loaded() || loading()) {
         <div class="form-section">
           <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
@@ -127,7 +127,7 @@ const COLUMNS: readonly TableColumn[] = [
               <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
             }
           </div>
-          <app-table aria-label="Pago derecho básico anual" [data]="rows()" [columns]="columns"
+          <app-table [loading]="loading() || !loaded()" aria-label="Pago derecho básico anual" [data]="rows()" [columns]="columns"
             [searchTerm]="searchTerm()" [showSummary]="false" [showRowNumber]="false"
             [selectionEnabled]="true" selectionLabel="Pago" (selectionChange)="togglePayment($event)" />
           <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>

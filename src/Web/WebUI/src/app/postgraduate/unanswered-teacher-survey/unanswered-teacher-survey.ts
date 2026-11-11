@@ -94,10 +94,10 @@ const COLUMNS: readonly TableColumn[] = [
       @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
       @if (loading()) { <p role="status">Cargando…</p> }
 
-      @if (rows().length > 0 || notice()) {
+      @if (loading() || rows().length > 0 || notice()) {
         <div class="form-section">
           <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
-          <app-table aria-label="Alumnos sin contestar encuesta docente" [data]="rows()" [columns]="columns"
+          <app-table [loading]="loading()" aria-label="Alumnos sin contestar encuesta docente" [data]="rows()" [columns]="columns"
             [showSummary]="false" [showRowNumber]="false" />
           <p class="fw-semibold mt-3 mb-0">Total:{{ rows().length }}</p>
         </div>
