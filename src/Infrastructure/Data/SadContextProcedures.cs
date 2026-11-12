@@ -625,6 +625,31 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecProgramacionDocenteXDecretoResult>?> SpRec_ProgramacionDocenteXDecretoAsync(
+        string? periodo, string? decreto, string? tipoPeriodo, string? escuela,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter
+        {
+            ParameterName = "returnValue",
+            Direction = ParameterDirection.Output,
+            SqlDbType = SqlDbType.Int,
+        };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Decreto", Size = 50, Value = decreto ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "TipoPeriodo", Size = 20, Value = tipoPeriodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Escuela", Size = 20, Value = escuela ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecProgramacionDocenteXDecretoResult>(
+            "EXEC @returnValue = [dbo].[spRec_ProgramacionDocenteXDecreto] @Periodo = @Periodo, @Decreto = @Decreto, @TipoPeriodo = @TipoPeriodo, @Escuela = @Escuela",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(
         string? incluirTodos, string? usuario,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

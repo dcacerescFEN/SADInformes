@@ -114,7 +114,10 @@ export const routes: Routes = [
                           : report.slug === 'enrollment-teaching-schedule'
                             ? import('./academic-enrollment/enrollment-teaching-schedule/enrollment-teaching-schedule')
                               .then((module) => module.EnrollmentTeachingSchedule)
-                            : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                            : report.slug.startsWith('teaching-schedule-')
+                              ? import('./academic-enrollment/teaching-schedule-decreto/teaching-schedule-decreto')
+                                .then((module) => module.TeachingScheduleDecreto)
+                              : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

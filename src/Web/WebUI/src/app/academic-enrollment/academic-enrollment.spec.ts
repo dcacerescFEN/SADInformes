@@ -55,6 +55,10 @@ describe('Navegación de Inscripción académica', () => {
       .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'enrollment-teaching-schedule')?.available)
       .toBe(true);
+    for (const slug of ['teaching-schedule-ic-old-plan', 'teaching-schedule-ic-new-plan',
+      'teaching-schedule-iicg-old-plan', 'teaching-schedule-iicg-new-plan']) {
+      expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === slug)?.available).toBe(true);
+    }
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
       .toBe('/postgraduate/teaching-schedule');
   });

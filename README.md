@@ -29,6 +29,7 @@ Cátedras inscritas ya aprobadas: [filtro de período](docs/enrolled-approved-co
 Cátedras inscritas sin requisitos: [filtro de período](docs/enrolled-without-requirements.md).
 Obligatorias reprobadas no inscritas: [filtro de período](docs/failed-mandatory-not-enrolled.md).
 Programación Docente: [filtros de escuela, período y área, con exportación](docs/enrollment-teaching-schedule.md).
+Programación Docente por decreto: [cuatro planes de Ingeniería Comercial e IICG](docs/teaching-schedule-decreto.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -355,10 +356,11 @@ postulación y agrega por curso**, **Resultados de permuta por alumno**, **Permu
 rechazadas por vacantes**, **Alumnos que completaron libres**, **Alumnos que
 completaron electivos**, **Cambios automáticos de mención** y **Cátedras
 inscritas ya aprobadas**, **Cátedras inscritas sin requisitos**, **Obligatorias
-reprobadas no inscritas** y **Programación Docente** ya son funcionales: cargan
-sus catálogos y procedimientos y muestran sus columnas legadas. Las demás
-opciones muestran la ficha local **Pendiente de migración**, su descripción y la
-referencia al archivo legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
+reprobadas no inscritas**, **Programación Docente** y **Programación Docente por
+decreto (cuatro planes)** ya son funcionales: cargan sus catálogos y
+procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
+ficha local **Pendiente de migración**, su descripción y la referencia al archivo
+legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
 ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
 legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
 incorporan.
@@ -381,7 +383,8 @@ y [`docs/automatic-mention-changes.md`](docs/automatic-mention-changes.md)
 y [`docs/enrolled-approved-courses.md`](docs/enrolled-approved-courses.md)
 y [`docs/enrolled-without-requirements.md`](docs/enrolled-without-requirements.md)
 y [`docs/failed-mandatory-not-enrolled.md`](docs/failed-mandatory-not-enrolled.md)
-y [`docs/enrollment-teaching-schedule.md`](docs/enrollment-teaching-schedule.md).
+y [`docs/enrollment-teaching-schedule.md`](docs/enrollment-teaching-schedule.md)
+y [`docs/teaching-schedule-decreto.md`](docs/teaching-schedule-decreto.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;
