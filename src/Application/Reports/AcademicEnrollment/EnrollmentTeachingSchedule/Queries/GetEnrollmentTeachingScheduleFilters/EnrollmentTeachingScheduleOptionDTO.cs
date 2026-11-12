@@ -1,0 +1,3 @@
+namespace Application.Reports.AcademicEnrollment.EnrollmentTeachingSchedule.Queries.GetEnrollmentTeachingScheduleFilters;
+
+public sealed record EnrollmentTeachingScheduleOptionDTO(string Value, string Text);

@@ -111,7 +111,10 @@ export const routes: Routes = [
                         : report.slug === 'failed-mandatory-not-enrolled'
                           ? import('./academic-enrollment/failed-mandatory-not-enrolled/failed-mandatory-not-enrolled')
                             .then((module) => module.FailedMandatoryNotEnrolled)
-                          : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                          : report.slug === 'enrollment-teaching-schedule'
+                            ? import('./academic-enrollment/enrollment-teaching-schedule/enrollment-teaching-schedule')
+                              .then((module) => module.EnrollmentTeachingSchedule)
+                            : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];
