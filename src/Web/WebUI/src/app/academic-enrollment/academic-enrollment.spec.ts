@@ -51,6 +51,8 @@ describe('Navegación de Inscripción académica', () => {
       .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'enrolled-without-requirements')?.available)
       .toBe(true);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'failed-mandatory-not-enrolled')?.available)
+      .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
       .toBe('/postgraduate/teaching-schedule');
   });
