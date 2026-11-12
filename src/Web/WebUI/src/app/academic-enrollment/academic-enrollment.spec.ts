@@ -59,6 +59,8 @@ describe('Navegación de Inscripción académica', () => {
       'teaching-schedule-iicg-old-plan', 'teaching-schedule-iicg-new-plan']) {
       expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === slug)?.available).toBe(true);
     }
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'course-crossing')?.available)
+      .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
       .toBe('/postgraduate/teaching-schedule');
   });
