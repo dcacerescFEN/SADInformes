@@ -31,6 +31,7 @@ Obligatorias reprobadas no inscritas: [filtro de período](docs/failed-mandatory
 Programación Docente: [filtros de escuela, período y área, con exportación](docs/enrollment-teaching-schedule.md).
 Programación Docente por decreto: [cuatro planes de Ingeniería Comercial e IICG](docs/teaching-schedule-decreto.md).
 Cruce de Cursos: [filtro de período y exportación](docs/course-crossing.md).
+Cursos para asignación de salas: [filtro de período y exportación](docs/courses-for-room-assignment.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -358,10 +359,11 @@ rechazadas por vacantes**, **Alumnos que completaron libres**, **Alumnos que
 completaron electivos**, **Cambios automáticos de mención** y **Cátedras
 inscritas ya aprobadas**, **Cátedras inscritas sin requisitos**, **Obligatorias
 reprobadas no inscritas**, **Programación Docente**, **Programación Docente por
-decreto (cuatro planes)** y **Cruce de Cursos** ya son funcionales: cargan sus
-catálogos y procedimientos y muestran sus columnas legadas. Las demás opciones
-muestran la ficha local **Pendiente de migración**, su descripción y la
-referencia al archivo legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado** reutiliza la
+decreto (cuatro planes)**, **Cruce de Cursos** y **Cursos para asignación de
+salas** ya son funcionales: cargan sus catálogos y procedimientos y muestran sus
+columnas legadas. Las demás opciones muestran la ficha local **Pendiente de
+migración**, su descripción y la referencia al archivo legado; no abren el SAD ni
+ejecutan consultas. **Programación Docente Postgrado** reutiliza la
 ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
 legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
 incorporan.
@@ -386,7 +388,8 @@ y [`docs/enrolled-without-requirements.md`](docs/enrolled-without-requirements.m
 y [`docs/failed-mandatory-not-enrolled.md`](docs/failed-mandatory-not-enrolled.md)
 y [`docs/enrollment-teaching-schedule.md`](docs/enrollment-teaching-schedule.md)
 y [`docs/teaching-schedule-decreto.md`](docs/teaching-schedule-decreto.md)
-y [`docs/course-crossing.md`](docs/course-crossing.md).
+y [`docs/course-crossing.md`](docs/course-crossing.md)
+y [`docs/courses-for-room-assignment.md`](docs/courses-for-room-assignment.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;

@@ -120,7 +120,10 @@ export const routes: Routes = [
                               : report.slug === 'course-crossing'
                                 ? import('./academic-enrollment/course-crossing/course-crossing')
                                   .then((module) => module.CourseCrossing)
-                                : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                                : report.slug === 'courses-for-room-assignment'
+                                  ? import('./academic-enrollment/courses-for-room-assignment/courses-for-room-assignment')
+                                    .then((module) => module.CoursesForRoomAssignment)
+                                  : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];
