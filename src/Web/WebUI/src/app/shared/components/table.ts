@@ -334,7 +334,12 @@ export interface TableAction {
       @if (showSummary() && data().length > 0) {
         <div class="d-flex justify-content-start">
           <div class="me-3">
-            Mostrando {{ getPaginatedData().length }} de {{ getFilteredData().length }} registros
+            @if (mode() === 'server' && total() === null) {
+              Mostrando {{ data().length }} registros
+            } @else {
+              Mostrando {{ getPaginatedData().length }} de
+              {{ total() ?? getFilteredData().length }} registros
+            }
           </div>
         </div>
       }
@@ -342,23 +347,29 @@ export interface TableAction {
       <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-end">
           <li class="page-item" [ngClass]="{ disabled: currentPage() === 1 }">
-            <button class="page-link" type="button" (click)="setPage(currentPage() - 1)">
+            <button class="page-link" type="button" [disabled]="currentPage() === 1"
+              (click)="setPage(currentPage() - 1)">
               Anterior
             </button>
           </li>
-          @for (page of range(); track page) {
-            @if (page === '...') {
-              <li class="page-item disabled">
-                <span class="page-link">{{ page }}</span>
-              </li>
-            } @else {
-              <li class="page-item" [ngClass]="{ active: currentPage() === page }">
-                <button class="page-link" type="button" (click)="setPage(page)">{{ page }}</button>
-              </li>
+          @if (mode() === 'server' && total() === null) {
+            <li class="page-item disabled"><span class="page-link">Página {{ currentPage() }}</span></li>
+          } @else {
+            @for (page of range(); track page) {
+              @if (page === '...') {
+                <li class="page-item disabled">
+                  <span class="page-link">{{ page }}</span>
+                </li>
+              } @else {
+                <li class="page-item" [ngClass]="{ active: currentPage() === page }">
+                  <button class="page-link" type="button" (click)="setPage(page)">{{ page }}</button>
+                </li>
+              }
             }
           }
           <li class="page-item" [ngClass]="{ disabled: currentPage() === nPage() }">
-            <button class="page-link" type="button" (click)="setPage(currentPage() + 1)">
+            <button class="page-link" type="button" [disabled]="currentPage() === nPage()"
+              (click)="setPage(currentPage() + 1)">
               Siguiente
             </button>
           </li>
@@ -386,6 +397,13 @@ export class Table {
   readonly selectionEnabled = input<boolean>(false);
   readonly selectionLabel = input<string>('Seleccionar');
   readonly loading = input<boolean>(false);
+  readonly mode = input<'client' | 'server'>('client');
+  readonly total = input<number | null>(null);
+  readonly page = input<number>(1);
+  readonly pageSize = input<number>(10);
+  readonly hasMore = input<boolean>(false);
+  readonly pageChange = output<number>();
+  readonly sortChange = output<{ key: string; direction: 'asc' | 'desc' }>();
   readonly actionEvent = output<{
     id: string | number | null | undefined;
     actionKey: string;
@@ -404,7 +422,11 @@ export class Table {
     effect(() => {
       this.data();
       this.searchTerm();
-      this.currentPage.set(1);
+      if (this.mode() === 'server') {
+        this.currentPage.set(Math.max(1, this.page()));
+      } else {
+        this.currentPage.set(1);
+      }
     });
   }
 
@@ -416,12 +438,20 @@ export class Table {
     if (typeof pageNumber === 'string') {
       return;
     }
-    this.currentPage.set(Math.min(Math.max(pageNumber, 1), this.nPage()));
+    const target = Math.max(1, pageNumber);
+    if (this.mode() === 'server') {
+      if (target !== this.currentPage()) this.pageChange.emit(target);
+      return;
+    }
+    this.currentPage.set(Math.min(target, this.nPage()));
   }
 
   public nPage() {
-    const filteredData = this.getFilteredData();
-    return Math.max(1, Math.ceil(filteredData.length / this.itemsPerPage));
+    if (this.mode() === 'server' && this.total() === null) {
+      return this.currentPage() + (this.hasMore() ? 1 : 0);
+    }
+    const count = this.mode() === 'server' ? (this.total() ?? 0) : this.getFilteredData().length;
+    return Math.max(1, Math.ceil(count / this.pageSize()));
   }
 
   public range() {
@@ -481,6 +511,9 @@ export class Table {
   }
 
   public getFilteredData() {
+    if (this.mode() === 'server') {
+      return [...this.data()];
+    }
     const term = this.searchTerm().trim().toLowerCase();
 
     if (!term) {
@@ -499,8 +532,11 @@ export class Table {
 
   public getPaginatedData() {
     const filteredData = this.getSortedData();
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
+    if (this.mode() === 'server') {
+      return filteredData;
+    }
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    const endIndex = startIndex + this.pageSize();
     return filteredData.slice(startIndex, endIndex);
   }
 
@@ -519,7 +555,12 @@ export class Table {
       this.sortColumn.set(column.key);
       this.sortDirection.set('asc');
     }
-    this.currentPage.set(1);
+    if (this.mode() === 'server') {
+      this.sortChange.emit({ key: this.sortColumn()!, direction: this.sortDirection() });
+      this.pageChange.emit(1);
+    } else {
+      this.currentPage.set(1);
+    }
   }
 
   public ariaSort(column: TableColumn): 'ascending' | 'descending' | 'none' {
@@ -608,6 +649,9 @@ export class Table {
   }
 
   private getSortedData(): object[] {
+    if (this.mode() === 'server') {
+      return this.getFilteredData();
+    }
     const column = this.sortColumn();
     if (!column) {
       return this.getFilteredData();

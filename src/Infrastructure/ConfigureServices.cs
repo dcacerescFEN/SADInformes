@@ -2,6 +2,7 @@ using Application.Navigation;
 using Application.Common.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Configuration;
+using Infrastructure.Photos;
 using Infrastructure.Services;
 using Infrastructure.Reporting;
 using System.Net;
@@ -54,6 +55,14 @@ public static class ConfigureServices
                     AllowAutoRedirect = false,
                     UseCookies = false,
                 };
+            });
+        services.AddMemoryCache();
+        services.AddHttpClient<IStudentPhotoProbe, HttpStudentPhotoProbe>(client =>
+                client.Timeout = TimeSpan.FromSeconds(2))
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+                UseCookies = false,
             });
         services.AddSingleton<IPostgraduateSettings>(
             provider => provider.GetRequiredService<PostgraduateSettings>());

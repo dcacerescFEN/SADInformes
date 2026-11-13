@@ -32,6 +32,9 @@ Programación Docente: [filtros de escuela, período y área, con exportación](
 Programación Docente por decreto: [cuatro planes de Ingeniería Comercial e IICG](docs/teaching-schedule-decreto.md).
 Cruce de Cursos: [filtro de período y exportación](docs/course-crossing.md).
 Cursos para asignación de salas: [filtro de período y exportación](docs/courses-for-room-assignment.md).
+Alumnos sin fotos: [consulta server-side y exportación](docs/students-without-photo.md).
+Tabla server-side: [diseño e implementación](docs/server-side-dynamic-table-plan.md).
+Correo masivo: [plan de migración](docs/bulk-email-plan.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
 Notificaciones NCE: [informe de solo lectura y exportaciones](docs/nce.md).
 Pago Derecho Básico Anual: [consulta y registro de pagos](docs/basic-right-payment.md).
@@ -350,7 +353,7 @@ anteriores se conservan.
 
 ### Inscripción académica: fichas locales
 
-La sección **Inscripción académica** expone las 22 opciones visibles del tab
+La sección **Inscripción académica** expone las 21 opciones visibles del tab
 legado `SAD/Informes/default.aspx` en rutas
 `/academic-enrollment/<opción>`. **Electivos de mención que no están en el plan
 común**, **Alumnos que pueden postular y no tienen prioridad**, **Resultados de
@@ -359,14 +362,13 @@ rechazadas por vacantes**, **Alumnos que completaron libres**, **Alumnos que
 completaron electivos**, **Cambios automáticos de mención** y **Cátedras
 inscritas ya aprobadas**, **Cátedras inscritas sin requisitos**, **Obligatorias
 reprobadas no inscritas**, **Programación Docente**, **Programación Docente por
-decreto (cuatro planes)**, **Cruce de Cursos** y **Cursos para asignación de
-salas** ya son funcionales: cargan sus catálogos y procedimientos y muestran sus
-columnas legadas. Las demás opciones muestran la ficha local **Pendiente de
-migración**, su descripción y la referencia al archivo legado; no abren el SAD ni
-ejecutan consultas. **Programación Docente Postgrado** reutiliza la
-ruta ya migrada `/postgraduate/teaching-schedule`. Las dos opciones ocultas del
-legado (`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se
-incorporan.
+decreto (cuatro planes)**, **Cruce de Cursos**, **Cursos para asignación de
+salas** y **Alumnos sin fotos** ya son funcionales: cargan sus catálogos y
+procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
+ficha local **Pendiente de migración**, su descripción y la referencia al archivo
+legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado X Programa y Modalidad** se
+ofrece únicamente en la sección Postgrado. Las dos opciones ocultas del legado
+(`Disponibilidad Horaria` y `Disponibilidad Observaciones`) no se incorporan.
 
 Las fichas pendientes no consultan APIs ni bases de datos, no abren aplicaciones
 externas y no permiten inscribir, registrar pagos, administrar firmas ni exportar
@@ -389,7 +391,8 @@ y [`docs/failed-mandatory-not-enrolled.md`](docs/failed-mandatory-not-enrolled.m
 y [`docs/enrollment-teaching-schedule.md`](docs/enrollment-teaching-schedule.md)
 y [`docs/teaching-schedule-decreto.md`](docs/teaching-schedule-decreto.md)
 y [`docs/course-crossing.md`](docs/course-crossing.md)
-y [`docs/courses-for-room-assignment.md`](docs/courses-for-room-assignment.md).
+y [`docs/courses-for-room-assignment.md`](docs/courses-for-room-assignment.md)
+y [`docs/students-without-photo.md`](docs/students-without-photo.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;

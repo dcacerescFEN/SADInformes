@@ -123,7 +123,10 @@ export const routes: Routes = [
                                 : report.slug === 'courses-for-room-assignment'
                                   ? import('./academic-enrollment/courses-for-room-assignment/courses-for-room-assignment')
                                     .then((module) => module.CoursesForRoomAssignment)
-                                  : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                                  : report.slug === 'students-without-photo'
+                                    ? import('./academic-enrollment/students-without-photo/students-without-photo')
+                                      .then((module) => module.StudentsWithoutPhoto)
+                                    : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

@@ -144,11 +144,13 @@ export const ACADEMIC_ENROLLMENT_REPORTS: readonly PostgraduateReport[] = [
     legacyPath: 'Informes/Inscripcion/CursosSistemaAsignacionSalas.aspx',
     available: true,
   },
-  entry('postgraduate-teaching-schedule', 'Programación Docente Postgrado',
-    'Programación docente de Postgrado por programa y modalidad.',
-    'ProgramacionXProgramaModalidad.aspx', '/postgraduate/teaching-schedule'),
-  entry('students-without-photo', 'Alumnos sin fotos',
-    'Alumnos que no tienen una fotografía registrada.', 'SinFotos.aspx'),
+  {
+    slug: 'students-without-photo',
+    title: 'Alumnos sin fotos',
+    description: 'Alumnos que no tienen una fotografía registrada.',
+    legacyPath: 'Informes/Inscripcion/SinFotos.aspx',
+    available: true,
+  },
   entry('course-load-reduction', 'Reducción de carga',
     'Alumnos con reducción de carga en el período.', 'ReduccionCarga.aspx'),
 ];

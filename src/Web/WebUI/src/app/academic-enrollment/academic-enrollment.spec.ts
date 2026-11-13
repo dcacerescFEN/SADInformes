@@ -24,9 +24,9 @@ describe('Navegación de Inscripción académica', () => {
 
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-  it('incluye las 22 opciones visibles sin duplicar slugs', () => {
-    expect(ACADEMIC_ENROLLMENT_REPORTS).toHaveLength(22);
-    expect(new Set(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.slug)).size).toBe(22);
+  it('incluye las 21 opciones visibles sin duplicar slugs', () => {
+    expect(ACADEMIC_ENROLLMENT_REPORTS).toHaveLength(21);
+    expect(new Set(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.slug)).size).toBe(21);
     expect(ACADEMIC_ENROLLMENT_REPORTS.every(report =>
       report.legacyPath.startsWith('Informes/Inscripcion/'))).toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'electives-without-common-plan')?.available)
@@ -63,8 +63,10 @@ describe('Navegación de Inscripción académica', () => {
       .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'courses-for-room-assignment')?.available)
       .toBe(true);
-    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule')?.routePath)
-      .toBe('/postgraduate/teaching-schedule');
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'students-without-photo')?.available)
+      .toBe(true);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule'))
+      .toBeUndefined();
   });
 
   it('carga el informe funcional de electivos sin plan común', async () => {
