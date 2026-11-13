@@ -119,6 +119,10 @@ public partial interface ISadContextProcedures
     Task<List<SpRecPersonasSinFotosResult>?> SpRec_SAD_SAD_PersonasSinFotosAsync(
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecReduccionCargasResult>?> SpRec_ReduccionCargasAsync(
+        string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(
         string? incluirTodos, string? usuario,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

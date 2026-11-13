@@ -33,6 +33,7 @@ Programación Docente por decreto: [cuatro planes de Ingeniería Comercial e IIC
 Cruce de Cursos: [filtro de período y exportación](docs/course-crossing.md).
 Cursos para asignación de salas: [filtro de período y exportación](docs/courses-for-room-assignment.md).
 Alumnos sin fotos: [consulta server-side y exportación](docs/students-without-photo.md).
+Reducción de carga: [filtro de período y exportación](docs/course-load-reduction.md).
 Tabla server-side: [diseño e implementación](docs/server-side-dynamic-table-plan.md).
 Correo masivo: [plan de migración](docs/bulk-email-plan.md).
 Actividades Cursos Postgrado: [filtro por año y exportación](docs/course-activities.md).
@@ -363,8 +364,8 @@ completaron electivos**, **Cambios automáticos de mención** y **Cátedras
 inscritas ya aprobadas**, **Cátedras inscritas sin requisitos**, **Obligatorias
 reprobadas no inscritas**, **Programación Docente**, **Programación Docente por
 decreto (cuatro planes)**, **Cruce de Cursos**, **Cursos para asignación de
-salas** y **Alumnos sin fotos** ya son funcionales: cargan sus catálogos y
-procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
+salas**, **Alumnos sin fotos** y **Reducción de carga** ya son funcionales:
+cargan sus catálogos y procedimientos y muestran sus columnas legadas. Las demás opciones muestran la
 ficha local **Pendiente de migración**, su descripción y la referencia al archivo
 legado; no abren el SAD ni ejecutan consultas. **Programación Docente Postgrado X Programa y Modalidad** se
 ofrece únicamente en la sección Postgrado. Las dos opciones ocultas del legado
@@ -392,7 +393,8 @@ y [`docs/enrollment-teaching-schedule.md`](docs/enrollment-teaching-schedule.md)
 y [`docs/teaching-schedule-decreto.md`](docs/teaching-schedule-decreto.md)
 y [`docs/course-crossing.md`](docs/course-crossing.md)
 y [`docs/courses-for-room-assignment.md`](docs/courses-for-room-assignment.md)
-y [`docs/students-without-photo.md`](docs/students-without-photo.md).
+y [`docs/students-without-photo.md`](docs/students-without-photo.md)
+y [`docs/course-load-reduction.md`](docs/course-load-reduction.md).
 Las rutas desconocidas siguen redirigiendo al primer informe de Inscripción académica.
 
 La comprobación visual en navegador de esta nueva navegación sigue pendiente;

@@ -126,7 +126,10 @@ export const routes: Routes = [
                                   : report.slug === 'students-without-photo'
                                     ? import('./academic-enrollment/students-without-photo/students-without-photo')
                                       .then((module) => module.StudentsWithoutPhoto)
-                                    : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                                    : report.slug === 'course-load-reduction'
+                                      ? import('./academic-enrollment/course-load-reduction/course-load-reduction')
+                                        .then((module) => module.CourseLoadReduction)
+                                      : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

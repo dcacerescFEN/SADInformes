@@ -151,6 +151,11 @@ export const ACADEMIC_ENROLLMENT_REPORTS: readonly PostgraduateReport[] = [
     legacyPath: 'Informes/Inscripcion/SinFotos.aspx',
     available: true,
   },
-  entry('course-load-reduction', 'Reducción de carga',
-    'Alumnos con reducción de carga en el período.', 'ReduccionCarga.aspx'),
+  {
+    slug: 'course-load-reduction',
+    title: 'Reducción de carga',
+    description: 'Alumnos con reducción de carga en el período.',
+    legacyPath: 'Informes/Inscripcion/ReduccionCarga.aspx',
+    available: true,
+  },
 ];
