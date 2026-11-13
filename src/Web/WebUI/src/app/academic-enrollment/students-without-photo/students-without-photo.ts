@@ -4,6 +4,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Search } from '../../shared/components/search';
 import { DynamicTable } from '../../shared/components/dynamic-table';
 import { TableColumn } from '../../shared/components/table';
+import { NotificationService } from '../../core/services/notification-service';
+import { EmailDispatchService } from './email-dispatch-service';
 
 interface Row {
   name: string;
@@ -51,6 +53,11 @@ const COLUMNS: readonly TableColumn[] = [
               <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
               {{ loading() ? 'Cargando…' : 'Actualizar' }}
             </button>
+            <button type="button" class="btn btn-search" data-action="email"
+              [disabled]="loading() || sending() || email.active()" (click)="sendEmail()">
+              <i class="bi bi-envelope me-1" aria-hidden="true"></i>
+              {{ sending() ? 'Enviando…' : 'Enviar correo' }}
+            </button>
             <button type="button" class="btn btn-create" data-action="export"
               [disabled]="rows().length === 0 || exporting()" (click)="download()">
               <i class="bi bi-file-earmark-excel me-1" aria-hidden="true"></i>
@@ -91,12 +98,15 @@ const COLUMNS: readonly TableColumn[] = [
 export class StudentsWithoutPhoto {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly email = inject(EmailDispatchService);
+  private readonly notification = inject(NotificationService);
   protected readonly columns = COLUMNS;
   protected readonly pageSize = PAGE_SIZE;
   protected readonly rows = signal<Row[]>([]);
   protected readonly loading = signal(false);
   protected readonly loaded = signal(false);
   protected readonly exporting = signal(false);
+  protected readonly sending = signal(false);
   protected readonly error = signal('');
   protected readonly page = signal(1);
   protected readonly hasMore = signal(false);
@@ -156,6 +166,55 @@ export class StudentsWithoutPhoto {
           this.error.set('No se pudo cargar el informe.');
         },
       });
+  }
+
+  protected sendEmail(): void {
+    if (this.sending() || this.email.active()) return;
+    this.sending.set(true);
+    this.email.availability().subscribe({
+      next: availability => {
+        this.sending.set(false);
+        if (!availability.success) {
+          void this.notification.alert('Envío no disponible', 'El envío de correo está desactivado.');
+          return;
+        }
+        if (!availability.data.enabled) {
+          void this.notification.alert('Envío desactivado', 'El envío de correo está desactivado.');
+          return;
+        }
+        if (!availability.data.smtpConfigured) {
+          void this.notification.alert('Envío no disponible', 'La configuración SMTP no está disponible.');
+          return;
+        }
+        void this.notification.confirmHtml(
+          'Enviar correo',
+          '<p>Se cargará la lista de alumnos sin foto y luego se enviarán los correos.</p>'
+            + '<p class="mb-0">El envío continuará en segundo plano y podrás minimizar el progreso.</p>',
+          'Aceptar y enviar',
+          'Cancelar',
+        ).then(confirmation => {
+          if (!confirmation.isConfirmed) return;
+          this.sending.set(true);
+          this.email.start().subscribe({
+            next: () => this.sending.set(false),
+            error: (error: HttpErrorResponse) => {
+              this.sending.set(false);
+              const title = error.error?.title;
+              void this.notification.alert(
+                'No se pudo iniciar el envío',
+                typeof title === 'string' && title.length > 0
+                  ? title
+                  : 'El envío de correo no está disponible.',
+              );
+            },
+          });
+        });
+      },
+      error: () => {
+        this.sending.set(false);
+        void this.notification.alert('Envío no disponible', 'El envío de correo está desactivado.');
+      },
+    });
   }
 
   protected download(): void {

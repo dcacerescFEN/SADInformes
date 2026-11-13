@@ -1,4 +1,5 @@
 using Application.Navigation;
+using Application.Reports.AcademicEnrollment.StudentsWithoutPhoto.Common.Email;
 using Application.Common.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Configuration;
@@ -44,6 +45,10 @@ public static class ConfigureServices
         services.AddSingleton<StudentPhotoSettings>();
         services.AddSingleton<ReportingSettings>();
         services.AddScoped<IReportRenderer, SsrsReportRenderer>();
+        services.AddSingleton<IEmailSender, SmtpEmailSender>();
+        services.AddSingleton<EmailDispatchRegistry>();
+        services.AddSingleton<EmailDispatchQueue>();
+        services.AddHostedService<EmailDispatchWorker>();
         services.AddHttpClient(SsrsReportRenderer.ClientName, client => client.Timeout = Timeout.InfiniteTimeSpan)
             .ConfigurePrimaryHttpMessageHandler(provider =>
             {

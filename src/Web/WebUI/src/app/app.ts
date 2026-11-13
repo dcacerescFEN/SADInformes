@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth-service';
 import { Header } from './core/layout/header';
 import { ReportsSidebar } from './core/layout/reports-sidebar';
+import { BackgroundTaskHost } from './core/tasks/background-task-host';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, ReportsSidebar],
+  imports: [RouterOutlet, Header, ReportsSidebar, BackgroundTaskHost],
   template: `
     <div class="layout-shell">
       @if (auth.isAuthenticated()) {
@@ -17,6 +18,7 @@ import { ReportsSidebar } from './core/layout/reports-sidebar';
         @if (auth.isAuthenticated()) { <app-reports-sidebar [collapsed]="sidebarCollapsed()" /> }
         <main class="layout-content" aria-label="Contenido de informes"><router-outlet /></main>
       </div>
+      <app-background-task-host />
     </div>
   `,
   styleUrl: './app.scss',

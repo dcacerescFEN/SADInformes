@@ -1,0 +1,3 @@
+namespace Application.Reports.AcademicEnrollment.StudentsWithoutPhoto.Queries.GetStudentsWithoutPhotoEmailAvailability;
+
+public sealed record EmailAvailabilityDTO(bool Enabled, bool SmtpConfigured);

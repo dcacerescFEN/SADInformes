@@ -94,7 +94,7 @@ test('AppConfig se carga directamente sin lector ni interfaz redundantes', () =>
   assert.equal(existsSync(resolve(root, 'src/Application/Configuration/IAppConfigurationReader.cs')), false);
   const initialiser = read('src/Infrastructure/Configuration/ConfigurationInitialiser.cs');
   assert.match(initialiser, /AppConfigContext configContext/);
-  assert.match(initialiser, /configContext\.Configurations\.AsNoTracking\(\)/);
+  assert.match(initialiser, /configContext\s*\.Configurations\.AsNoTracking\(\)/);
   assert.match(read('src/Infrastructure/ConfigureServices.cs'), /AddDbContext<AppConfigContext>/);
 });
 

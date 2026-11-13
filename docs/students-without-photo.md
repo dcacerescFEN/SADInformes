@@ -27,12 +27,31 @@ Migración de `SAD/Informes/Inscripcion/SinFotos.aspx` a la ruta
 **Nombre**, **Rut**, **Cód. Alumno**, **Tipo Alumno**, **Celular**,
 **Mail Fen**, **Mail Personal**.
 
+## Correo masivo
+
+- Botón **Enviar correo** con confirmación y vista previa de la plantilla legacy.
+- El envío corre en segundo plano; la pantalla no espera a que terminen todos los correos.
+- El progreso muestra primero **Cargando lista de alumnos** y después **Enviando correo**.
+- El modal permite **Minimizar** y **Cancelar envío**; la cancelación no revierte los ya enviados.
+- La confirmación no muestra la plantilla: solo explica que primero se carga la lista y luego se envían los correos.
+- Usa el mismo permiso del informe: `REPORT_ACCESS_REPORT_MODULE`.
+- Configuración SMTP con formato SADAlumnos desde AppConfig:
+  `SendEmail`, `EmailFrom`, `EmailTo`, `EmailServer`, `EmailPort`.
+- No hay tabla de campañas. El estado del job vive en memoria y se pierde al
+  reiniciar el API.
+- El progreso se muestra en el centro global de tareas, que se puede minimizar y
+  mantener al navegar a otro informe.
+- La plantilla conserva el texto de `Button1_Click` y no admite HTML libre.
+
 ## Backend
 
 | Elemento | Valor |
 |---|---|
 | Informe | `GET .../report?page=1&pageSize=10&search=...` |
 | Exportación | `GET .../export` |
+| Correo: preview | `GET .../email/preview` |
+| Correo: inicio | `POST .../email` → `202` |
+| Correo: estado | `GET .../email/{jobId}` |
 | Permiso | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` |
 | Informe | `spRec_SAD_SAD_PersonasSinFotos` |
 | Fotos | `StudentPhotoBaseUrl` de AppConfig |
@@ -44,7 +63,7 @@ explícita y usa el `TextWorkbook` compartido (XLSX, `no-store`, `nosniff`).
 
 ## Fuera de alcance
 
-- El envío masivo de correo de la pantalla legada no se migró: requiere SMTP y
-  una acción explícita, no forma parte de la consulta del informe.
+- No hay historial persistente ni tabla de campañas: el job de correo vive en
+  memoria y se pierde al reiniciar el API.
 - El SP no se modificó. No se verificó contra SQL Server, el servidor de fotos ni
   un navegador real.
