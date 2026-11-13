@@ -1,6 +1,6 @@
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
-import { hasClientAccess } from './site-access';
+import { hasClientAccess, hasClientPermission } from './site-access';
 
 export interface PublicKeycloakConfig { url: string; realm: string; clientId: string; }
 export const KEYCLOAK_FACTORY = new InjectionToken<(config: PublicKeycloakConfig) => Keycloak>(
@@ -21,6 +21,7 @@ export class AuthService {
   private readonly user = signal('');
   private readonly displayName = signal('');
   private readonly resourceAccess = signal<unknown>(undefined);
+  private clientId = '';
   readonly isAuthenticated = this.authenticated.asReadonly();
   readonly username = this.user.asReadonly();
   readonly name = this.displayName.asReadonly();
@@ -31,6 +32,7 @@ export class AuthService {
     if (!response.ok || !isConfiguration(configuration))
       throw new Error('La configuración de Keycloak es inválida.');
 
+    this.clientId = configuration.clientId;
     const keycloak = this.createKeycloak(configuration);
     this.keycloak = keycloak;
     keycloak.onAuthLogout = () => this.syncSession();
@@ -60,6 +62,11 @@ export class AuthService {
 
   hasSiteAccess(clientId: string): boolean {
     return this.isAuthenticated() && hasClientAccess(this.resourceAccess(), clientId);
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.isAuthenticated()
+      && hasClientPermission(this.resourceAccess(), this.clientId, permission);
   }
 
   async getValidToken(): Promise<string | undefined> {

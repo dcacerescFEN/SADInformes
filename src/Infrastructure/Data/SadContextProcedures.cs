@@ -733,6 +733,77 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecPeriodosAcademicosResult>?> SpRec_PeriodosAcademicosAsync(
+        string? limite, int? modo, string? conTodos, string? tipo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Limite", Size = 20, Value = limite ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Modo", Value = modo ?? (object)DBNull.Value, SqlDbType = SqlDbType.Int },
+            new SqlParameter { ParameterName = "ConTodos", Size = 2, Value = conTodos ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo", Size = 10, Value = tipo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecPeriodosAcademicosResult>(
+            "EXEC @returnValue = [dbo].[spRec_PeriodosAcademicos] @Limite = @Limite, @Modo = @Modo, @ConTodos = @ConTodos, @Tipo = @Tipo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecPeriodoDisponibilidadResult>?> SpRec_PeriodoDisponibilidadAsync(
+        string? uname,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Uname", Size = 20, Value = uname ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecPeriodoDisponibilidadResult>(
+            "EXEC @returnValue = [dbo].[spRec_PeriodoDisponibilidad] @Uname = @Uname",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecFEProgramacionDocenteResult>?> SpRec_FE_ProgramacionDocenteAsync(
+        string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecFEProgramacionDocenteResult>(
+            "EXEC @returnValue = [dbo].[spRec_FE_ProgramacionDocente] @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecFEDisponibilidadObservacionesResult>?> SpRec_FE_DisponibilidadObservacionesAsync(
+        string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecFEDisponibilidadObservacionesResult>(
+            "EXEC @returnValue = [dbo].[spRec_FE_DisponibilidadObservaciones] @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(
         string? incluirTodos, string? usuario,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

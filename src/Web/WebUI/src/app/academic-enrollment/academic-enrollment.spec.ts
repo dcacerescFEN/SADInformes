@@ -24,9 +24,9 @@ describe('Navegación de Inscripción académica', () => {
 
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-  it('incluye las 21 opciones visibles sin duplicar slugs', () => {
-    expect(ACADEMIC_ENROLLMENT_REPORTS).toHaveLength(21);
-    expect(new Set(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.slug)).size).toBe(21);
+  it('incluye las 23 opciones visibles sin duplicar slugs', () => {
+    expect(ACADEMIC_ENROLLMENT_REPORTS).toHaveLength(23);
+    expect(new Set(ACADEMIC_ENROLLMENT_REPORTS.map(report => report.slug)).size).toBe(23);
     expect(ACADEMIC_ENROLLMENT_REPORTS.every(report =>
       report.legacyPath.startsWith('Informes/Inscripcion/'))).toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'electives-without-common-plan')?.available)
@@ -67,6 +67,10 @@ describe('Navegación de Inscripción académica', () => {
       .toBe(true);
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'course-load-reduction')?.available)
       .toBe(true);
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'teacher-availability')?.permission)
+      .toBe('REPORT_VIEW_AVAILABILITY');
+    expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'teacher-availability-observations')?.permission)
+      .toBe('REPORT_VIEW_AVAILABILITY');
     expect(ACADEMIC_ENROLLMENT_REPORTS.find(report => report.slug === 'postgraduate-teaching-schedule'))
       .toBeUndefined();
   });

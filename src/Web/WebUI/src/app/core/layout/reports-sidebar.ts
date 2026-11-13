@@ -246,9 +246,13 @@ export class ReportsSidebar {
     const slugs = this.favorites();
     return this.sections.flatMap(section =>
       section.reports.map(report => ({ report, routePrefix: section.routePrefix ?? '/postgraduate' })))
-      .filter(({ report }) => slugs.includes(report.slug))
+      .filter(({ report }) => slugs.includes(report.slug) && this.canView(report))
       .filter(({ report }) => !query || report.title.toLocaleLowerCase('es').includes(query));
   });
+
+  private canView(report: PostgraduateReport): boolean {
+    return !report.permission || this.auth.hasPermission(report.permission);
+  }
 
   protected reportRoute(report: PostgraduateReport, routePrefix?: string): string {
     return report.routePath ?? `${routePrefix ?? '/postgraduate'}/${report.slug}`;

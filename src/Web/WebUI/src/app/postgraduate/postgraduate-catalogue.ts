@@ -7,6 +7,8 @@ export interface PostgraduateReport {
   readonly routePath?: string;
   /** true cuando la pantalla ya está migrada y no usa la ficha pendiente. */
   readonly available?: boolean;
+  /** Permiso adicional necesario para ver la opción. */
+  readonly permission?: string;
 }
 
 function entry(slug: string, title: string, description: string, page: string,

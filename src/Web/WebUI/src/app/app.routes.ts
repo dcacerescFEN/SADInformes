@@ -129,7 +129,13 @@ export const routes: Routes = [
                                     : report.slug === 'course-load-reduction'
                                       ? import('./academic-enrollment/course-load-reduction/course-load-reduction')
                                         .then((module) => module.CourseLoadReduction)
-                                      : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+                                      : report.slug === 'teacher-availability'
+                                        ? import('./academic-enrollment/teacher-availability/teacher-availability')
+                                          .then((module) => module.TeacherAvailability)
+                                        : report.slug === 'teacher-availability-observations'
+                                          ? import('./academic-enrollment/teacher-availability-observations/teacher-availability-observations')
+                                            .then((module) => module.TeacherAvailabilityObservations)
+                                          : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

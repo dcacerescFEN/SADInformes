@@ -11,6 +11,21 @@ const POLICIES = new Map<string, { module: string; permission?: string }>([
   ['SADProcesos', { module: 'PROCESS', permission: 'PROCESS_ACCESS_PROCESS_MODULE' }],
 ]);
 
+export function hasClientPermission(access: unknown, clientId: string, permission: string): boolean {
+  if (typeof clientId !== 'string' || typeof permission !== 'string') return false;
+  if (typeof access !== 'object' || access === null || Array.isArray(access)
+    || !Object.prototype.hasOwnProperty.call(access, clientId)) return false;
+  const entry: unknown = (access as Record<string, unknown>)[clientId];
+  if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) return false;
+  const roles: unknown = (entry as { roles?: unknown }).roles;
+  const module = permission.split('_')[0];
+  return Array.isArray(roles) && (
+    roles.includes('PERMISSION_' + permission)
+    || roles.includes('ROLE_' + module + '_ADMIN')
+    || roles.includes('ROLE_' + module + '_SUPERADMIN')
+  );
+}
+
 export function hasClientAccess(access: unknown, clientId: string): boolean {
   if (typeof clientId !== 'string') return false;
   const policy = POLICIES.get(clientId.endsWith('-iis') ? clientId.slice(0, -4) : clientId);

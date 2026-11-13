@@ -9,4 +9,9 @@ public static class Permission
     /// y se evalúa en Keycloak como PERMISSION_REPORT_VIEW_POSTGRADUATE.
     /// </summary>
     public const string REPORT_VIEW_POSTGRADUATE = "REPORT_VIEW_POSTGRADUATE";
+
+    public const string REPORT_VIEW_AVAILABILITY = "REPORT_VIEW_AVAILABILITY";
+    public const string REPORT_SEND_AVAILABILITY_EMAIL = "REPORT_SEND_AVAILABILITY_EMAIL";
+    public const string REPORT_EDIT_AVAILABILITY = "REPORT_EDIT_AVAILABILITY";
+    public const string REPORT_DELETE_AVAILABILITY = "REPORT_DELETE_AVAILABILITY";
 }

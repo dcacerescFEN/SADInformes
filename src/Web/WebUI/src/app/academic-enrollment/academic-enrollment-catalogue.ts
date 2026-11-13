@@ -152,6 +152,22 @@ export const ACADEMIC_ENROLLMENT_REPORTS: readonly PostgraduateReport[] = [
     available: true,
   },
   {
+    slug: 'teacher-availability',
+    title: 'Disponibilidad Horaria',
+    description: 'Disponibilidad horaria de profesores.',
+    legacyPath: 'Informes/Inscripcion/DisponibilidadHoraria.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_AVAILABILITY',
+  },
+  {
+    slug: 'teacher-availability-observations',
+    title: 'Disponibilidad Observaciones',
+    description: 'Observaciones de disponibilidad por profesor.',
+    legacyPath: 'Informes/Inscripcion/DispObservaciones.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_AVAILABILITY',
+  },
+  {
     slug: 'course-load-reduction',
     title: 'Reducción de carga',
     description: 'Alumnos con reducción de carga en el período.',
