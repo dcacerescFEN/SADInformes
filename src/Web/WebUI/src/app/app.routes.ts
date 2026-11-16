@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth-guard';
 import { POSTGRADUATE_REPORTS } from './postgraduate/postgraduate-catalogue';
 import { ACADEMIC_ENROLLMENT_REPORTS } from './academic-enrollment/academic-enrollment-catalogue';
+import { REQUESTS_REPORTS } from './requests/requests-catalogue';
 
 export const routes: Routes = [
   {
@@ -136,6 +137,13 @@ export const routes: Routes = [
                                           ? import('./academic-enrollment/teacher-availability-observations/teacher-availability-observations')
                                             .then((module) => module.TeacherAvailabilityObservations)
                                           : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
+  })),
+  ...REQUESTS_REPORTS.map(report => ({
+    path: 'requests/' + report.slug,
+    canActivate: [authGuard],
+    data: { report },
+    loadComponent: () => import('./requests/automatic-processing-requests/automatic-processing-requests')
+      .then((module) => module.AutomaticProcessingRequests),
   })),
   {
     path: 'academic-enrollment/teacher-availability/:teacherCode/edit',

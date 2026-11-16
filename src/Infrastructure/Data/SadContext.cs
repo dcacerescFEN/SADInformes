@@ -31,6 +31,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<NotificacionCausalEliminacionPostgrado> NotificacionesCausalEliminacionPostgrado => Set<NotificacionCausalEliminacionPostgrado>();
     public DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado => Set<CausalEliminacionPostgrado>();
     public DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado => Set<TipoCausalEliminacionPostgrado>();
+    public DbSet<Solicitud89> Solicitudes89 => Set<Solicitud89>();
 
     /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
     public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
@@ -307,6 +308,22 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.ToTable("CausalEliminacionPostgrado", "SAD");
             entity.HasKey(row => row.IdCausalEliminacionPostgrado);
             entity.HasIndex(row => row.IdPublico).IsUnique();
+        });
+        modelBuilder.Entity<Solicitud89>(entity =>
+        {
+            entity.ToTable("Solicitudes89", "dbo");
+            entity.HasKey(row => row.CodSolicitud);
+            entity.Property(row => row.CodSolicitud).HasColumnName("Cod_Solicitud").HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.CodAlumno).HasColumnName("Cod_Alumno").HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.TipoSolicitud).HasColumnName("Tipo_Solicitud").HasMaxLength(5).IsUnicode(false);
+            entity.Property(row => row.EstadoSolicitud).HasColumnName("Estado_Solicitud").HasMaxLength(10).IsUnicode(false);
+            entity.Property(row => row.PeriodoSolicitud).HasColumnName("Periodo_Solicitud").HasMaxLength(5).IsUnicode(false);
+            entity.Property(row => row.FechaSolicitud).HasColumnName("Fecha_Solicitud").HasColumnType("datetime");
+            entity.Property(row => row.EstadoImpresion).HasColumnName("Estado_Impresion").HasMaxLength(21).IsUnicode(false);
+            entity.Property(row => row.TramitacionAutomatizada).HasColumnName("Tramitacion_Automatizada").HasMaxLength(12).IsUnicode(false);
+            entity.Property(row => row.TramitacionAdministrativa).HasColumnName("Tramitacion_Administrativa").HasMaxLength(12).IsUnicode(false);
+            entity.Property(row => row.TipoAlumno).HasMaxLength(50).IsUnicode(false);
+            entity.Property(row => row.ComentarioValidacion).IsUnicode(false);
         });
         modelBuilder.Entity<TipoCausalEliminacionPostgrado>(entity =>
         {

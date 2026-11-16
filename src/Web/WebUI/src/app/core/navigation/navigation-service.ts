@@ -42,6 +42,18 @@ export class NavigationService {
     });
   });
 
+  studentRequestsUrl(studentCode: string): string | null {
+    const base = safeUrl(this.menu()['studentsMenuUrl']);
+    const code = studentCode.trim();
+    if (!base || !code) return null;
+    const url = new URL(base);
+    const prefix = url.pathname.replace(/\/+$/, '');
+    url.pathname = prefix + '/detail/' + encodeURIComponent(code) + '/registration/requests';
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  }
+
   async load(): Promise<void> {
     this.menu.set({});
     this.error.set('');

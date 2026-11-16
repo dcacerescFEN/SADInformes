@@ -733,6 +733,26 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecSolicitudesProcesadasAutomaticamenteSadResult>?> SpRec_SolicitudesProcesadasAutomaticamenteSadAsync(
+        string? carrera, string? periodo, string? tipoSol, string? tramitacionAutomatizada,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Carrera", Size = 255, Value = carrera ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "TipoSol", Size = 255, Value = tipoSol ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "TramitacionAutomatizada", Size = 255, Value = tramitacionAutomatizada ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecSolicitudesProcesadasAutomaticamenteSadResult>(
+            "EXEC @returnValue = [dbo].[spRec_SolicitudesProcesadasAutomaticamenteSad] @Carrera = @Carrera, @Periodo = @Periodo, @TipoSol = @TipoSol, @TramitacionAutomatizada = @TramitacionAutomatizada",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecPeriodosAcademicosResult>?> SpRec_PeriodosAcademicosAsync(
         string? limite, int? modo, string? conTodos, string? tipo,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

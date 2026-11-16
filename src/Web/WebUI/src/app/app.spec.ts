@@ -25,7 +25,7 @@ describe('Base de SADInformes', () => {
       { provide: NavigationService, useValue: { links: signal([]), error: signal(''), load: vi.fn() } },
       { provide: ThemeStore, useValue: { preference: signal('auto'), resolvedTheme: () => 'light', setPreference: vi.fn() } },
       { provide: AuthService, useValue: {
-        isAuthenticated: authenticated, username, name,
+        isAuthenticated: authenticated, username, name, hasPermission: () => true,
         logout: vi.fn().mockResolvedValue(undefined), login: vi.fn().mockResolvedValue(undefined),
       } },
     ] });

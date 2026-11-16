@@ -28,7 +28,7 @@ describe('Sidebar de Informes', () => {
         ...POSTGRADUATE_REPORTS.map(report => ({ path: 'postgraduate/' + report.slug, component: TestPage })),
         ...ACADEMIC_ENROLLMENT_REPORTS.map(report => ({ path: 'academic-enrollment/' + report.slug, component: TestPage })),
       ]),
-      { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba' } },
+      { provide: AuthService, useValue: { username: () => 'usuario', name: () => 'Usuario Prueba', hasPermission: () => true } },
     ] }).compileComponents();
     TestBed.inject(NgbConfig).animation = false;
     fixture = TestBed.createComponent(ReportsSidebar);

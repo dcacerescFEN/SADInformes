@@ -9,8 +9,9 @@ import { AuthService } from '../auth/auth-service';
 import { REPORT_SECTIONS, ReportSection } from './report-sections';
 import { LEGACY_POSTGRADUATE_SLUGS, POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
 import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
+import { REQUESTS_REPORTS } from '../../requests/requests-catalogue';
 
-const ALL_REPORTS = [...POSTGRADUATE_REPORTS, ...ACADEMIC_ENROLLMENT_REPORTS];
+const ALL_REPORTS = [...POSTGRADUATE_REPORTS, ...ACADEMIC_ENROLLMENT_REPORTS, ...REQUESTS_REPORTS];
 
 const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';
 
@@ -229,8 +230,14 @@ export class ReportsSidebar {
 
   protected readonly visibleSections = computed<ReportSection[]>(() => {
     const query = this.searchQuery().trim().toLocaleLowerCase('es');
-    if (!query) return [...this.sections];
-    return this.sections.flatMap(section => {
+    const sections: ReportSection[] = [];
+    for (const section of this.sections) {
+      const reports = section.reports.filter(report => this.canView(report));
+      if (reports.length > 0 || section.reports.length === 0)
+        sections.push({ ...section, reports });
+    }
+    if (!query) return sections;
+    return sections.flatMap(section => {
       const sectionMatches = section.title.toLocaleLowerCase('es').includes(query);
       const reports = sectionMatches
         ? section.reports

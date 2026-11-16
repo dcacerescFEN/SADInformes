@@ -13,4 +13,5 @@ public static class Permission
     public const string REPORT_VIEW_AVAILABILITY = "REPORT_VIEW_AVAILABILITY";
     public const string REPORT_SEND_AVAILABILITY_EMAIL = "REPORT_SEND_AVAILABILITY_EMAIL";
     public const string REPORT_EDIT_AVAILABILITY = "REPORT_EDIT_AVAILABILITY";
+    public const string REPORT_VIEW_REQUESTS = "REPORT_VIEW_REQUESTS";
 }
