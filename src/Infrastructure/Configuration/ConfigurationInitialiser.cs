@@ -89,6 +89,7 @@ public sealed class ConfigurationInitialiser(
                 .Append(StudentPhotoSettings.ConfigurationKey)
                 .Concat(ReportingSettings.Keys)
                 .Concat(EmailSettings.Keys)
+                .Append(TeacherAvailabilityEmailSettings.BccKey)
                 .Select(name => name.ToLowerInvariant())
                 .ToArray();
             var rows = await configContext
@@ -141,6 +142,8 @@ public sealed class ConfigurationInitialiser(
                 email.emailTo,
                 email.emailFrom
             );
+            TeacherAvailabilityEmailSettings.Initialize(
+                values.GetValueOrDefault(TeacherAvailabilityEmailSettings.BccKey));
         }
         catch (Exception error)
             when (error is DbException or InvalidOperationException or ArgumentException)

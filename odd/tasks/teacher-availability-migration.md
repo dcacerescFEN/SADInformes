@@ -1,6 +1,6 @@
 # Plan: migración de Disponibilidad Horaria y Observaciones
 
-Estado: Fase 1 implementada; fases 2–4 pendientes.
+Estado: Fases 1–4 implementadas.
 
 ## 1. Hallazgo
 
@@ -56,7 +56,6 @@ Se crean permisos nuevos siguiendo `Estandarizacion-Permisos.md`, módulo
 | `REPORT_VIEW_AVAILABILITY` | Consulta la disponibilidad horaria y sus observaciones. |
 | `REPORT_SEND_AVAILABILITY_EMAIL` | Envía correos individuales o masivos de disponibilidad. |
 | `REPORT_EDIT_AVAILABILITY` | Configura el período y edita la disponibilidad de un profesor. |
-| `REPORT_DELETE_AVAILABILITY` | Elimina la disponibilidad registrada de un profesor. |
 
 ### Equivalencias legacy
 
@@ -66,7 +65,6 @@ Disponibilidad       > SADInformes  "REPORT_VIEW_AVAILABILITY
 
 Disponibilidad Admin > SADInformes  "REPORT_VIEW_AVAILABILITY
                                       REPORT_EDIT_AVAILABILITY
-                                      REPORT_DELETE_AVAILABILITY
                                       REPORT_SEND_AVAILABILITY_EMAIL"
 ```
 
@@ -82,7 +80,7 @@ Se registran en:
 - Lista y observaciones: `REPORT_VIEW_AVAILABILITY`.
 - Envío de correo: `REPORT_SEND_AVAILABILITY_EMAIL`.
 - Administración y mantenedor: `REPORT_EDIT_AVAILABILITY`.
-- Eliminar disponibilidad: `REPORT_DELETE_AVAILABILITY`.
+- Eliminar disponibilidad: `REPORT_EDIT_AVAILABILITY` (el legacy no tiene permiso separado).
 
 `PermissionPolicyProvider` ya resuelve políticas que empiezan con `REPORT_`, por
 lo que `REPORT_*` funciona sin cambios en el provider.
@@ -201,6 +199,9 @@ no bloquear la pantalla. El envío individual puede ser directo con confirmació
 ## 6. Fases
 
 Fase 1 implementada: permisos de consulta, sidebar, lista y observaciones.
+Fase 2 implementada: correos individuales/masivos asíncronos, plantillas legacy, BCC, `spMOD_FE_Bienvenida`, modal global, cancelación y botones diferenciados.
+Fase 3 implementada: botón Administración, ruta de configuración, consulta/edición del período, confirmación de activación y pruebas.
+Fase 4 implementada: mantenedor de disponibilidad por profesor, edición de modalidad de cursos, módulos cascada y eliminación con confirmación.
 
 Log: Fase 1 completada; fases 2–4 pendientes por escritura en DocenciaWeb/NDB_SEE y contratos no versionados.
 
@@ -235,7 +236,7 @@ Esta fase ya resuelve que las dos opciones aparezcan y sean consultables.
 
 ### Fase 4 — Mantenedor y eliminación
 
-- `REPORT_EDIT_AVAILABILITY` y `REPORT_DELETE_AVAILABILITY`.
+- `REPORT_EDIT_AVAILABILITY` para edición y eliminación.
 - Editor de módulos por profesor/período.
 - Eliminación con confirmación y alcance explícito.
 - Wrappers tipados para DocenciaWeb/Sad.
@@ -282,8 +283,9 @@ Disponibilidad, no Alumnos sin fotos.
 
 ## 10. Verificación Fase 1
 
-- WebApi enfocado 3/3 y suite completa 608/608.
+- WebApi enfocado 4/4 y suite completa 609/609.
 - Angular enfocado 8/8 y suite completa 406/406.
+- PermissionExporter PASS.
 - Build Angular correcto.
 - Sin verificación SQL, SMTP ni navegador real.
 
@@ -292,3 +294,7 @@ Disponibilidad, no Alumnos sin fotos.
 Implementar Fase 1 primero, con permisos y solo lectura, para incorporar las dos
 opciones al menú sin asumir riesgos de escritura. Después avanzar por fases:
 correos, administración y mantenedor.
+
+## Tasks
+
+- [x] T1 — Fase 3: administración del período y botón de administración.

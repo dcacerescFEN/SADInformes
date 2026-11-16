@@ -1,4 +1,5 @@
 import { NgClass } from '@angular/common';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Component, effect, input, output, signal } from '@angular/core';
 
 export interface TableColumn {
@@ -17,6 +18,10 @@ export interface TableColumn {
   emphasized?: boolean;
   cellClass?: string;
   link?: (row: object) => string | null;
+  popover?: (row: object) => string;
+  popoverTitle?: string;
+  popoverIcon?: string;
+  popoverClass?: string;
 }
 
 export interface TableAction {
@@ -25,11 +30,12 @@ export interface TableAction {
   actionKey: string;
   cssClass?: string;
   ariaLabel?: (row: object) => string;
+  iconOnly?: boolean;
 }
 
 @Component({
   selector: 'app-table',
-  imports: [NgClass],
+  imports: [NgClass, NgbPopover],
   template: `
     <div class="table-container">
       <div class="table-responsive">
@@ -140,6 +146,10 @@ export interface TableAction {
                               column.alternateAction.ariaLabel?.(row) ??
                               actionLabel(column.alternateAction, row)
                             "
+                            [attr.title]="
+                              column.alternateAction.ariaLabel?.(row) ??
+                              actionLabel(column.alternateAction, row)
+                            "
                             (click)="
                               $event.stopPropagation();
                               onAction(getRowId(row), column.alternateAction.actionKey)
@@ -152,7 +162,9 @@ export interface TableAction {
                                 aria-hidden="true"
                               ></i>
                             }
-                            {{ actionLabel(column.alternateAction, row) }}
+                            @if (!column.alternateAction.iconOnly) {
+                              {{ actionLabel(column.alternateAction, row) }}
+                            }
                           </button>
                         } @else if (isColumnActionVisible(row, column)) {
                           @if (column.action; as action) {
@@ -164,6 +176,7 @@ export interface TableAction {
                               [attr.aria-label]="
                                 action.ariaLabel?.(row) ?? actionLabel(action, row)
                               "
+                              [attr.title]="action.ariaLabel?.(row) ?? actionLabel(action, row)"
                               (click)="
                                 $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
                               "
@@ -171,7 +184,7 @@ export interface TableAction {
                               @if (action.icon) {
                                 <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
                               }
-                              {{ actionLabel(action, row) }}
+                              @if (!action.iconOnly) { {{ actionLabel(action, row) }} }
                             </button>
                           }
                           @for (action of column.additionalActions ?? []; track action.actionKey) {
@@ -183,6 +196,7 @@ export interface TableAction {
                               [attr.aria-label]="
                                 action.ariaLabel?.(row) ?? actionLabel(action, row)
                               "
+                              [attr.title]="action.ariaLabel?.(row) ?? actionLabel(action, row)"
                               (click)="
                                 $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
                               "
@@ -190,7 +204,7 @@ export interface TableAction {
                               @if (action.icon) {
                                 <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
                               }
-                              {{ actionLabel(action, row) }}
+                              @if (!action.iconOnly) { {{ actionLabel(action, row) }} }
                             </button>
                           }
                         }
@@ -224,6 +238,9 @@ export interface TableAction {
                             [attr.aria-label]="
                               column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
                             "
+                            [attr.title]="
+                              column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
+                            "
                             (click)="
                               $event.stopPropagation();
                               onAction(getRowId(row), column.action.actionKey)
@@ -232,7 +249,29 @@ export interface TableAction {
                             @if (column.action.icon) {
                               <i class="bi" [ngClass]="column.action.icon" aria-hidden="true"></i>
                             }
-                            {{ actionLabel(column.action, row) }}
+                            @if (!column.action.iconOnly) { {{ actionLabel(column.action, row) }} }
+                          </button>
+                        }
+                      </td>
+                    } @else if (column.popover) {
+                      <td class="table-action-cell">
+                        @if (isColumnActionVisible(row, column)) {
+                          <button
+                            class="btn btn-sm btn-outline-warning"
+                            type="button"
+                            #observationPopover="ngbPopover"
+                            [ngbPopover]="column.popover(row)"
+                            [popoverTitle]="column.popoverTitle ?? column.name"
+                            [disabled]="isColumnActionDisabled(row, column)"
+                            [attr.aria-label]="column.popover(row)"
+                            placement="auto"
+                            triggers="manual"
+                            container="body"
+                            [popoverClass]="column.popoverClass ?? 'observation-popover'"
+                            (mouseenter)="observationPopover.open()"
+                            (mouseleave)="observationPopover.close()"
+                          >
+                            <i class="bi" [ngClass]="column.popoverIcon ?? 'bi-journal-text'" aria-hidden="true"></i>
                           </button>
                         }
                       </td>
@@ -246,6 +285,9 @@ export interface TableAction {
                           [attr.aria-label]="
                             column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
                           "
+                          [attr.title]="
+                            column.action.ariaLabel?.(row) ?? actionLabel(column.action, row)
+                          "
                           (click)="
                             $event.stopPropagation();
                             onAction(getRowId(row), column.action.actionKey)
@@ -254,7 +296,7 @@ export interface TableAction {
                           @if (column.action.icon) {
                             <i class="bi" [ngClass]="column.action.icon" aria-hidden="true"></i>
                           }
-                          {{ actionLabel(column.action, row) }}
+                          @if (!column.action.iconOnly) { {{ actionLabel(column.action, row) }} }
                         </button>
                       </td>
                     } @else if (column.link?.(row); as href) {
@@ -288,7 +330,7 @@ export interface TableAction {
                         />
                       </td>
                     } @else {
-                      <td [ngClass]="column.cellClass">
+                      <td [class.table-cell-multiline]="column.multiline" [ngClass]="column.cellClass">
                         {{ getCellValue(row, column.key) }}
                       </td>
                     }
@@ -302,9 +344,11 @@ export interface TableAction {
                         <button
                           class="btn"
                           [ngClass]="action.cssClass"
+                          [attr.title]="action.ariaLabel?.(row) ?? actionLabel(action, row)"
                           (click)="onAction(getRowId(row), action.actionKey)"
                         >
-                          <i class="bi" [ngClass]="action.icon"></i> {{ actionLabel(action, row) }}
+                          <i class="bi" [ngClass]="action.icon"></i>
+                          @if (!action.iconOnly) { {{ actionLabel(action, row) }} }
                         </button>
                         <span>&nbsp;</span>
                       } @else {

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Application.Common.Interfaces;
 using Application.Common.Mediator;
 using Domain.Common;
@@ -47,6 +48,9 @@ public sealed class GetTeacherAvailabilityHandler(
             period, periodName, rows, pending, rows.Length - pending));
     }
 
-    private static string Text(string? value) => value?.Trim() ?? "";
+    private static readonly Regex BreakTag = new(@"<br\s*/?>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static string Text(string? value) =>
+        value is null ? "" : BreakTag.Replace(value, "\n").Trim();
     private static string Number(int? value) => value?.ToString(CultureInfo.InvariantCulture) ?? "";
 }

@@ -34,7 +34,7 @@ Cruce de Cursos: [filtro de período y exportación](docs/course-crossing.md).
 Cursos para asignación de salas: [filtro de período y exportación](docs/courses-for-room-assignment.md).
 Alumnos sin fotos: [consulta server-side y exportación](docs/students-without-photo.md).
 Reducción de carga: [filtro de período y exportación](docs/course-load-reduction.md).
-Disponibilidad Horaria: [solo lectura](docs/teacher-availability.md).
+Disponibilidad Horaria: [consulta y correos](docs/teacher-availability.md).
 Disponibilidad Observaciones: [solo lectura](docs/teacher-availability-observations.md).
 Tabla server-side: [diseño e implementación](docs/server-side-dynamic-table-plan.md).
 Correo masivo: [plan de migración](docs/bulk-email-plan.md).

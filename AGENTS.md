@@ -87,6 +87,27 @@ its use cases through `Commands` and `Queries` folders:
 - Reuse the shared `app-table`, `ng-select` floating-label filters,
   `page-header`/`page-title`/`page-subtitle` layout and the SADAlumnos-style
   `NotificationService` (SweetAlert2) for confirmation and notifications.
+
+### Forms and actions
+
+- Native text, number, date, time and textarea inputs use the SADAlumnos
+  `form-floating` pattern: `<div class="form-floating">`, an input/textarea with
+  `class="form-control"` and a placeholder, followed by a `<label for="...">`.
+- All select controls use `ng-select` with search enabled; do not use native
+  `<select>`. Filters keep the `ng-select-container-custom` + `floating-label` +
+  `ng-select-custom` pattern; inline table selects use `ng-select-custom ng-select-custom-plain`
+  and `[searchable]="true"`. Inside a scrollable `form-section` or table, set
+  `appendTo="body"` so the dropdown does not create an internal scrollbar.
+- Form action buttons are right-aligned with `justify-content-end`, in the order
+  **Cancelar** then **Guardar**. Cancelar uses `btn btn-clear` with
+  `bi-x-circle`; Guardar uses the project's success button (`btn-create` or
+  `btn-save`) with `bi-save`.
+- A page with a previous screen exposes a right-aligned page-header button
+  **Volver a {previous page}** using `btn btn-clear` and `bi-arrow-left`.
+- Table row actions are icon-only with a tooltip: set `TableAction.iconOnly` and
+  provide the description through `label`/`ariaLabel`; do not render label text.
+- Successful saves use `NotificationService.showSuccess` (top-end toast, 3 seconds);
+  do not open a blocking `alert` for a successful save. Errors use `showError`.
 - Every destructive or academic write requires explicit confirmation and must not
   resend a stale selection after the dialog resolves.
 - Disable actions from authoritative server flags (for example `canEnroll`), not

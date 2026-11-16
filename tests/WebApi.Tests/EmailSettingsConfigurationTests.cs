@@ -38,6 +38,7 @@ public sealed class EmailSettingsConfigurationTests
         Add("EmailTo", "appconfig-to@fen.uchile.cl");
         Add("EmailServer", "smtp.appconfig.cl");
         Add("EmailPort", "2525");
+        Add("ReportAvailabilityEmailBcc", "bcc@fen.uchile.cl");
         await context.SaveChangesAsync();
 
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
@@ -56,5 +57,6 @@ public sealed class EmailSettingsConfigurationTests
         Assert.Equal("appconfig-to@fen.uchile.cl", EmailSettings.EmailTo);
         Assert.Equal("smtp.appconfig.cl", EmailSettings.Server);
         Assert.Equal(2525, EmailSettings.Port);
+        Assert.Equal("bcc@fen.uchile.cl", TeacherAvailabilityEmailSettings.Bcc);
     }
 }

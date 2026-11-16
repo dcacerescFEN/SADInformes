@@ -40,7 +40,7 @@ const COLUMNS: readonly TableColumn[] = [
             <div class="col-lg-4 col-md-6">
               <div class="ng-select-container-custom">
                 <label class="floating-label" for="availability-observations-period">Período</label>
-                <ng-select id="availability-observations-period" formControlName="period"
+                <ng-select id="availability-observations-period" formControlName="period" appendTo="body"
                   data-filter="period" [items]="periods()" bindLabel="text" bindValue="value"
                   [clearable]="false" class="form-select ng-select-custom" />
               </div>

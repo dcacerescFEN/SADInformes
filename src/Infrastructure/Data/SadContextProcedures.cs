@@ -804,6 +804,142 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecPeriodoDisponibilidadDatosXPeriodoResult>?> SpRec_PeriodoDisponibilidad_DatosXPeriodoAsync(
+        string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 20, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecPeriodoDisponibilidadDatosXPeriodoResult>(
+            "EXEC @returnValue = [dbo].[spRec_PeriodoDisponibilidad_DatosXPeriodo] @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<int> SpMOD_FE_TipoModuloCatedrasAsync(
+        string? codCatedra, string? codSeccion, int? tipoModulo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Cod_Catedra", Size = 15, Value = codCatedra ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Cod_Seccion", Size = 15, Value = codSeccion ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Modulo", Value = tipoModulo ?? (object)DBNull.Value, SqlDbType = SqlDbType.Int },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spMOD_FE_TipoModuloCatedras] @Cod_Catedra = @Cod_Catedra, @Cod_Seccion = @Cod_Seccion, @Tipo_Modulo = @Tipo_Modulo",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
+    public virtual async Task<int> SpMOD_FE_ModulosCascadaFinalAsync(
+        int? id, string? moduloCascada,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Id", Value = id ?? (object)DBNull.Value, SqlDbType = SqlDbType.Int },
+            new SqlParameter { ParameterName = "ModuloCascada", Size = 15, Value = moduloCascada ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spMOD_FE_ModulosCascadaFinal] @Id = @Id, @ModuloCascada = @ModuloCascada",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
+    public virtual async Task<int> SpINS_FE_ModulosCascadaFinalAsync(
+        string? periodo, string? codPersona, int? idModulo, string? moduloCascada,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Cod_Persona", Size = 15, Value = codPersona ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "IdModulo", Value = idModulo ?? (object)DBNull.Value, SqlDbType = SqlDbType.Int },
+            new SqlParameter { ParameterName = "ModuloCascada", Size = 15, Value = moduloCascada ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spINS_FE_ModulosCascadaFinal] @Periodo = @Periodo, @Cod_Persona = @Cod_Persona, @IdModulo = @IdModulo, @ModuloCascada = @ModuloCascada",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
+    public virtual async Task<int> SpELI_DisponibilidadesAsync(
+        string? codPersona, string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Cod_Persona", Size = 15, Value = codPersona ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spELI_Disponibilidades] @Cod_Persona = @Cod_Persona, @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
+    public virtual async Task<int> SpMod_PeriodoDisponibilidad_DatosXPeriodoAsync(
+        string? periodo, string? fechaInicio, string? fechaTermino, string? horaIncio,
+        string? horaTermino, string? textoFechaCorreoDisponibilidad, bool? periodoProceso,
+        string? textoFechaRezadadoCorreoDisponibilidad,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 20, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "FechaInicio", Size = 30, Value = fechaInicio ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "FechaTermino", Size = 30, Value = fechaTermino ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "HoraIncio", Size = 20, Value = horaIncio ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "HoraTermino", Size = 20, Value = horaTermino ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "TextoFechaCorreoDisponibilidad", Size = 100, Value = textoFechaCorreoDisponibilidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "PeriodoProceso", Value = periodoProceso ?? false, SqlDbType = SqlDbType.Bit },
+            new SqlParameter { ParameterName = "TextoFechaRezadadoCorreoDisponibilidad", Size = 100, Value = textoFechaRezadadoCorreoDisponibilidad ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spMod_PeriodoDisponibilidad_DatosXPeriodo] @Periodo = @Periodo, @FechaInicio = @FechaInicio, @FechaTermino = @FechaTermino, @HoraIncio = @HoraIncio, @HoraTermino = @HoraTermino, @TextoFechaCorreoDisponibilidad = @TextoFechaCorreoDisponibilidad, @PeriodoProceso = @PeriodoProceso, @TextoFechaRezadadoCorreoDisponibilidad = @TextoFechaRezadadoCorreoDisponibilidad",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
+    public virtual async Task<int> SpMOD_FE_BienvenidaAsync(
+        string? periodo, string? codProfesor,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Cod_Profesor", Size = 10, Value = codProfesor ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spMOD_FE_Bienvenida] @Periodo = @Periodo, @Cod_Profesor = @Cod_Profesor",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
     public virtual async Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(
         string? incluirTodos, string? usuario,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

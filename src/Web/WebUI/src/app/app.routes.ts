@@ -137,5 +137,17 @@ export const routes: Routes = [
                                             .then((module) => module.TeacherAvailabilityObservations)
                                           : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
+  {
+    path: 'academic-enrollment/teacher-availability/:teacherCode/edit',
+    canActivate: [authGuard],
+    loadComponent: () => import('./academic-enrollment/teacher-availability-editor/teacher-availability-editor')
+      .then((module) => module.TeacherAvailabilityEditor),
+  },
+  {
+    path: 'academic-enrollment/teacher-availability/settings',
+    canActivate: [authGuard],
+    loadComponent: () => import('./academic-enrollment/teacher-availability-settings/teacher-availability-settings')
+      .then((module) => module.TeacherAvailabilitySettings),
+  },
   { path: '**', redirectTo: '/academic-enrollment/electives-without-common-plan' },
 ];

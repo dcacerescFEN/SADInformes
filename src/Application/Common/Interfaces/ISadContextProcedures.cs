@@ -139,6 +139,36 @@ public partial interface ISadContextProcedures
         string? periodo,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecPeriodoDisponibilidadDatosXPeriodoResult>?> SpRec_PeriodoDisponibilidad_DatosXPeriodoAsync(
+        string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpMOD_FE_TipoModuloCatedrasAsync(
+        string? codCatedra, string? codSeccion, int? tipoModulo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpMOD_FE_ModulosCascadaFinalAsync(
+        int? id, string? moduloCascada,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpINS_FE_ModulosCascadaFinalAsync(
+        string? periodo, string? codPersona, int? idModulo, string? moduloCascada,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpELI_DisponibilidadesAsync(
+        string? codPersona, string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpMod_PeriodoDisponibilidad_DatosXPeriodoAsync(
+        string? periodo, string? fechaInicio, string? fechaTermino, string? horaIncio,
+        string? horaTermino, string? textoFechaCorreoDisponibilidad, bool? periodoProceso,
+        string? textoFechaRezadadoCorreoDisponibilidad,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<int> SpMOD_FE_BienvenidaAsync(
+        string? periodo, string? codProfesor,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecTiposAlumnoResult>?> SpRec_TiposAlumnoAsync(
         string? incluirTodos, string? usuario,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

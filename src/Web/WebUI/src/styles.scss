@@ -1,7 +1,10 @@
 @use "variables" as vars;
 
 :root {
+  --button-text: #{vars.$white};
   --warning-yellow: #{vars.$warning-yellow};
+  --danger-red: #{vars.$danger-red};
+  --success-green: #{vars.$success-green};
   --dark-gray: #{vars.$dark-gray};
   --primary-blue: #003b7a;
   --primary-blue-deep: #06245a;
@@ -14,7 +17,7 @@
   --table-row-hover-background: #f3f6fb;
   --dropdown-option-selected-background: #dbe8f8;
   --layout-surface: rgba(255, 255, 255, 0.9);
-  --light-blue: #dbe8f8;
+  --light-blue: #{vars.$light-blue};
   --border-gray: #cfd8e3;
   --input-background: #ffffff;
   --input-text: #1e2b3c;
@@ -155,7 +158,7 @@ body {
 .btn-export-excel,
 .btn-export-pdf {
   border: none;
-  color: #fff;
+  color: var(--button-text);
 }
 
 .btn-create {
@@ -167,7 +170,7 @@ body {
   background: #16a34a;
   box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   text-decoration: none;
-  color: #fff;
+  color: var(--button-text);
   transform: translateY(-1px);
 }
 
@@ -179,7 +182,7 @@ body {
 .btn-export-excel:hover {
   background: var(--export-excel-hover);
   box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
-  color: #fff;
+  color: var(--button-text);
   transform: translateY(-1px);
 }
 
@@ -191,7 +194,7 @@ body {
 .btn-export-pdf:hover {
   background: var(--export-pdf-hover);
   box-shadow: 0 4px 12px rgba(176, 42, 55, 0.3);
-  color: #fff;
+  color: var(--button-text);
   transform: translateY(-1px);
 }
 
@@ -202,7 +205,7 @@ body {
 
 .btn-search:hover {
   transform: translateY(-1px);
-  color: #fff;
+  color: var(--button-text);
 }
 
 .btn-clear,
@@ -227,6 +230,111 @@ body {
   transform: none;
   box-shadow: none;
   opacity: 0.65;
+}
+
+// Toasts compartidos con SADAlumnos.
+.notificacion-success {
+  background-color: var(--success-green) !important;
+  color: var(--button-text);
+}
+
+.notificacion-error {
+  background-color: var(--danger-red) !important;
+  color: var(--button-text);
+}
+
+// Botones semánticos de disponibilidad.
+.btn-availability-all,
+.btn-availability-welcome,
+.btn-availability-pending,
+.btn-availability-single {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-availability-all,
+.btn-availability-welcome,
+.btn-availability-pending {
+  border: none;
+}
+
+.btn-availability-all {
+  background: var(--primary-blue);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-blue) 25%, transparent);
+  color: var(--button-text);
+}
+
+.btn-availability-all:hover {
+  background: var(--primary-blue-deep);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-blue) 30%, transparent);
+  color: var(--button-text);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.btn-availability-welcome {
+  background: var(--warning-yellow);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--warning-yellow) 30%, transparent);
+  color: var(--dark-gray);
+}
+
+.btn-availability-welcome:hover {
+  background: color-mix(in srgb, var(--warning-yellow) 82%, var(--dark-gray));
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--warning-yellow) 35%, transparent);
+  color: var(--dark-gray);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.btn-availability-pending {
+  background: var(--danger-red);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--danger-red) 25%, transparent);
+  color: var(--button-text);
+}
+
+.btn-availability-pending:hover {
+  background: color-mix(in srgb, var(--danger-red) 82%, var(--dark-gray));
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--danger-red) 30%, transparent);
+  color: var(--button-text);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.btn-availability-single {
+  background: var(--light-blue);
+  border: 1px solid var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.btn-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 6px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.btn-availability-single:hover {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue-deep);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-blue) 30%, transparent);
+  color: var(--button-text);
+  transform: translateY(-1px);
+}
+
+.btn-availability-all:disabled,
+.btn-availability-welcome:disabled,
+.btn-availability-pending:disabled,
+.btn-availability-single:disabled {
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
 }
 
 // Tabla reutilizable de shared.
@@ -383,9 +491,51 @@ body {
 
 
 
+// Popover de observaciones, mismo patrón que la auditoría de SADAlumnos.
+.observation-popover {
+  --bs-popover-max-width: 26rem;
+}
+
+.observation-popover .popover-body {
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  color: var(--layout-text);
+  background-color: var(--layout-surface-strong);
+}
+
+// Popover de auditoría/observaciones, formato SADAlumnos con fondo amarillo.
+.audit-popover {
+  max-width: 360px;
+  border-color: var(--layout-border-color);
+  --bs-popover-border-color: var(--layout-border-color);
+  --bs-popover-bg: var(--layout-surface-strong);
+  --bs-popover-header-bg: var(--warning-yellow);
+  --bs-popover-header-color: var(--primary-blue-deep);
+  --bs-popover-body-color: var(--layout-text);
+
+  .popover-header {
+    background-color: var(--warning-yellow);
+    color: var(--primary-blue-deep);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--warning-yellow) 78%, var(--primary-blue-deep));
+  }
+
+  .popover-body {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    background: var(--layout-surface-strong);
+    color: var(--layout-text);
+    white-space: pre-line;
+  }
+}
+
 // Selectores ng-select con etiqueta flotante, igual que las referencias.
 .ng-select-container-custom {
   position: relative;
+  width: 100%;
 }
 
 .floating-label {
@@ -400,19 +550,31 @@ body {
   z-index: 1;
 }
 
-.ng-select-custom .ng-select-container {
+.ng-select-custom .ng-select-container,
+.ng-select-custom-plain .ng-select-container {
   background-color: var(--input-background);
   color: var(--input-text);
   border: 1px solid var(--input-border-color);
   box-shadow: none;
   height: calc(2.5rem + 2px);
+  width: 100%;
+}
+
+.ng-select-custom .ng-select-container {
   padding-top: 0.3rem;
   margin-top: 1.2rem;
 }
 
-.ng-select-custom {
-  display: flex;
-  align-items: center;
+.ng-select-custom-plain .ng-select-container {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.ng-select-custom,
+.ng-select-custom-plain {
+  display: block;
+  width: 100%;
+  min-width: 0;
   padding: 0;
 }
 
@@ -449,6 +611,9 @@ body {
 }
 
 .ng-dropdown-panel {
+  z-index: 3000;
+  opacity: 1 !important;
+  pointer-events: auto;
   background-color: var(--layout-surface-strong);
   border-color: var(--layout-border-color);
   color: var(--layout-text);

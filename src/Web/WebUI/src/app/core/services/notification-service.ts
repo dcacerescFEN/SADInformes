@@ -3,6 +3,32 @@ import Swal from 'sweetalert2';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+  showSuccess(title: string, message: string) {
+    void Swal.fire({
+      title,
+      text: message,
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 3000,
+      toast: true,
+      position: 'top-end',
+      customClass: { popup: 'notificacion-success' },
+    });
+  }
+
+  showError(title: string, message: string) {
+    void Swal.fire({
+      title,
+      text: message,
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 3000,
+      toast: true,
+      position: 'top-end',
+      customClass: { popup: 'notificacion-error' },
+    });
+  }
+
   confirmHtml(title: string, html: string, confirmButtonText: string, cancelButtonText: string) {
     return Swal.fire({
       title,

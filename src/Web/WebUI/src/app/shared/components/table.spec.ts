@@ -253,6 +253,37 @@ describe('Table sorting and filtering', () => {
     expect(events).toEqual([{ id: 'F-1', actionKey: 'review' }]);
   });
 
+  it('renders an icon-only action with a tooltip and no visible label', async () => {
+    const fixture = TestBed.createComponent(Table);
+    Object.defineProperties(fixture.componentInstance, {
+      columns: {
+        value: signal<TableColumn[]>([
+          { key: 'folio', name: 'Folio' },
+          {
+            key: 'action',
+            name: 'Acciones',
+            action: {
+              icon: 'bi-envelope',
+              label: 'Enviar correo',
+              actionKey: 'email',
+              iconOnly: true,
+              ariaLabel: () => 'Enviar correo',
+            },
+          },
+        ]),
+      },
+      data: { value: signal([{ folio: 'F-1' }]) },
+      showRowNumber: { value: signal(false) },
+    });
+    await fixture.whenStable();
+
+    const button = fixture.nativeElement.querySelector('tbody button') as HTMLButtonElement;
+    expect(button.textContent?.trim()).toBe('');
+    expect(button.getAttribute('title')).toBe('Enviar correo');
+    expect(button.getAttribute('aria-label')).toBe('Enviar correo');
+    expect(button.querySelector('i')?.className).toContain('bi-envelope');
+  });
+
   it('renders skeleton rows and suppresses the empty state while loading', async () => {
     const fixture = TestBed.createComponent(Table);
     Object.defineProperties(fixture.componentInstance, {

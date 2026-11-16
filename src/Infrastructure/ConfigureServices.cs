@@ -1,5 +1,6 @@
 using Application.Navigation;
 using Application.Reports.AcademicEnrollment.StudentsWithoutPhoto.Common.Email;
+using Application.Reports.AcademicEnrollment.TeacherAvailability.Common.Email;
 using Application.Common.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Configuration;
@@ -36,6 +37,7 @@ public static class ConfigureServices
         services.AddScoped<ISadContext>(provider => provider.GetRequiredService<SadContext>());
         services.AddScoped<ISadContextProcedures, SadContextProcedures>();
         services.AddScoped<IDocenciaWebContext>(provider => provider.GetRequiredService<DocenciaWebContext>());
+        services.AddScoped<IDocenciaWebProcedures, DocenciaWebContextProcedures>();
         services.AddScoped<ISigmaRemuneracionesContext>(provider => provider.GetRequiredService<SigmaRemuneracionesContext>());
 
         services.AddScoped<IApiResponseService, ApiResponseService>();
@@ -49,6 +51,9 @@ public static class ConfigureServices
         services.AddSingleton<EmailDispatchRegistry>();
         services.AddSingleton<EmailDispatchQueue>();
         services.AddHostedService<EmailDispatchWorker>();
+        services.AddSingleton<TeacherAvailabilityEmailRegistry>();
+        services.AddSingleton<TeacherAvailabilityEmailQueue>();
+        services.AddHostedService<TeacherAvailabilityEmailWorker>();
         services.AddHttpClient(SsrsReportRenderer.ClientName, client => client.Timeout = Timeout.InfiniteTimeSpan)
             .ConfigurePrimaryHttpMessageHandler(provider =>
             {
