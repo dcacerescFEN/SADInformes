@@ -67,6 +67,24 @@ describe('Solicitudes no impresas', () => {
     expect(fixture.nativeElement.textContent).toContain('Homologación de Seminario X Electivos Magister');
   });
 
+  it('uses OTROS and shows the type filter for the other types route', async () => {
+    routeData.requestType = 'OTROS';
+    const fixture = TestBed.createComponent(RequestsByStatus);
+    fixture.detectChanges();
+    http.expectOne((request) => request.url === BASE + '/types'
+      && request.params.get('career') === 'IC')
+      .flush({ success: true, data: { types: [
+        { value: 'OTROS', text: 'TODOS' }, { value: '1', text: 'Tipo uno' },
+      ] } });
+    await fixture.whenStable();
+    http.expectOne((request) => request.url === BASE + '/report'
+      && request.params.get('type') === 'OTROS')
+      .flush({ success: true, data: { career: 'IC', status: 'NO IMPRESA', type: 'OTROS', rows: [] } });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Otros Tipos');
+  });
+
   it('reloads when the career changes', async () => {
     const fixture = await load();
     const component = fixture.componentInstance as unknown as {

@@ -143,7 +143,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: {
       report,
-      requestType: report.slug === 'non-printed-seminar-homologation-magister' ? '65' : '67',
+      requestType: report.slug === 'non-printed-seminar-homologation-magister'
+        ? '65'
+        : report.slug === 'non-printed-other-types' ? 'OTROS' : '67',
     },
     loadComponent: () => report.slug === 'automatic-processing-requests'
       ? import('./requests/automatic-processing-requests/automatic-processing-requests')

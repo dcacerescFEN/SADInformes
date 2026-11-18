@@ -50,6 +50,16 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
                   [searchable]="true" appendTo="body" class="form-select ng-select-custom" />
               </div>
             </div>
+            @if (showType) {
+              <div class="col-lg-5 col-md-6">
+                <div class="ng-select-container-custom">
+                  <label class="floating-label" for="status-type">Tipo de solicitud</label>
+                  <ng-select id="status-type" formControlName="type" data-filter="type"
+                    [items]="types()" bindLabel="text" bindValue="value" [clearable]="false"
+                    [searchable]="true" appendTo="body" class="form-select ng-select-custom" />
+                </div>
+              </div>
+            }
           </div>
         </form>
       </div>
@@ -77,16 +87,23 @@ export class RequestsByStatus {
   private readonly destroyRef = inject(DestroyRef);
   private readonly navigation = inject(NavigationService);
   private readonly route = inject(ActivatedRoute);
-  private readonly requestType = this.route.snapshot.data['requestType'] === '65' ? '65' : '67';
+  private readonly requestType = (() => {
+    const value = this.route.snapshot.data['requestType'];
+    return value === '65' || value === 'OTROS' ? value : '67';
+  })();
   protected readonly title = this.requestType === '65'
     ? 'Solicitudes no impresas · Homologación de Seminario X Electivos Magister'
-    : 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado';
-  readonly form = inject(FormBuilder).nonNullable.group({ career: 'IC' });
+    : this.requestType === 'OTROS'
+      ? 'Solicitudes no impresas · Otros Tipos'
+      : 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado';
+  protected readonly showType = this.requestType === 'OTROS';
+  readonly form = inject(FormBuilder).nonNullable.group({ career: 'IC', type: 'OTROS' });
   protected readonly careers: readonly Option[] = [
     { value: 'IC', text: 'Ingeniería Comercial' },
     { value: 'IICG', text: 'Ingeniería en Información y Control de Gestión' },
     { value: 'CA', text: 'Contador Auditor' },
   ];
+  protected readonly types = signal<Option[]>([]);
   protected readonly rows = signal<Row[]>([]);
   protected readonly searchTerm = signal('');
   protected readonly loading = signal(false);
@@ -105,9 +122,47 @@ export class RequestsByStatus {
   private revision = 0;
 
   constructor() {
-    this.form.controls.career.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadReport());
-    this.loadReport();
+    if (this.showType) {
+      this.form.controls.career.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadTypes());
+      this.form.controls.type.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadReport());
+      this.loadTypes();
+    } else {
+      this.form.controls.career.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadReport());
+      this.loadReport();
+    }
+  }
+
+  protected loadTypes(): void {
+    const revision = ++this.revision;
+    this.loading.set(true);
+    this.loaded.set(false);
+    this.rows.set([]);
+    this.range.set('');
+    this.error.set('');
+    const career = this.form.controls.career.value;
+    this.http.get<{ success: boolean; data: { types: Option[] } }>(BASE + '/types', {
+      params: { career },
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: result => {
+        if (revision !== this.revision) return;
+        this.loading.set(false);
+        if (!result.success) { this.error.set('No se pudieron cargar los tipos.'); return; }
+        const types = result.data.types.some(option => option.value === 'OTROS')
+          ? result.data.types
+          : [{ value: 'OTROS', text: 'TODOS' }, ...result.data.types];
+        this.types.set(types);
+        this.form.patchValue({ type: 'OTROS' }, { emitEvent: false });
+        this.loadReport();
+      },
+      error: () => {
+        if (revision !== this.revision) return;
+        this.loading.set(false);
+        this.error.set('No se pudieron cargar los tipos.');
+      },
+    });
   }
 
   protected loadReport(): void {
@@ -120,7 +175,10 @@ export class RequestsByStatus {
     this.error.set('');
     this.searchTerm.set('');
     this.http.get<{ success: boolean; data: Report }>(BASE + '/report', {
-      params: { career: value.career, status: 'NO IMPRESA', type: this.requestType },
+      params: {
+        career: value.career, status: 'NO IMPRESA',
+        type: this.showType ? value.type : this.requestType,
+      },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: result => {
         if (revision !== this.revision) return;

@@ -1,5 +1,6 @@
 using Application.Common.Mediator;
 using Application.Reports.Requests.RequestsByStatus.Queries.GetRequestsByStatus;
+using Application.Reports.Requests.RequestsByStatus.Queries.GetRequestsByStatusTypes;
 using Domain.Constants;
 using Microsoft.Data.SqlClient;
 using WebApi.Extension;
@@ -13,7 +14,21 @@ public sealed class RequestsByStatusEndpoints : IEndpoint
         var group = app.MapGroup("/api/reports/requests/by-status")
             .RequireAuthorization(Permission.REPORT_ACCESS, Permission.REPORT_VIEW_REQUESTS)
             .WithTags("Reports/Requests");
+        group.MapGet("/types", GetTypes).WithSummary("Tipos de solicitudes para Otros Tipos");
         group.MapGet("/report", GetReport).WithSummary("Solicitudes por estado");
+    }
+
+    private static async Task<IResult> GetTypes(
+        string? career, IRequestDispatcher sender, HttpContext context, CancellationToken cancellationToken)
+    {
+        context.Response.Headers.CacheControl = "no-store";
+        try
+        {
+            return Results.Ok(await sender.Send(
+                new GetRequestsByStatusTypes(career), cancellationToken));
+        }
+        catch (ArgumentException error) { return Invalid(error.Message); }
+        catch (Exception error) when (IsUnavailable(error)) { return Unavailable(); }
     }
 
     private static async Task<IResult> GetReport(

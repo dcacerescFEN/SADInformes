@@ -266,7 +266,9 @@ Permission: `REPORT_VIEW_REQUESTS`.
 - Typed `spRec_SolicitudesXEstado` and `_Tipo` wrappers.
 - Filters: career only; type is fixed to `67` and status to `NO IMPRESA`.
 - Hidden internal columns, photo/link and empty state.
-- Endpoint and Angular reports for type `67` and `65`, both `NO IMPRESA`.
+- Endpoint and Angular reports for types `67`, `65` and `OTROS`, all `NO IMPRESA`.
+- Otros Tipos exposes a type filter (default `TODOS` / `OTROS`); the other two
+  reports keep a fixed type.
 - Legacy has no Excel export.
 - Print detail, print confirmation and validation comment remain pending.
 

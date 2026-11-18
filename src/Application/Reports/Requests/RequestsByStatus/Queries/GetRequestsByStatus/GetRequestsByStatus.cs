@@ -18,7 +18,8 @@ public sealed class GetRequestsByStatusHandler(
         var career = NormalizeCareer(request.Career);
         var status = NormalizeStatus(request.Status);
         var type = request.Type?.Trim() ?? "67";
-        if (type is not ("67" or "65")) throw new ArgumentException("El tipo no es válido.");
+        if (type.Length is 0 or > 10)
+            throw new ArgumentException("El tipo no es válido.");
         var data = await procedures.SpRec_SolicitudesXEstadoAsync(
             career, status, type, cancellationToken: cancellationToken) ?? [];
         var rows = data.Select(row => new RequestByStatusRowDTO(
