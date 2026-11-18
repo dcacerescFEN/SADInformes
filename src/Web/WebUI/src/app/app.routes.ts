@@ -141,7 +141,10 @@ export const routes: Routes = [
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],
-    data: { report },
+    data: {
+      report,
+      requestType: report.slug === 'non-printed-seminar-homologation-magister' ? '65' : '67',
+    },
     loadComponent: () => report.slug === 'automatic-processing-requests'
       ? import('./requests/automatic-processing-requests/automatic-processing-requests')
         .then((module) => module.AutomaticProcessingRequests)

@@ -1,20 +1,23 @@
-# Solicitudes no impresas — Reconocimiento de Cátedras Aprobadas en Postgrado
+# Solicitudes no impresas
 
-Migración inicial de `SAD/Informes/Solicitudes/SolicitudesXEstado.aspx` para el
-tipo `67` y estado `NO IMPRESA`.
+Migración de `SAD/Informes/Solicitudes/SolicitudesXEstado.aspx` para solicitudes
+no impresas. Cada pantalla tiene un tipo fijo.
 
-## Ruta
+## Rutas
 
 ```text
 /requests/non-printed-postgraduate-course-recognition
+/requests/non-printed-seminar-homologation-magister
 ```
+
+- Reconocimiento de Cátedras Aprobadas en Postgrado: tipo `67`.
+- Homologación de Seminario X Electivos Magister: tipo `65`.
 
 ## Filtros
 
 - Carrera: IC, IICG, CA.
 - Estado fijo: `NO IMPRESA` (el informe es de no impresas).
-- Tipo fijo: `67 · Reconocimiento de Cátedras Aprobadas en Postgrado`.
-  No se ofrece selector de tipo.
+- Tipo fijo según la ruta: `67` o `65`. No se ofrece selector de tipo.
 
 ## Backend
 
@@ -22,7 +25,7 @@ tipo `67` y estado `NO IMPRESA`.
 GET /api/reports/requests/by-status/report?career=IC&status=NO%20IMPRESA
 ```
 
-`spRec_SolicitudesXEstado` recibe siempre el tipo `67` y estado `NO IMPRESA`.
+`spRec_SolicitudesXEstado` recibe el tipo fijo de la ruta y estado `NO IMPRESA`.
 
 ## Tabla
 

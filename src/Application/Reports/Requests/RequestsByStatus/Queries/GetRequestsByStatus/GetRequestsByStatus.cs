@@ -5,7 +5,7 @@ using Domain.Common;
 
 namespace Application.Reports.Requests.RequestsByStatus.Queries.GetRequestsByStatus;
 
-public sealed record GetRequestsByStatus(string? Career, string? Status)
+public sealed record GetRequestsByStatus(string? Career, string? Status, string? Type)
     : IRequest<ApiResponse<RequestsByStatusReportDTO>>;
 
 public sealed class GetRequestsByStatusHandler(
@@ -17,7 +17,8 @@ public sealed class GetRequestsByStatusHandler(
     {
         var career = NormalizeCareer(request.Career);
         var status = NormalizeStatus(request.Status);
-        const string type = "67";
+        var type = request.Type?.Trim() ?? "67";
+        if (type is not ("67" or "65")) throw new ArgumentException("El tipo no es válido.");
         var data = await procedures.SpRec_SolicitudesXEstadoAsync(
             career, status, type, cancellationToken: cancellationToken) ?? [];
         var rows = data.Select(row => new RequestByStatusRowDTO(

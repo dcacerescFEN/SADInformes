@@ -17,7 +17,7 @@ public sealed class RequestsByStatusTests
         var procedures = new Procedures();
         var response = await new GetRequestsByStatusHandler(
             procedures, new ApiResponseService()).Handle(
-            new GetRequestsByStatus("IC", "NO IMPRESA"), default);
+            new GetRequestsByStatus("IC", "NO IMPRESA", null), default);
 
         Assert.Equal("67", procedures.LastType);
         var row = Assert.Single(response.Data.Rows);
@@ -25,6 +25,17 @@ public sealed class RequestsByStatusTests
             (row.PersonCode, row.StudentCode, row.RequestCode, row.Date));
         Assert.Equal(("Reconocimiento de Cátedras Aprobadas en Postgrado", "REGULAR", "Comentario"),
             (row.Type, row.Situation, row.Comment));
+    }
+
+    [Fact]
+    public async Task Report_uses_type_65_for_the_seminar_homologation_report()
+    {
+        var procedures = new Procedures();
+        await new GetRequestsByStatusHandler(procedures, new ApiResponseService())
+            .Handle(new GetRequestsByStatus("IICG", "NO IMPRESA", "65"), default);
+
+        Assert.Equal(("IICG", "NO IMPRESA", "65"),
+            (procedures.LastCareer, procedures.LastStatus, procedures.LastType));
     }
 
     private sealed class Procedures : SadContextProcedures

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { NavigationService } from '../../core/navigation/navigation-service';
 import { RequestsByStatus } from './requests-by-status';
 
@@ -14,10 +14,13 @@ const row = {
 
 describe('Solicitudes no impresas', () => {
   let http: HttpTestingController;
+  const routeData = { requestType: '67' };
   beforeEach(() => {
+    routeData.requestType = '67';
     TestBed.configureTestingModule({
       imports: [RequestsByStatus],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
+        { provide: ActivatedRoute, useValue: { snapshot: { data: routeData } } },
         { provide: NavigationService, useValue: { studentRequestsUrl: (code: string) =>
           `https://sad.example.test/alumnos/students/detail/${code}/registration/requests` } }],
     });
@@ -30,7 +33,8 @@ describe('Solicitudes no impresas', () => {
     fixture.detectChanges();
     http.expectOne((request) => request.url === BASE + '/report'
       && request.params.get('career') === 'IC'
-      && request.params.get('status') === 'NO IMPRESA')
+      && request.params.get('status') === 'NO IMPRESA'
+      && request.params.get('type') === '67')
       .flush({ success: true, data: { career: 'IC', status: 'NO IMPRESA', type: '67', rows: [row] } });
     await fixture.whenStable();
     fixture.detectChanges();
@@ -51,6 +55,18 @@ describe('Solicitudes no impresas', () => {
       .toBe('https://fotos.fen.uchile.cl/P1.jpg');
   });
 
+  it('uses type 65 for the seminar homologation route', async () => {
+    routeData.requestType = '65';
+    const fixture = TestBed.createComponent(RequestsByStatus);
+    fixture.detectChanges();
+    http.expectOne((request) => request.url === BASE + '/report'
+      && request.params.get('type') === '65')
+      .flush({ success: true, data: { career: 'IC', status: 'NO IMPRESA', type: '65', rows: [] } });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Homologación de Seminario X Electivos Magister');
+  });
+
   it('reloads when the career changes', async () => {
     const fixture = await load();
     const component = fixture.componentInstance as unknown as {
@@ -60,7 +76,8 @@ describe('Solicitudes no impresas', () => {
     fixture.detectChanges();
     http.expectOne((request) => request.url === BASE + '/report'
       && request.params.get('career') === 'IICG'
-      && request.params.get('status') === 'NO IMPRESA')
+      && request.params.get('status') === 'NO IMPRESA'
+      && request.params.get('type') === '67')
       .flush({ success: true, data: { career: 'IICG', status: 'NO IMPRESA', type: '67', rows: [] } });
     await fixture.whenStable();
     fixture.detectChanges();

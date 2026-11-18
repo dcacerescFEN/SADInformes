@@ -10,6 +10,14 @@ export const REQUESTS_REPORTS: readonly PostgraduateReport[] = [
     permission: 'REPORT_VIEW_REQUESTS',
   },
   {
+    slug: 'non-printed-seminar-homologation-magister',
+    title: 'Solicitudes no impresas · Homologación de Seminario X Electivos Magister',
+    description: 'Solicitudes no impresas de homologación de seminario por electivos de Magister.',
+    legacyPath: 'Informes/Solicitudes/SolicitudesXEstado.aspx?carrera=ic&estado=no impresa&tipo=65',
+    available: true,
+    permission: 'REPORT_VIEW_REQUESTS',
+  },
+  {
     slug: 'non-printed-postgraduate-course-recognition',
     title: 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado',
     description: 'Solicitudes no impresas de reconocimiento de cátedras aprobadas en Postgrado.',

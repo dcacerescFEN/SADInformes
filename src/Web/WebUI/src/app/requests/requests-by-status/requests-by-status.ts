@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NavigationService } from '../../core/navigation/navigation-service';
 import { Search } from '../../shared/components/search';
@@ -28,7 +29,7 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
         <div>
           <h1 class="page-title">
             <i class="bi bi-inbox" aria-hidden="true"></i>
-            Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado
+            {{ title }}
           </h1>
           <p class="page-subtitle mb-0">
             Solicitudes pendientes de impresión por carrera.
@@ -75,6 +76,11 @@ export class RequestsByStatus {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly navigation = inject(NavigationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly requestType = this.route.snapshot.data['requestType'] === '65' ? '65' : '67';
+  protected readonly title = this.requestType === '65'
+    ? 'Solicitudes no impresas · Homologación de Seminario X Electivos Magister'
+    : 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado';
   readonly form = inject(FormBuilder).nonNullable.group({ career: 'IC' });
   protected readonly careers: readonly Option[] = [
     { value: 'IC', text: 'Ingeniería Comercial' },
@@ -114,7 +120,7 @@ export class RequestsByStatus {
     this.error.set('');
     this.searchTerm.set('');
     this.http.get<{ success: boolean; data: Report }>(BASE + '/report', {
-      params: { career: value.career, status: 'NO IMPRESA' },
+      params: { career: value.career, status: 'NO IMPRESA', type: this.requestType },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: result => {
         if (revision !== this.revision) return;
