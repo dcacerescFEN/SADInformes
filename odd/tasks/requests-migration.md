@@ -269,6 +269,7 @@ Permission: `REPORT_VIEW_REQUESTS`.
 - Endpoint and Angular reports for types `67`, `65` and `OTROS`, all `NO IMPRESA`.
 - Otros Tipos exposes a type filter (default `TODOS` / `OTROS`); the other two
   reports keep a fixed type.
+- Pendientes uses `PENDIENTE`, career filter and a type filter defaulting to `TODOS` (`%`).
 - Legacy has no Excel export.
 - Print detail, print confirmation and validation comment remain pending.
 

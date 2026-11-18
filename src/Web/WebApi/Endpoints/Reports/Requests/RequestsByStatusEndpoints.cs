@@ -19,13 +19,14 @@ public sealed class RequestsByStatusEndpoints : IEndpoint
     }
 
     private static async Task<IResult> GetTypes(
-        string? career, IRequestDispatcher sender, HttpContext context, CancellationToken cancellationToken)
+        string? career, string? status, string? typeFilter, IRequestDispatcher sender,
+        HttpContext context, CancellationToken cancellationToken)
     {
         context.Response.Headers.CacheControl = "no-store";
         try
         {
             return Results.Ok(await sender.Send(
-                new GetRequestsByStatusTypes(career), cancellationToken));
+                new GetRequestsByStatusTypes(career, status, typeFilter), cancellationToken));
         }
         catch (ArgumentException error) { return Invalid(error.Message); }
         catch (Exception error) when (IsUnavailable(error)) { return Unavailable(); }

@@ -32,7 +32,8 @@ const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
             {{ title }}
           </h1>
           <p class="page-subtitle mb-0">
-            Solicitudes pendientes de impresión por carrera.
+            @if (isPending) { Solicitudes pendientes de tramitación por carrera. }
+            @else { Solicitudes pendientes de impresión por carrera. }
             @if (range()) { · Rango {{ range() }} }.
           </p>
         </div>
@@ -89,15 +90,21 @@ export class RequestsByStatus {
   private readonly route = inject(ActivatedRoute);
   private readonly requestType = (() => {
     const value = this.route.snapshot.data['requestType'];
-    return value === '65' || value === 'OTROS' ? value : '67';
+    return value === '65' || value === 'OTROS' || value === '%' ? value : '67';
   })();
   protected readonly title = this.requestType === '65'
     ? 'Solicitudes no impresas · Homologación de Seminario X Electivos Magister'
     : this.requestType === 'OTROS'
       ? 'Solicitudes no impresas · Otros Tipos'
-      : 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado';
-  protected readonly showType = this.requestType === 'OTROS';
-  readonly form = inject(FormBuilder).nonNullable.group({ career: 'IC', type: 'OTROS' });
+      : this.requestType === '%'
+        ? 'Solicitudes pendientes'
+        : 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado';
+  protected readonly isPending = this.requestType === '%';
+  private readonly requestStatus = this.isPending ? 'PENDIENTE' : 'NO IMPRESA';
+  protected readonly showType = this.requestType === 'OTROS' || this.isPending;
+  readonly form = inject(FormBuilder).nonNullable.group({
+    career: 'IC', type: this.isPending ? '%' : 'OTROS',
+  });
   protected readonly careers: readonly Option[] = [
     { value: 'IC', text: 'Ingeniería Comercial' },
     { value: 'IICG', text: 'Ingeniería en Información y Control de Gestión' },
@@ -144,17 +151,21 @@ export class RequestsByStatus {
     this.error.set('');
     const career = this.form.controls.career.value;
     this.http.get<{ success: boolean; data: { types: Option[] } }>(BASE + '/types', {
-      params: { career },
+      params: {
+        career, status: this.requestStatus,
+        typeFilter: this.isPending ? '%' : 'OTROS',
+      },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: result => {
         if (revision !== this.revision) return;
         this.loading.set(false);
         if (!result.success) { this.error.set('No se pudieron cargar los tipos.'); return; }
-        const types = result.data.types.some(option => option.value === 'OTROS')
+        const defaultType = this.isPending ? '%' : 'OTROS';
+        const types = result.data.types.some(option => option.value === defaultType)
           ? result.data.types
-          : [{ value: 'OTROS', text: 'TODOS' }, ...result.data.types];
+          : [{ value: defaultType, text: 'TODOS' }, ...result.data.types];
         this.types.set(types);
-        this.form.patchValue({ type: 'OTROS' }, { emitEvent: false });
+        this.form.patchValue({ type: defaultType }, { emitEvent: false });
         this.loadReport();
       },
       error: () => {
@@ -176,7 +187,7 @@ export class RequestsByStatus {
     this.searchTerm.set('');
     this.http.get<{ success: boolean; data: Report }>(BASE + '/report', {
       params: {
-        career: value.career, status: 'NO IMPRESA',
+        career: value.career, status: this.requestStatus,
         type: this.showType ? value.type : this.requestType,
       },
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

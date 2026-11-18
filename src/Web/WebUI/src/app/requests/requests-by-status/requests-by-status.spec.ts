@@ -67,12 +67,34 @@ describe('Solicitudes no impresas', () => {
     expect(fixture.nativeElement.textContent).toContain('Homologación de Seminario X Electivos Magister');
   });
 
+  it('uses pending status and shows the type filter for the pending route', async () => {
+    routeData.requestType = '%';
+    const fixture = TestBed.createComponent(RequestsByStatus);
+    fixture.detectChanges();
+    http.expectOne((request) => request.url === BASE + '/types'
+      && request.params.get('status') === 'PENDIENTE'
+      && request.params.get('typeFilter') === '%')
+      .flush({ success: true, data: { types: [
+        { value: '%', text: 'TODOS' }, { value: '1', text: 'Tipo uno' },
+      ] } });
+    await fixture.whenStable();
+    http.expectOne((request) => request.url === BASE + '/report'
+      && request.params.get('status') === 'PENDIENTE'
+      && request.params.get('type') === '%')
+      .flush({ success: true, data: { career: 'IC', status: 'PENDIENTE', type: '%', rows: [] } });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Solicitudes pendientes');
+  });
+
   it('uses OTROS and shows the type filter for the other types route', async () => {
     routeData.requestType = 'OTROS';
     const fixture = TestBed.createComponent(RequestsByStatus);
     fixture.detectChanges();
     http.expectOne((request) => request.url === BASE + '/types'
-      && request.params.get('career') === 'IC')
+      && request.params.get('career') === 'IC'
+      && request.params.get('status') === 'NO IMPRESA'
+      && request.params.get('typeFilter') === 'OTROS')
       .flush({ success: true, data: { types: [
         { value: 'OTROS', text: 'TODOS' }, { value: '1', text: 'Tipo uno' },
       ] } });

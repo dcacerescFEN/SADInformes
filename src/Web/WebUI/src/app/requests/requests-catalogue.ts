@@ -18,6 +18,14 @@ export const REQUESTS_REPORTS: readonly PostgraduateReport[] = [
     permission: 'REPORT_VIEW_REQUESTS',
   },
   {
+    slug: 'pending-requests',
+    title: 'Solicitudes pendientes',
+    description: 'Solicitudes pendientes de tramitación por carrera.',
+    legacyPath: 'Informes/Solicitudes/SolicitudesXEstado.aspx?carrera=ic&estado=pendiente',
+    available: true,
+    permission: 'REPORT_VIEW_REQUESTS',
+  },
+  {
     slug: 'non-printed-other-types',
     title: 'Solicitudes no impresas · Otros Tipos',
     description: 'Solicitudes no impresas de otros tipos distintos de 67 y 65.',

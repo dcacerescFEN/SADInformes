@@ -145,7 +145,9 @@ export const routes: Routes = [
       report,
       requestType: report.slug === 'non-printed-seminar-homologation-magister'
         ? '65'
-        : report.slug === 'non-printed-other-types' ? 'OTROS' : '67',
+        : report.slug === 'non-printed-other-types'
+          ? 'OTROS'
+          : report.slug === 'pending-requests' ? '%' : '67',
     },
     loadComponent: () => report.slug === 'automatic-processing-requests'
       ? import('./requests/automatic-processing-requests/automatic-processing-requests')

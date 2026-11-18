@@ -17,7 +17,7 @@ public sealed class RequestsByStatusTests
     {
         var procedures = new Procedures();
         var response = await new GetRequestsByStatusTypesHandler(
-            procedures, new ApiResponseService()).Handle(new GetRequestsByStatusTypes("CA"), default);
+            procedures, new ApiResponseService()).Handle(new GetRequestsByStatusTypes("CA", "NO IMPRESA", "OTROS"), default);
 
         Assert.Equal(("CA", "NO IMPRESA", "OTROS"),
             (procedures.LastCareer, procedures.LastStatus, procedures.LastType));
@@ -59,6 +59,17 @@ public sealed class RequestsByStatusTests
             .Handle(new GetRequestsByStatus("CA", "NO IMPRESA", "OTROS"), default);
 
         Assert.Equal(("CA", "NO IMPRESA", "OTROS"),
+            (procedures.LastCareer, procedures.LastStatus, procedures.LastType));
+    }
+
+    [Fact]
+    public async Task Pending_report_uses_pendiente_and_all_types()
+    {
+        var procedures = new Procedures();
+        await new GetRequestsByStatusHandler(procedures, new ApiResponseService())
+            .Handle(new GetRequestsByStatus("CA", "PENDIENTE", "%"), default);
+
+        Assert.Equal(("CA", "PENDIENTE", "%"),
             (procedures.LastCareer, procedures.LastStatus, procedures.LastType));
     }
 

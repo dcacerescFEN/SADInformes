@@ -9,6 +9,7 @@ no impresas. Cada pantalla tiene un tipo fijo.
 /requests/non-printed-postgraduate-course-recognition
 /requests/non-printed-seminar-homologation-magister
 /requests/non-printed-other-types
+/requests/pending-requests
 ```
 
 - Reconocimiento de Cátedras Aprobadas en Postgrado: tipo `67`.
@@ -22,11 +23,13 @@ no impresas. Cada pantalla tiene un tipo fijo.
 - Reconocimiento (`67`) y Homologación (`65`): tipo fijo, sin selector.
 - Otros Tipos (`OTROS`): filtro de tipo con **TODOS** por defecto; al elegir un
 tipo se envía ese valor a `spRec_SolicitudesXEstado`.
+- Pendientes: estado `PENDIENTE` y filtro de tipo con **TODOS** (`%`) por
+defecto; al elegir un tipo se envía ese valor a `spRec_SolicitudesXEstado`.
 
 ## Backend
 
 ```text
-GET /api/reports/requests/by-status/types?career=IC
+GET /api/reports/requests/by-status/types?career=IC&status=PENDIENTE&typeFilter=%25
 GET /api/reports/requests/by-status/report?career=IC&status=NO%20IMPRESA&type=OTROS
 ```
 
