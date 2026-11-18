@@ -22,6 +22,14 @@ export interface TableColumn {
   popoverTitle?: string;
   popoverIcon?: string;
   popoverClass?: string;
+  avatar?: (row: object) => string | null;
+  icons?: (row: object) => readonly TableIcon[];
+}
+
+export interface TableIcon {
+  icon: string;
+  label: string;
+  cssClass?: string;
 }
 
 export interface TableAction {
@@ -305,6 +313,17 @@ export interface TableAction {
                           {{ getCellValue(row, column.key) }}
                         </a>
                       </td>
+                    } @else if (column.icons) {
+                      <td [class.table-cell-multiline]="column.multiline" [ngClass]="column.cellClass">
+                        <div class="table-icon-list">
+                          @for (item of column.icons(row); track $index) {
+                            <div class="table-icon-list__item">
+                              <i class="bi" [ngClass]="[item.icon, item.cssClass ?? '']" [attr.title]="item.label" aria-hidden="true"></i>
+                              <span class="table-icon-list__label">{{ item.label }}</span>
+                            </div>
+                          }
+                        </div>
+                      </td>
                     } @else if (getValueType(getCellValue(row, column.key)) === 'boolean') {
                       <td [class.table-cell-multiline]="column.multiline">
                         @if (getCellValue(row, column.key)) {
@@ -331,7 +350,14 @@ export interface TableAction {
                       </td>
                     } @else {
                       <td [class.table-cell-multiline]="column.multiline" [ngClass]="column.cellClass">
-                        {{ getCellValue(row, column.key) }}
+                        @if (column.avatar?.(row); as avatarUrl) {
+                          <div class="table-cell-with-avatar">
+                            <img class="table-cell-avatar" [src]="avatarUrl" alt="" />
+                            <span>{{ getCellValue(row, column.key) }}</span>
+                          </div>
+                        } @else {
+                          {{ getCellValue(row, column.key) }}
+                        }
                       </td>
                     }
                   }
@@ -425,6 +451,33 @@ export interface TableAction {
     .table-cell-multiline {
       white-space: pre-line;
     }
+    .table-cell-with-avatar {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .table-cell-avatar {
+      width: 40px;
+      height: 54px;
+      object-fit: cover;
+      border-radius: 0.35rem;
+      flex: 0 0 auto;
+    }
+    .table-icon-list {
+      display: grid;
+      gap: 0.35rem;
+    }
+    .table-icon-list__item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+    .table-icon-list__label {
+      white-space: pre-line;
+    }
+    .table-icon-success { color: var(--success-green); }
+    .table-icon-danger { color: var(--danger-red); }
+    .table-icon-warning { color: var(--warning-yellow); }
     .table-action-cell {
       min-width: 6rem;
       text-align: center;

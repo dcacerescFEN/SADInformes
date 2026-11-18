@@ -733,6 +733,59 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecAlumnosConSolicitudesPermanenciaNoResueltasResult>?> SpRec_AlumnosConSolicitudesPermanenciaNoResueltasAsync(
+        string? tipoAlumno, string? periodo,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Tipo_Alumno", Size = 30, Value = tipoAlumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Periodo", Size = 20, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnosConSolicitudesPermanenciaNoResueltasResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosConSolicitudesPermanenciaNoResueltas] @Tipo_Alumno = @Tipo_Alumno, @Periodo = @Periodo",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecAlumnoSolicitudesResult>?> SpRec_AlumnoSolicitudesAsync(
+        string? codAlumno, string? filtro,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Cod_Alumno", Size = 20, Value = codAlumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Filtro", Size = 30, Value = filtro ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnoSolicitudesResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnoSolicitudes] @Cod_Alumno = @Cod_Alumno, @Filtro = @Filtro",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecAlumnoReprobadasCoreResult>?> SpRec_AlumnoReprobadasCoreAsync(
+        string? codAlumno,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Cod_Alumno", Size = 20, Value = codAlumno ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnoReprobadasCoreResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnoReprobadasCore] @Cod_Alumno = @Cod_Alumno",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecSolicitudesXEstadoResult>?> SpRec_SolicitudesXEstadoAsync(
         string? carrera, string? estado, string? tipoSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

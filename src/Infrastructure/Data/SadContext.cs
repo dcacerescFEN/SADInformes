@@ -32,6 +32,7 @@ public partial class SadContext(DbContextOptions<SadContext> options)
     public DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado => Set<CausalEliminacionPostgrado>();
     public DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado => Set<TipoCausalEliminacionPostgrado>();
     public DbSet<Solicitud89> Solicitudes89 => Set<Solicitud89>();
+    public DbSet<PeriodoAcademico> PeriodosAcademicos => Set<PeriodoAcademico>();
 
     /// <summary>Starts a transaction on the connection also used by typed procedures.</summary>
     public virtual async Task<IDbContextTransaction> BeginTransactionAsync(
@@ -308,6 +309,15 @@ public partial class SadContext(DbContextOptions<SadContext> options)
             entity.ToTable("CausalEliminacionPostgrado", "SAD");
             entity.HasKey(row => row.IdCausalEliminacionPostgrado);
             entity.HasIndex(row => row.IdPublico).IsUnique();
+        });
+        modelBuilder.Entity<PeriodoAcademico>(entity =>
+        {
+            entity.ToTable("Periodos_Academicos", "dbo");
+            entity.HasKey(row => row.Periodo);
+            entity.Property(row => row.Periodo).HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.Tipo).HasMaxLength(20).IsUnicode(false);
+            entity.Property(row => row.InicioPeriodo).HasColumnType("datetime");
+            entity.Property(row => row.FinPeriodo).HasColumnType("datetime");
         });
         modelBuilder.Entity<Solicitud89>(entity =>
         {

@@ -285,11 +285,12 @@ Permission: `REPORT_VIEW_REQUESTS`.
 - SSRS print detail only if a validated equivalent exists; otherwise defer.
 - Tests for selected rows, confirmation and permission boundaries.
 
-### T6 — Unresolved permanence requests
+### T6 — Unresolved permanence requests — DONE (initial)
 
-- Resolve nested-data source.
-- Main query and nested detail UI/modal.
-- Export strategy and tests.
+- Main query and grouped multiline UI.
+- Nested data via existing per-student `spRec_AlumnoSolicitudes` and
+  `spRec_AlumnoReprobadasCore`; missing bulk SPs remain a performance follow-up.
+- Tests and documentation.
 
 ### T7 — Documentation and full verification
 

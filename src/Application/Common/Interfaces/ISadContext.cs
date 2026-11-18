@@ -26,6 +26,7 @@ public partial interface ISadContext
     DbSet<CausalEliminacionPostgrado> CausalesEliminacionPostgrado { get; }
     DbSet<TipoCausalEliminacionPostgrado> TiposCausalEliminacionPostgrado { get; }
     DbSet<Solicitud89> Solicitudes89 { get; }
+    DbSet<PeriodoAcademico> PeriodosAcademicos { get; }
 
 
     Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default);

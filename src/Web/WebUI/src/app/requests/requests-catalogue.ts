@@ -18,6 +18,14 @@ export const REQUESTS_REPORTS: readonly PostgraduateReport[] = [
     permission: 'REPORT_VIEW_REQUESTS',
   },
   {
+    slug: 'unresolved-permanence',
+    title: 'Alumnos con Solicitudes de Permanencia No Resueltas',
+    description: 'Alumnos con solicitudes de permanencia pendientes por carrera y período.',
+    legacyPath: 'Informes/Solicitudes/AlumnosConSolicitudesPermanenciaNoResueltas.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_REQUESTS',
+  },
+  {
     slug: 'pending-requests',
     title: 'Solicitudes pendientes',
     description: 'Solicitudes pendientes de tramitación por carrera.',
