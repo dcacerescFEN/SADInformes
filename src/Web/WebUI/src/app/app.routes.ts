@@ -142,8 +142,11 @@ export const routes: Routes = [
     path: 'requests/' + report.slug,
     canActivate: [authGuard],
     data: { report },
-    loadComponent: () => import('./requests/automatic-processing-requests/automatic-processing-requests')
-      .then((module) => module.AutomaticProcessingRequests),
+    loadComponent: () => report.slug === 'automatic-processing-requests'
+      ? import('./requests/automatic-processing-requests/automatic-processing-requests')
+        .then((module) => module.AutomaticProcessingRequests)
+      : import('./requests/requests-by-status/requests-by-status')
+        .then((module) => module.RequestsByStatus),
   })),
   {
     path: 'academic-enrollment/teacher-availability/:teacherCode/edit',

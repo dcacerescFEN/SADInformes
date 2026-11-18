@@ -48,7 +48,7 @@ export class NavigationService {
     if (!base || !code) return null;
     const url = new URL(base);
     const prefix = url.pathname.replace(/\/+$/, '');
-    url.pathname = prefix + '/detail/' + encodeURIComponent(code) + '/registration/requests';
+    url.pathname = prefix + '/students/detail/' + encodeURIComponent(code) + '/registration/requests';
     url.search = '';
     url.hash = '';
     return url.toString();

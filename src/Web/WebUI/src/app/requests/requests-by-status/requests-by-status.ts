@@ -1,0 +1,143 @@
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient } from '@angular/common/http';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NavigationService } from '../../core/navigation/navigation-service';
+import { Search } from '../../shared/components/search';
+import { Table, TableColumn } from '../../shared/components/table';
+
+interface Option { value: string; text: string; }
+interface SourceRow {
+  personCode: string; studentCode: string; name: string; requestCode: string; date: string;
+  type: string; situation: string; comment: string; firstRequest: string; lastRequest: string;
+}
+interface Row extends SourceRow { photoUrl: string; }
+interface Report { career: string; status: string; type: string; rows: SourceRow[]; }
+
+const BASE = '/api/reports/requests/by-status';
+const DEFAULT_PHOTO = 'https://fotos.fen.uchile.cl/perfilNN.jpg';
+
+@Component({
+  selector: 'app-requests-by-status',
+  imports: [ReactiveFormsModule, NgSelectModule, Search, Table],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div class="container-fluid px-0 py-4">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">
+            <i class="bi bi-inbox" aria-hidden="true"></i>
+            Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado
+          </h1>
+          <p class="page-subtitle mb-0">
+            Solicitudes pendientes de impresión por carrera.
+            @if (range()) { · Rango {{ range() }} }.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-section mb-3">
+        <h2 class="section-title"><i class="bi bi-funnel" aria-hidden="true"></i>Filtros</h2>
+        <form [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+              <div class="ng-select-container-custom">
+                <label class="floating-label" for="status-career">Carrera</label>
+                <ng-select id="status-career" formControlName="career" data-filter="career"
+                  [items]="careers" bindLabel="text" bindValue="value" [clearable]="false"
+                  [searchable]="true" appendTo="body" class="form-select ng-select-custom" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      @if (error()) { <div class="alert alert-warning" role="alert">{{ error() }}</div> }
+
+      @if (!error()) {
+        <div class="form-section">
+          <h2 class="section-title"><i class="bi bi-table" aria-hidden="true"></i>Resultados</h2>
+          <div class="d-flex justify-content-end mb-3">
+            <div class="search-box"><app-search (search)="searchTerm.set($event)" /></div>
+          </div>
+          <app-table [loading]="loading() || !loaded()" aria-label="Solicitudes no impresas"
+            [data]="rows()" [columns]="columns" [searchTerm]="searchTerm()"
+            [showSummary]="false" [showRowNumber]="false" />
+          <p class="fw-semibold mt-3 mb-0">Total: {{ rows().length }}</p>
+        </div>
+      }
+    </div>
+  `,
+  styles: '.search-box { width: 20rem; max-width: 100%; }',
+})
+export class RequestsByStatus {
+  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly navigation = inject(NavigationService);
+  readonly form = inject(FormBuilder).nonNullable.group({ career: 'IC' });
+  protected readonly careers: readonly Option[] = [
+    { value: 'IC', text: 'Ingeniería Comercial' },
+    { value: 'IICG', text: 'Ingeniería en Información y Control de Gestión' },
+    { value: 'CA', text: 'Contador Auditor' },
+  ];
+  protected readonly rows = signal<Row[]>([]);
+  protected readonly searchTerm = signal('');
+  protected readonly loading = signal(false);
+  protected readonly loaded = signal(false);
+  protected readonly error = signal('');
+  protected readonly range = signal('');
+  protected readonly columns: readonly TableColumn[] = [
+    { key: 'date', name: 'Fecha', sortable: true },
+    { key: 'requestCode', name: 'Solicitud', sortable: true },
+    { key: 'type', name: 'Tipo', sortable: true, multiline: true },
+    { key: 'name', name: 'Alumno', sortable: true, link: (row) => this.navigation.studentRequestsUrl((row as Row).studentCode) },
+    { key: 'photoUrl', name: 'Foto', sortable: false },
+    { key: 'situation', name: 'Situación Académica', sortable: true, multiline: true },
+    { key: 'comment', name: 'Comentario Validación', sortable: true, multiline: true },
+  ];
+  private revision = 0;
+
+  constructor() {
+    this.form.controls.career.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadReport());
+    this.loadReport();
+  }
+
+  protected loadReport(): void {
+    const value = this.form.getRawValue();
+    const revision = ++this.revision;
+    this.loading.set(true);
+    this.loaded.set(false);
+    this.rows.set([]);
+    this.range.set('');
+    this.error.set('');
+    this.searchTerm.set('');
+    this.http.get<{ success: boolean; data: Report }>(BASE + '/report', {
+      params: { career: value.career, status: 'NO IMPRESA' },
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: result => {
+        if (revision !== this.revision) return;
+        this.loading.set(false);
+        this.loaded.set(true);
+        if (!result.success) { this.error.set('No se pudo cargar el informe.'); return; }
+        this.rows.set(result.data.rows.map(row => ({
+          ...row,
+          photoUrl: row.personCode
+            ? `https://fotos.fen.uchile.cl/${encodeURIComponent(row.personCode)}.jpg`
+            : DEFAULT_PHOTO,
+        })));
+        const first = result.data.rows[0]?.firstRequest ?? '';
+        const last = result.data.rows[0]?.lastRequest ?? '';
+        this.range.set(first && last ? `${first} a ${last}` : '');
+      },
+      error: () => {
+        if (revision !== this.revision) return;
+        this.loading.set(false);
+        this.loaded.set(true);
+        this.rows.set([]);
+        this.error.set('No se pudo cargar el informe.');
+      },
+    });
+  }
+}

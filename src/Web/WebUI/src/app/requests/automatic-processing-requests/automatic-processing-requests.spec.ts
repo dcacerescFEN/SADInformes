@@ -25,7 +25,7 @@ describe('Solicitudes procesadas automáticamente', () => {
       imports: [AutomaticProcessingRequests],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
         { provide: NavigationService, useValue: { studentRequestsUrl: (code: string) =>
-          `https://sad.example.test/alumnos/default.aspx?codigo=${code}&modo=11` } }],
+          `https://sad.example.test/alumnos/students/detail/${code}/registration/requests` } }],
     });
     http = TestBed.inject(HttpTestingController);
   });
@@ -54,8 +54,8 @@ describe('Solicitudes procesadas automáticamente', () => {
     expect(root.querySelectorAll('app-table thead th')).toHaveLength(9);
     expect(root.textContent).toContain('ANA PÉREZ');
     expect(root.textContent).toContain('Total: 1');
-    expect(root.querySelector('tbody a')?.getAttribute('href')).toContain('codigo=A1');
-    expect(root.querySelector('tbody a')?.getAttribute('href')).toContain('modo=11');
+    expect(root.querySelector('tbody a')?.getAttribute('href'))
+      .toBe('https://sad.example.test/alumnos/students/detail/A1/registration/requests');
   });
 
   it('reloads when a filter changes', async () => {

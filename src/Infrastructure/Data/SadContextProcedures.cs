@@ -733,6 +733,44 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecSolicitudesXEstadoResult>?> SpRec_SolicitudesXEstadoAsync(
+        string? carrera, string? estado, string? tipoSolicitud,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Carrera", Size = 10, Value = carrera ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Estado", Size = 30, Value = estado ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Solicitud", Size = 10, Value = tipoSolicitud ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecSolicitudesXEstadoResult>(
+            "EXEC @returnValue = [dbo].[spRec_SolicitudesXEstado] @Carrera = @Carrera, @Estado = @Estado, @Tipo_Solicitud = @Tipo_Solicitud",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
+    public virtual async Task<List<SpRecSolicitudesXEstadoTipoResult>?> SpRec_SolicitudesXEstado_TipoAsync(
+        string? carrera, string? estado, string? tipoSolicitud,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Carrera", Size = 10, Value = carrera ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Estado", Size = 30, Value = estado ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Tipo_Solicitud", Size = 10, Value = tipoSolicitud ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecSolicitudesXEstadoTipoResult>(
+            "EXEC @returnValue = [dbo].[spRec_SolicitudesXEstado_Tipo] @Carrera = @Carrera, @Estado = @Estado, @Tipo_Solicitud = @Tipo_Solicitud",
+            sqlParameters, cancellationToken ?? default, commandTimeoutSeconds: 300);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<List<SpRecSolicitudesProcesadasAutomaticamenteSadResult>?> SpRec_SolicitudesProcesadasAutomaticamenteSadAsync(
         string? carrera, string? periodo, string? tipoSol, string? tramitacionAutomatizada,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

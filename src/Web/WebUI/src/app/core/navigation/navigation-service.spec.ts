@@ -73,7 +73,7 @@ describe('Menú central', () => {
   it('construye el enlace de solicitudes con la ruta nueva de SADAlumnos', async () => {
     await load({ studentsMenuUrl: 'https://sad.example.test/alumnos' });
     expect(navigation.studentRequestsUrl('A1')).toBe(
-      'https://sad.example.test/alumnos/detail/A1/registration/requests');
+      'https://sad.example.test/alumnos/students/detail/A1/registration/requests');
   });
 
   it('no inventa enlaces ante un contrato vacío', async () => {

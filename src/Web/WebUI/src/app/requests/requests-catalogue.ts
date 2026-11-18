@@ -9,4 +9,12 @@ export const REQUESTS_REPORTS: readonly PostgraduateReport[] = [
     available: true,
     permission: 'REPORT_VIEW_REQUESTS',
   },
+  {
+    slug: 'non-printed-postgraduate-course-recognition',
+    title: 'Solicitudes no impresas · Reconocimiento de Cátedras Aprobadas en Postgrado',
+    description: 'Solicitudes no impresas de reconocimiento de cátedras aprobadas en Postgrado.',
+    legacyPath: 'Informes/Solicitudes/SolicitudesXEstado.aspx?carrera=ic&estado=no impresa&tipo=67',
+    available: true,
+    permission: 'REPORT_VIEW_REQUESTS',
+  },
 ];

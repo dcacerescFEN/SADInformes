@@ -93,7 +93,7 @@ Keep that behavior and pass the selected raw values.
 `Nombre`, `Código`, `N° Solicitud`, `Fecha`, `Tipo`, `Solicitado`,
 `Tram. Admin.`, `Resultado`, `Fecha Proceso`.
 
-- `Código` links to SADAlumnos `/students/detail/{codigo}`.
+- `Código` links to SADAlumnos `/students/detail/{codigo}/registration/requests`.
 - `Solicitado` and `Resultado` can contain long text; use multiline cells.
 
 Permission: `REPORT_VIEW_REQUESTS`.
@@ -261,11 +261,14 @@ Permission: `REPORT_VIEW_REQUESTS`.
 - Evidence: WebApi 2 focused tests, Angular 3 focused tests, build GREEN.
 - Legacy has no Excel export; no export button was added.
 
-### T3 — Requests by status (read-only)
+### T3 — Requests by status (read-only) — PARTIAL
 
 - Typed `spRec_SolicitudesXEstado` and `_Tipo` wrappers.
-- Filters, hidden internal columns, photo/link and empty state.
-- Endpoint, Angular report, XLSX and tests.
+- Filters: career only; type is fixed to `67` and status to `NO IMPRESA`.
+- Hidden internal columns, photo/link and empty state.
+- Endpoint and Angular report for type `67` / `NO IMPRESA`.
+- Legacy has no Excel export.
+- Print detail, print confirmation and validation comment remain pending.
 
 ### T4 — Validation comments
 

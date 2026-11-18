@@ -123,6 +123,14 @@ public partial interface ISadContextProcedures
         string? periodo,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecSolicitudesXEstadoResult>?> SpRec_SolicitudesXEstadoAsync(
+        string? carrera, string? estado, string? tipoSolicitud,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
+    Task<List<SpRecSolicitudesXEstadoTipoResult>?> SpRec_SolicitudesXEstado_TipoAsync(
+        string? carrera, string? estado, string? tipoSolicitud,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecSolicitudesProcesadasAutomaticamenteSadResult>?> SpRec_SolicitudesProcesadasAutomaticamenteSadAsync(
         string? carrera, string? periodo, string? tipoSol, string? tramitacionAutomatizada,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
