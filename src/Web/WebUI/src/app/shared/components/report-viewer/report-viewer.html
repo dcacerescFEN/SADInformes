@@ -1,0 +1,55 @@
+<div class="report-viewer">
+  <header class="report-viewer__header">
+    <div class="report-viewer__title-wrap">
+      <span class="report-viewer__title">
+        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+        {{ title() }}
+      </span>
+      <small class="report-viewer__subtitle">Vista previa PDF de la solicitud seleccionada.</small>
+    </div>
+
+    <div class="report-viewer__actions">
+      <button
+        type="button"
+        class="report-viewer__download"
+        data-action="download-pdf"
+        aria-label="Descargar PDF"
+        [disabled]="isLoading() || !hasBlob()"
+        (click)="download()">
+        <i class="bi bi-download" aria-hidden="true"></i>
+        <span>Descargar PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="report-viewer__body">
+    @if (isLoading()) {
+      <div class="report-viewer__overlay">
+        <span class="spinner-border text-primary" role="status" aria-hidden="true"></span>
+        <p class="mb-0">Cargando vista previa...</p>
+      </div>
+    }
+
+    @if (hasError()) {
+      <div class="report-viewer__overlay report-viewer__overlay--error">
+        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        <p class="mb-0">No se pudo cargar la vista previa.</p>
+        <button type="button" class="btn btn-outline-danger btn-sm" data-action="retry" (click)="retry()">
+          <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
+          Reintentar
+        </button>
+      </div>
+    }
+
+    @if (!requestCode().trim() && !isLoading() && !hasError()) {
+      <div class="report-viewer__overlay">
+        <i class="bi bi-file-earmark-break" aria-hidden="true"></i>
+        <p class="mb-0">Seleccione una solicitud para ver su detalle.</p>
+      </div>
+    }
+
+    @if (safeBlobUrl()) {
+      <iframe [src]="safeBlobUrl()" class="report-viewer__iframe" frameborder="0" title="Vista previa de la solicitud"></iframe>
+    }
+  </div>
+</div>

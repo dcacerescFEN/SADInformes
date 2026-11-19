@@ -11,6 +11,7 @@ public sealed record RequestByStatusRowDTO(
     string StudentCode,
     string Name,
     string RequestCode,
+    string RawRequestCode,
     string Date,
     string Type,
     string Situation,

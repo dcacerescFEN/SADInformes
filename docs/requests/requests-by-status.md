@@ -36,6 +36,28 @@ GET /api/reports/requests/by-status/report?career=IC&status=NO%20IMPRESA&type=OT
 `spRec_SolicitudesXEstado` recibe el tipo fijo de la ruta o el tipo elegido en
 Otros Tipos, siempre con estado `NO IMPRESA`.
 
+## Confirmar impresión
+
+En los informes `NO IMPRESA`, el botón **Confirmar impresión** está visible con
+`REPORT_PRINT_REQUESTS`. Pide confirmación, envía los códigos visibles a
+`POST /api/reports/requests/by-status/confirm-print` y marca cada solicitud con
+`spMod_Solicitud_Impresa` dentro de una transacción. Al finalizar recarga el
+listado y muestra un toast.
+
+## Editar comentario
+
+La columna **Comentario Validación** se edita inline con permiso
+`REPORT_EDIT_REQUEST_VALIDATION`. El botón de edición cambia a guardar, el
+comentario se envía a `PUT /api/reports/requests/by-status/comment` y al guardar
+vuelve a texto sin recargar la lista. **Cancelar edición** descarta el borrador
+sin llamar al backend. Máximo 400 caracteres; vacío guarda `NULL`.
+
+## Imprimir detalle
+
+Con permiso `REPORT_PRINT_REQUESTS`, el botón **Imprimir detalle** abre
+`/requests/print-detail` con la carrera, estado y tipo actuales. Ver
+[print-detail.md](print-detail.md).
+
 ## Tabla
 
 Fecha, Solicitud, Tipo, Alumno, Foto, Situación Académica y Comentario

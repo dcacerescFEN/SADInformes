@@ -1,0 +1,126 @@
+.report-viewer {
+  display: flex;
+  flex-direction: column;
+  min-height: min(78vh, 900px);
+  height: 100%;
+  background: var(--layout-surface-strong);
+  color: var(--layout-text);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.report-viewer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-blue) 88%, #ffffff 12%),
+    color-mix(in srgb, var(--primary-blue-deep) 82%, #000000 18%)
+  );
+  color: #fff;
+}
+
+.report-viewer__title-wrap {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.report-viewer__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.report-viewer__subtitle {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.report-viewer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.report-viewer__download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.report-viewer__download:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.report-viewer__download:disabled {
+  opacity: 0.6;
+}
+
+.report-viewer__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: color-mix(in srgb, var(--layout-surface) 70%, var(--layout-background) 30%);
+}
+
+.report-viewer__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--layout-surface-strong) 88%, transparent 12%);
+  color: var(--layout-muted-text);
+}
+
+.report-viewer__overlay--error {
+  color: var(--bs-danger-text-emphasis);
+}
+
+.report-viewer__overlay i {
+  font-size: 2rem;
+}
+
+.report-viewer__iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: min(68vh, 820px);
+  border: 0;
+  background: #fff;
+}
+
+@media (max-width: 767.98px) {
+  .report-viewer {
+    min-height: 72vh;
+  }
+
+  .report-viewer__header {
+    flex-direction: column;
+  }
+
+  .report-viewer__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

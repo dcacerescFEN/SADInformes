@@ -138,6 +138,12 @@ export const routes: Routes = [
                                             .then((module) => module.TeacherAvailabilityObservations)
                                           : import('./postgraduate/postgraduate-placeholder').then((module) => module.PostgraduatePlaceholder),
   })),
+  {
+    path: 'requests/print-detail',
+    canActivate: [authGuard],
+    loadComponent: () => import('./requests/print-detail/print-detail')
+      .then((module) => module.RequestPrintDetail),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],

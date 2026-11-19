@@ -1,11 +1,15 @@
 using Application.Common.Interfaces;
 using Application.Reports.Requests.RequestsByStatus.Queries.GetRequestsByStatus;
 using Application.Reports.Requests.RequestsByStatus.Queries.GetRequestsByStatusTypes;
+using Application.Reports.Requests.RequestsByStatus.Commands.ConfirmRequestsPrinted;
+using Application.Reports.Requests.RequestsByStatus.Commands.UpdateRequestValidationComment;
+using Domain.Entities.Sad.Tables.dbo;
 using Domain.Common;
 using Domain.Entities.Sad.Sp;
 using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Xunit;
 
 namespace WebApi.Tests;
@@ -73,14 +77,71 @@ public sealed class RequestsByStatusTests
             (procedures.LastCareer, procedures.LastStatus, procedures.LastType));
     }
 
+    [Fact]
+    public async Task Confirm_print_calls_the_sp_once_per_distinct_code()
+    {
+        var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseInMemoryDatabase("requests-print-" + Guid.NewGuid())
+            .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            .Options);
+        var procedures = new Procedures(context);
+        var response = await new ConfirmRequestsPrintedHandler(
+            context, procedures, new ApiResponseService()).Handle(
+            new ConfirmRequestsPrinted(["A1", "A2", "A1"]), default);
+
+        Assert.Equal(2, response.Data);
+        Assert.Equal(["A1", "A2"], procedures.PrintedCodes);
+    }
+
+    [Fact]
+    public async Task Comment_update_trims_saves_and_clears_the_selected_request()
+    {
+        var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseInMemoryDatabase("requests-comment-" + Guid.NewGuid()).Options);
+        context.Solicitudes89.Add(new Solicitud89
+        {
+            CodSolicitud = "2024200001", ComentarioValidacion = "Anterior",
+        });
+        context.SaveChanges();
+        var handler = new UpdateRequestValidationCommentHandler(context, new ApiResponseService());
+
+        await handler.Handle(new UpdateRequestValidationComment("2024200001", "  Nuevo  "), default);
+        Assert.Equal("Nuevo", context.Solicitudes89.Single().ComentarioValidacion);
+
+        await handler.Handle(new UpdateRequestValidationComment("2024200001", "   "), default);
+        Assert.Null(context.Solicitudes89.Single().ComentarioValidacion);
+    }
+
+    [Fact]
+    public async Task Comment_update_rejects_more_than_400_characters()
+    {
+        var context = new SadContext(new DbContextOptionsBuilder<SadContext>()
+            .UseInMemoryDatabase("requests-comment-limit-" + Guid.NewGuid()).Options);
+        var handler = new UpdateRequestValidationCommentHandler(context, new ApiResponseService());
+
+        await Assert.ThrowsAsync<ArgumentException>(() => handler.Handle(
+            new UpdateRequestValidationComment("2024200001", new string('x', 401)), default));
+    }
+
     private sealed class Procedures : SadContextProcedures
     {
-        public Procedures() : base(new SadContext(new DbContextOptionsBuilder<SadContext>()
-            .UseInMemoryDatabase("requests-status-" + Guid.NewGuid()).Options)) { }
+        public Procedures(SadContext? context = null) : base(context ?? new SadContext(
+            new DbContextOptionsBuilder<SadContext>()
+                .UseInMemoryDatabase("requests-status-" + Guid.NewGuid()).Options)) { }
+
+        public List<string> PrintedCodes { get; } = [];
 
         public string? LastCareer { get; private set; }
         public string? LastStatus { get; private set; }
         public string? LastType { get; private set; }
+
+        public override Task<int> SpMod_Solicitud_ImpresaAsync(
+            string? codSolicitud, OutputParameter<int>? returnValue = null,
+            CancellationToken? cancellationToken = default)
+        {
+            if (codSolicitud is not null) PrintedCodes.Add(codSolicitud);
+            return Task.FromResult(1);
+        }
 
         public override Task<List<SpRecSolicitudesXEstadoTipoResult>?> SpRec_SolicitudesXEstado_TipoAsync(
             string? carrera, string? estado, string? tipoSolicitud,

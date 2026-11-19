@@ -24,7 +24,8 @@ public sealed class GetRequestsByStatusHandler(
             career, status, type, cancellationToken: cancellationToken) ?? [];
         var rows = data.Select(row => new RequestByStatusRowDTO(
             Text(row.Cod_Persona), Text(row.Cod_Alumno), Text(row.Nombre),
-            FormatRequest(row.Cod_Solicitud), Date(row.Fecha_Solicitud), Text(row.Tipo_Solicitud),
+            FormatRequest(row.Cod_Solicitud), Text(row.Cod_Solicitud),
+            Date(row.Fecha_Solicitud), Text(row.Tipo_Solicitud),
             Text(row.Situacion), Text(row.ComentarioValidacion),
             Text(row.Primero), Text(row.Ultimo))).ToArray();
 

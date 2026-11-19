@@ -24,6 +24,14 @@ export interface TableColumn {
   popoverClass?: string;
   avatar?: (row: object) => string | null;
   icons?: (row: object) => readonly TableIcon[];
+  editText?: TableEditText;
+}
+
+export interface TableEditText {
+  editing: (row: object) => boolean;
+  value: (row: object) => string;
+  maxLength?: number;
+  input: (row: object, value: string) => void;
 }
 
 export interface TableIcon {
@@ -39,6 +47,7 @@ export interface TableAction {
   cssClass?: string;
   ariaLabel?: (row: object) => string;
   iconOnly?: boolean;
+  visible?: (row: object) => boolean;
 }
 
 @Component({
@@ -196,24 +205,26 @@ export interface TableAction {
                             </button>
                           }
                           @for (action of column.additionalActions ?? []; track action.actionKey) {
-                            <button
-                              class="btn ms-1"
-                              type="button"
-                              [ngClass]="action.cssClass"
-                              [disabled]="isColumnActionDisabled(row, column)"
-                              [attr.aria-label]="
-                                action.ariaLabel?.(row) ?? actionLabel(action, row)
-                              "
-                              [attr.title]="action.ariaLabel?.(row) ?? actionLabel(action, row)"
-                              (click)="
-                                $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
-                              "
-                            >
-                              @if (action.icon) {
-                                <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
-                              }
-                              @if (!action.iconOnly) { {{ actionLabel(action, row) }} }
-                            </button>
+                            @if (action.visible?.(row) ?? true) {
+                              <button
+                                class="btn ms-1"
+                                type="button"
+                                [ngClass]="action.cssClass"
+                                [disabled]="isColumnActionDisabled(row, column)"
+                                [attr.aria-label]="
+                                  action.ariaLabel?.(row) ?? actionLabel(action, row)
+                                "
+                                [attr.title]="action.ariaLabel?.(row) ?? actionLabel(action, row)"
+                                (click)="
+                                  $event.stopPropagation(); onAction(getRowId(row), action.actionKey)
+                                "
+                              >
+                                @if (action.icon) {
+                                  <i class="bi" [ngClass]="action.icon" aria-hidden="true"></i>
+                                }
+                                @if (!action.iconOnly) { {{ actionLabel(action, row) }} }
+                              </button>
+                            }
                           }
                         }
                       </td>
@@ -312,6 +323,14 @@ export interface TableAction {
                         <a [href]="href" target="_blank" rel="noopener noreferrer">
                           {{ getCellValue(row, column.key) }}
                         </a>
+                      </td>
+                    } @else if (column.editText && column.editText.editing(row)) {
+                      <td [ngClass]="column.cellClass">
+                        <textarea class="form-control form-control-sm table-edit-text"
+                          [attr.maxlength]="column.editText.maxLength ?? null"
+                          [value]="column.editText.value(row)"
+                          (input)="column.editText.input(row, $any($event.target).value)"
+                          (click)="$event.stopPropagation()"></textarea>
                       </td>
                     } @else if (column.icons) {
                       <td [class.table-cell-multiline]="column.multiline" [ngClass]="column.cellClass">
@@ -478,14 +497,22 @@ export interface TableAction {
     .table-icon-success { color: var(--success-green); }
     .table-icon-danger { color: var(--danger-red); }
     .table-icon-warning { color: var(--warning-yellow); }
+    .table-edit-text {
+      min-width: 14rem;
+      min-height: 4rem;
+    }
     .table-action-cell {
       min-width: 6rem;
       text-align: center;
+    }
+    .row-clickable {
+      cursor: pointer;
     }
   `,
 })
 export class Table {
   readonly data = input<readonly object[]>([]);
+  readonly rowId = input<((row: object) => string | number | null | undefined) | null>(null);
   readonly columns = input<readonly TableColumn[]>([]);
   readonly actions = input<readonly TableAction[]>([]);
   readonly searchTerm = input<string>('');
@@ -722,6 +749,8 @@ export class Table {
   }
 
   public getRowId(row: object): string | number | null | undefined {
+    const custom = this.rowId();
+    if (custom) return custom(row);
     const idKey = this.columns()[0]?.key;
 
     if (!idKey) {

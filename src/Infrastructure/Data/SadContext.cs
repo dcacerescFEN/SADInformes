@@ -41,7 +41,8 @@ public partial class SadContext(DbContextOptions<SadContext> options)
         var transaction = await Database.BeginTransactionAsync(isolationLevel, cancellationToken);
         try
         {
-            await Database.ExecuteSqlRawAsync("SET XACT_ABORT ON;", cancellationToken);
+            if (Database.IsRelational())
+                await Database.ExecuteSqlRawAsync("SET XACT_ABORT ON;", cancellationToken);
             return transaction;
         }
         catch

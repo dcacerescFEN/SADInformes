@@ -786,6 +786,23 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<int> SpMod_Solicitud_ImpresaAsync(
+        string? codSolicitud,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "Cod_Solicitud", Size = 20, Value = codSolicitud ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var affected = await context.Database.ExecuteSqlRawAsync(
+            "EXEC @returnValue = [dbo].[spMod_Solicitud_Impresa] @Cod_Solicitud = @Cod_Solicitud",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return affected;
+    }
+
     public virtual async Task<List<SpRecSolicitudesXEstadoResult>?> SpRec_SolicitudesXEstadoAsync(
         string? carrera, string? estado, string? tipoSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
