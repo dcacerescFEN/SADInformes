@@ -142,6 +142,10 @@ public partial interface ISadContextProcedures
     Task<List<SpRecExpedientesNoAbiertosResult>?> SpRec_ExpedientesNoAbiertosAsync(
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecExpedientesAbiertosXPeriodoResult>?> SpRec_ExpedientesAbiertosXPeriodoAsync(
+        string? desde, string? hasta,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

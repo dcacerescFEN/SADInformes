@@ -1,10 +1,11 @@
 import { REPORT_SECTIONS } from '../core/layout/report-sections';
 import { migrateFavoriteSlugs } from '../core/layout/reports-sidebar';
+import { routes } from '../app.routes';
 import { REGULATION_REPORTS } from './regulation-catalogue';
 
 describe('Catálogo de Aplicación de reglamento', () => {
   it('registra el informe de egresados con su permiso y ruta legacy', () => {
-    expect(REGULATION_REPORTS).toHaveLength(2);
+    expect(REGULATION_REPORTS).toHaveLength(3);
     const report = REGULATION_REPORTS[0];
     expect(report).toMatchObject({
       slug: 'graduates-over-3-years',
@@ -28,6 +29,18 @@ describe('Catálogo de Aplicación de reglamento', () => {
     expect(report.description.trim().length).toBeGreaterThan(0);
   });
 
+  it('registra el informe de expedientes abiertos por período con su permiso y ruta legacy', () => {
+    const report = REGULATION_REPORTS[2];
+    expect(report).toMatchObject({
+      slug: 'opened-files-by-period',
+      title: 'Expedientes Abiertos en un Período Dado',
+      legacyPath: 'Informes/AplicacionReglamento/ExpedientesXPeriodo.aspx',
+      available: true,
+      permission: 'REPORT_VIEW_REGULATION',
+    });
+    expect(report.description.trim().length).toBeGreaterThan(0);
+  });
+
   it('publica el informe en la sección Aplicación de reglamento con ruta propia', () => {
     const section = REPORT_SECTIONS.find(item => item.id === 'aplicacion-reglamento');
     expect(section?.title).toBe('Aplicación de reglamento');
@@ -37,6 +50,15 @@ describe('Catálogo de Aplicación de reglamento', () => {
 
   it('incluye el informe en las opciones que el sidebar conoce', () => {
     expect(migrateFavoriteSlugs(REGULATION_REPORTS.map(report => report.slug)))
-      .toEqual(['graduates-over-3-years', 'unopened-files']);
+      .toEqual(['graduates-over-3-years', 'unopened-files', 'opened-files-by-period']);
+  });
+
+  it('declara la ruta perezosa del informe de expedientes abiertos por período', async () => {
+    const route = routes.find(item => item.path === 'regulation/opened-files-by-period');
+    expect(route).toBeDefined();
+    expect(route?.canActivate).toHaveLength(1);
+    expect(typeof route?.loadComponent).toBe('function');
+    const module = await import('./opened-files-by-period/opened-files-by-period');
+    expect(typeof module.OpenedFilesByPeriod).toBe('function');
   });
 });

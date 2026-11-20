@@ -17,4 +17,12 @@ export const REGULATION_REPORTS: readonly PostgraduateReport[] = [
     available: true,
     permission: 'REPORT_VIEW_REGULATION',
   },
+  {
+    slug: 'opened-files-by-period',
+    title: 'Expedientes Abiertos en un Período Dado',
+    description: 'Alumnos que abrieron su expediente de titulación dentro de un período, con su situación académica y datos de contacto.',
+    legacyPath: 'Informes/AplicacionReglamento/ExpedientesXPeriodo.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_REGULATION',
+  },
 ];

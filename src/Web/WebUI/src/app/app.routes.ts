@@ -156,6 +156,12 @@ export const routes: Routes = [
     loadComponent: () => import('./regulation/unopened-files/unopened-files')
       .then((module) => module.UnopenedFiles),
   },
+  {
+    path: 'regulation/opened-files-by-period',
+    canActivate: [authGuard],
+    loadComponent: () => import('./regulation/opened-files-by-period/opened-files-by-period')
+      .then((module) => module.OpenedFilesByPeriod),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],
