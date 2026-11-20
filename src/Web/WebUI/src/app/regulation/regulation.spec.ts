@@ -82,4 +82,5 @@ describe('Catálogo de Aplicación de reglamento', () => {
     const module = await import('./ranking/ranking');
     expect(typeof module.Ranking).toBe('function');
   });
+
 });

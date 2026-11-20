@@ -24,10 +24,12 @@ roles ni asignaciones**.
 | `Viñeta Informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Muestra el destino Informes en la navbar. |
 | `ver Postgrado` | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Permiso único para todos los informes de Postgrado; reemplaza los permisos específicos por informe. |
 | `informes aplicación reglamento` | `PERMISSION_REPORT_VIEW_REGULATION` | Informe Alumnos egresados hace más de tres años (Aplicación de reglamento). `consulta alumnos` y `solo informes` son comportamiento de navegación legado, no permisos de informes, y no se migran; todo usuario necesita además `PERMISSION_REPORT_ACCESS_REPORT_MODULE`. |
+| `informes otros` | `PERMISSION_REPORT_VIEW_OTHER` | Sección Otros del menú legacy. |
+| `cuadro de honor` (Cuadro de Honor) | `PERMISSION_REPORT_VIEW_HONOR_ROLL` | El informe exige además `PERMISSION_REPORT_VIEW_OTHER` y `PERMISSION_REPORT_ACCESS_REPORT_MODULE`. |
 | `consulta alumnos` | — | En el SAD expulsaba al módulo de alumnos. No se migra como permiso de informes. |
 | `solo informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
 | `informes acreditación` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Era un requisito adicional en varias páginas de Postgrado. |
-| `cuadro de honor` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Requisito adicional de rankings; hoy lo cubre el permiso del informe. |
+| `cuadro de honor` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | En Postgrado era requisito adicional de rankings; allí lo cubre el permiso del informe (`PERMISSION_REPORT_VIEW_POSTGRADUATE`). En Pregrado lo reemplaza `PERMISSION_REPORT_VIEW_HONOR_ROLL`. |
 | `ver Postgrado` + `encuesta egresados` (Estadísticas encuesta salida) | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Implementado; requiere asignación en Keycloak |
 | `reporte proximas licenciaturas` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo controlaba la visibilidad del enlace. |
 | `INFORMES - MANTENEDORES POSTGRADO` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | El acceso real lo define cada sistema externo. |

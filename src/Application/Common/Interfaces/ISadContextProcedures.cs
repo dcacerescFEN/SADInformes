@@ -51,6 +51,10 @@ public partial interface ISadContextProcedures
         string? tipo_Alumno, string? modalidad, string? añoIngreso, string? año,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecAlumnosCuadroDeHonorResult>?> SpRec_AlumnosCuadroDeHonorAsync(
+        string? carrera, string? añoIngreso, string? año,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<List<SpRecEncuestaGraduadosTiposAlumnoResult>?> spRec_EncuestaGraduados_TiposAlumnoAsync(
         string? incluirTodos, string? usuario, OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
     Task<List<SpRecEncuestaGraduadosAlumnosResult>?> spRec_EncuestaGraduados_AlumnosAsync(

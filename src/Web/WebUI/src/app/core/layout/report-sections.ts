@@ -2,6 +2,7 @@ import { POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/pos
 import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 import { REQUESTS_REPORTS } from '../../requests/requests-catalogue';
 import { REGULATION_REPORTS } from '../../regulation/regulation-catalogue';
+import { OTHER_REPORTS } from '../../others/others-catalogue';
 
 export interface ReportSection {
   readonly id: string;
@@ -23,7 +24,7 @@ export const REPORT_SECTIONS: readonly ReportSection[] = [
   { id: 'postgrado', title: 'Postgrado', icon: 'bi-mortarboard', routePrefix: '/postgraduate', reports: POSTGRADUATE_REPORTS },
   { id: 'gestion-docente', title: 'Gestión docente', icon: 'bi-person-workspace', reports: [] },
   { id: 'cadfpreg', title: 'Cadfpreg', icon: 'bi-clipboard-data', reports: [] },
-  { id: 'otros', title: 'Otros', icon: 'bi-three-dots', reports: [] },
+  { id: 'otros', title: 'Otros', icon: 'bi-three-dots', routePrefix: '/others', reports: OTHER_REPORTS },
   { id: 'nexocomunicacion', title: 'NexoComunicacion', icon: 'bi-chat-dots', reports: [] },
   { id: 'see', title: 'SEE', icon: 'bi-calendar-week', reports: [] },
   { id: 'hibridas-extracurriculares', title: 'Híbridas y actividades extracurriculares', icon: 'bi-calendar-event', reports: [] },

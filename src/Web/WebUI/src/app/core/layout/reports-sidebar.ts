@@ -11,9 +11,11 @@ import { LEGACY_POSTGRADUATE_SLUGS, POSTGRADUATE_REPORTS, PostgraduateReport } f
 import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 import { REQUESTS_REPORTS } from '../../requests/requests-catalogue';
 import { REGULATION_REPORTS } from '../../regulation/regulation-catalogue';
+import { OTHER_REPORTS } from '../../others/others-catalogue';
 
 const ALL_REPORTS = [
   ...POSTGRADUATE_REPORTS, ...ACADEMIC_ENROLLMENT_REPORTS, ...REQUESTS_REPORTS, ...REGULATION_REPORTS,
+  ...OTHER_REPORTS,
 ];
 
 const FAVORITE_ROUTES_STORAGE_KEY = 'sadinformes.sidebar.favorite-routes';

@@ -22,4 +22,17 @@ public static class Permission
     /// como PERMISSION_REPORT_VIEW_REGULATION.
     /// </summary>
     public const string REPORT_VIEW_REGULATION = "REPORT_VIEW_REGULATION";
+
+    /// <summary>
+    /// Consulta el Cuadro de Honor de Aplicación de reglamento. Se evalúa en Keycloak
+    /// como PERMISSION_REPORT_VIEW_HONOR_ROLL y reemplaza al permiso SAD legado
+    /// «cuadro de honor».
+    /// </summary>
+    public const string REPORT_VIEW_HONOR_ROLL = "REPORT_VIEW_HONOR_ROLL";
+
+    /// <summary>
+    /// Consulta los informes de la sección Otros. Se evalúa en Keycloak como
+    /// PERMISSION_REPORT_VIEW_OTHER y reemplaza al permiso SAD legado «informes otros».
+    /// </summary>
+    public const string REPORT_VIEW_OTHER = "REPORT_VIEW_OTHER";
 }

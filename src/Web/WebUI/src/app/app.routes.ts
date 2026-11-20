@@ -168,6 +168,12 @@ export const routes: Routes = [
     loadComponent: () => import('./regulation/ranking/ranking')
       .then((module) => module.Ranking),
   },
+  {
+    path: 'others/honor-roll',
+    canActivate: [authGuard],
+    loadComponent: () => import('./others/honor-roll/honor-roll')
+      .then((module) => module.HonorRoll),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],
