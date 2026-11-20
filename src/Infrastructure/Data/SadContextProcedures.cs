@@ -786,6 +786,23 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecAlumnosEgresadosMasTresAnosResult>?> SpRec_AlumnosEgresadosMasTresAnosAsync(
+        string? periodoActual,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+            new SqlParameter { ParameterName = "PeriodoActual", Size = 5, Value = periodoActual ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+        };
+        var result = await context.SqlQueryAsync<SpRecAlumnosEgresadosMasTresAnosResult>(
+            "EXEC @returnValue = [dbo].[spRec_AlumnosEgresadosMasTresAños] @PeriodoActual = @PeriodoActual",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

@@ -144,6 +144,12 @@ export const routes: Routes = [
     loadComponent: () => import('./requests/print-detail/print-detail')
       .then((module) => module.RequestPrintDetail),
   },
+  {
+    path: 'regulation/graduates-over-3-years',
+    canActivate: [authGuard],
+    loadComponent: () => import('./regulation/graduates-over-3-years/graduates-over-3-years')
+      .then((module) => module.GraduatesOver3Years),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],

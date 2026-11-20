@@ -23,6 +23,7 @@ roles ni asignaciones**.
 | --- | --- | --- |
 | `Viñeta Informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Muestra el destino Informes en la navbar. |
 | `ver Postgrado` | `PERMISSION_REPORT_VIEW_POSTGRADUATE` | Permiso único para todos los informes de Postgrado; reemplaza los permisos específicos por informe. |
+| `informes aplicación reglamento` | `PERMISSION_REPORT_VIEW_REGULATION` | Informe Alumnos egresados hace más de tres años (Aplicación de reglamento). `consulta alumnos` y `solo informes` son comportamiento de navegación legado, no permisos de informes, y no se migran; todo usuario necesita además `PERMISSION_REPORT_ACCESS_REPORT_MODULE`. |
 | `consulta alumnos` | — | En el SAD expulsaba al módulo de alumnos. No se migra como permiso de informes. |
 | `solo informes` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Solo ocultaba botones del encabezado; el nuevo shell no los tiene. |
 | `informes acreditación` | `PERMISSION_REPORT_ACCESS_REPORT_MODULE` | Era un requisito adicional en varias páginas de Postgrado. |

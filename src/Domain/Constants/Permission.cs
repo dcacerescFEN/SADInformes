@@ -16,4 +16,10 @@ public static class Permission
     public const string REPORT_VIEW_REQUESTS = "REPORT_VIEW_REQUESTS";
     public const string REPORT_PRINT_REQUESTS = "REPORT_PRINT_REQUESTS";
     public const string REPORT_EDIT_REQUEST_VALIDATION = "REPORT_EDIT_REQUEST_VALIDATION";
+
+    /// <summary>
+    /// Consulta los informes de Aplicación de reglamento. Se evalúa en Keycloak
+    /// como PERMISSION_REPORT_VIEW_REGULATION.
+    /// </summary>
+    public const string REPORT_VIEW_REGULATION = "REPORT_VIEW_REGULATION";
 }

@@ -135,6 +135,10 @@ public partial interface ISadContextProcedures
         string? codAlumno,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecAlumnosEgresadosMasTresAnosResult>?> SpRec_AlumnosEgresadosMasTresAnosAsync(
+        string? periodoActual,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

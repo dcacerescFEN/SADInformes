@@ -42,16 +42,26 @@ export class NavigationService {
     });
   });
 
-  studentRequestsUrl(studentCode: string): string | null {
+  studentDetailUrl(studentCode: string, section: string): string | null {
     const base = safeUrl(this.menu()['studentsMenuUrl']);
     const code = studentCode.trim();
-    if (!base || !code) return null;
+    const path = section.trim().replace(/^\/+|\/+$/g, '');
+    if (!base || !code || !path) return null;
     const url = new URL(base);
     const prefix = url.pathname.replace(/\/+$/, '');
-    url.pathname = prefix + '/students/detail/' + encodeURIComponent(code) + '/registration/requests';
+    url.pathname = `${prefix}/students/detail/${encodeURIComponent(code)}/${path}`;
     url.search = '';
     url.hash = '';
     return url.toString();
+  }
+
+  studentRequestsUrl(studentCode: string): string | null {
+    return this.studentDetailUrl(studentCode, 'registration/requests');
+  }
+
+  /** Legacy `alumnos/default.aspx?codigo=<code>&modo=4` (Notas). */
+  studentGradesUrl(studentCode: string): string | null {
+    return this.studentDetailUrl(studentCode, 'grade-reports/grades');
   }
 
   async load(): Promise<void> {

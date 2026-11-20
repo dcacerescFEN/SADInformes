@@ -76,6 +76,19 @@ describe('Menú central', () => {
       'https://sad.example.test/alumnos/students/detail/A1/registration/requests');
   });
 
+  it('construye el enlace de notas con la ruta nueva de SADAlumnos', async () => {
+    await load({ studentsMenuUrl: 'https://sad.example.test/alumnos' });
+    expect(navigation.studentGradesUrl('A/1')).toBe(
+      'https://sad.example.test/alumnos/students/detail/A%2F1/grade-reports/grades');
+  });
+
+  it('deshabilita los enlaces de ficha cuando falta el menú de alumnos', async () => {
+    await load({ studentsMenuClientId: 'SADAlumnos' });
+    expect(navigation.studentDetailUrl('A1', 'grade-reports/grades')).toBeNull();
+    expect(navigation.studentGradesUrl('A1')).toBeNull();
+    expect(navigation.studentRequestsUrl('A1')).toBeNull();
+  });
+
   it('no inventa enlaces ante un contrato vacío', async () => {
     await load(null);
     expect(navigation.links()).toEqual([]);

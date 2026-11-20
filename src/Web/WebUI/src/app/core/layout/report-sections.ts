@@ -1,6 +1,7 @@
 import { POSTGRADUATE_REPORTS, PostgraduateReport } from '../../postgraduate/postgraduate-catalogue';
 import { ACADEMIC_ENROLLMENT_REPORTS } from '../../academic-enrollment/academic-enrollment-catalogue';
 import { REQUESTS_REPORTS } from '../../requests/requests-catalogue';
+import { REGULATION_REPORTS } from '../../regulation/regulation-catalogue';
 
 export interface ReportSection {
   readonly id: string;
@@ -14,7 +15,7 @@ export interface ReportSection {
 export const REPORT_SECTIONS: readonly ReportSection[] = [
   { id: 'academic-enrollment', title: 'Inscripción académica', icon: 'bi-journal-check', routePrefix: '/academic-enrollment', reports: ACADEMIC_ENROLLMENT_REPORTS },
   { id: 'solicitudes', title: 'Solicitudes', icon: 'bi-inbox', routePrefix: '/requests', reports: REQUESTS_REPORTS },
-  { id: 'aplicacion-reglamento', title: 'Aplicación de reglamento', icon: 'bi-journal-text', reports: [] },
+  { id: 'aplicacion-reglamento', title: 'Aplicación de reglamento', icon: 'bi-journal-text', routePrefix: '/regulation', reports: REGULATION_REPORTS },
   { id: 'certificados', title: 'Certificados', icon: 'bi-file-earmark-check', reports: [] },
   { id: 'bienestar', title: 'Bienestar', icon: 'bi-heart', reports: [] },
   { id: 'ceremonia', title: 'Ceremonia', icon: 'bi-award', reports: [] },
