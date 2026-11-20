@@ -9,4 +9,12 @@ export const REGULATION_REPORTS: readonly PostgraduateReport[] = [
     available: true,
     permission: 'REPORT_VIEW_REGULATION',
   },
+  {
+    slug: 'unopened-files',
+    title: 'Alumnos que cumplen requisitos y no han abierto expediente',
+    description: 'Alumnos que cumplen los requisitos de la reglamentación y aún no han abierto su expediente de titulación.',
+    legacyPath: 'Informes/AplicacionReglamento/ExpedientesNoAbiertos.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_REGULATION',
+  },
 ];

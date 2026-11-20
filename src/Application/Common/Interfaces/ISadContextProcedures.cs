@@ -139,6 +139,9 @@ public partial interface ISadContextProcedures
         string? periodoActual,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecExpedientesNoAbiertosResult>?> SpRec_ExpedientesNoAbiertosAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

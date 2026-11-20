@@ -4,12 +4,24 @@ import { REGULATION_REPORTS } from './regulation-catalogue';
 
 describe('Catálogo de Aplicación de reglamento', () => {
   it('registra el informe de egresados con su permiso y ruta legacy', () => {
-    expect(REGULATION_REPORTS).toHaveLength(1);
+    expect(REGULATION_REPORTS).toHaveLength(2);
     const report = REGULATION_REPORTS[0];
     expect(report).toMatchObject({
       slug: 'graduates-over-3-years',
       title: 'Detección de Alumnos Egresados Más de 3 Años',
       legacyPath: 'Informes/AplicacionReglamento/EgresadosMas3.aspx',
+      available: true,
+      permission: 'REPORT_VIEW_REGULATION',
+    });
+    expect(report.description.trim().length).toBeGreaterThan(0);
+  });
+
+  it('registra el informe de expedientes no abiertos con su permiso y ruta legacy', () => {
+    const report = REGULATION_REPORTS[1];
+    expect(report).toMatchObject({
+      slug: 'unopened-files',
+      title: 'Alumnos que cumplen requisitos y no han abierto expediente',
+      legacyPath: 'Informes/AplicacionReglamento/ExpedientesNoAbiertos.aspx',
       available: true,
       permission: 'REPORT_VIEW_REGULATION',
     });
@@ -25,6 +37,6 @@ describe('Catálogo de Aplicación de reglamento', () => {
 
   it('incluye el informe en las opciones que el sidebar conoce', () => {
     expect(migrateFavoriteSlugs(REGULATION_REPORTS.map(report => report.slug)))
-      .toEqual(['graduates-over-3-years']);
+      .toEqual(['graduates-over-3-years', 'unopened-files']);
   });
 });

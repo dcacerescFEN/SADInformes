@@ -803,6 +803,21 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecExpedientesNoAbiertosResult>?> SpRec_ExpedientesNoAbiertosAsync(
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecExpedientesNoAbiertosResult>(
+            "EXEC @returnValue = [dbo].[spRec_ExpedientesNoAbiertos]",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)

@@ -150,6 +150,12 @@ export const routes: Routes = [
     loadComponent: () => import('./regulation/graduates-over-3-years/graduates-over-3-years')
       .then((module) => module.GraduatesOver3Years),
   },
+  {
+    path: 'regulation/unopened-files',
+    canActivate: [authGuard],
+    loadComponent: () => import('./regulation/unopened-files/unopened-files')
+      .then((module) => module.UnopenedFiles),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],
