@@ -64,6 +64,11 @@ export class NavigationService {
     return this.studentDetailUrl(studentCode, 'grade-reports/grades');
   }
 
+  /** Legacy `alumnos/default.aspx?codigo=<code>&modo=7` (Avance). */
+  studentProgressUrl(studentCode: string): string | null {
+    return this.studentDetailUrl(studentCode, 'grade-reports/progress');
+  }
+
   /** Legacy `alumnos/default.aspx?modo=34&codigo=<code>` (Apertura de expediente). */
   studentFileOpeningUrl(studentCode: string): string | null {
     return this.studentDetailUrl(studentCode, 'academic-status/file-opening');

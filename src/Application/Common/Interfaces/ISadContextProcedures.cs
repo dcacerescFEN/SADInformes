@@ -146,6 +146,10 @@ public partial interface ISadContextProcedures
         string? desde, string? hasta,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
 
+    Task<List<SpRecRankingEgresoXGrupoResult>?> SpRec_RankingEgresoXGrupoAsync(
+        string? grupo, string? periodo, string? rankingPorPeriodo, string? ordenarPor, string? orden,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);
+
     Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default);

@@ -82,6 +82,12 @@ describe('Menú central', () => {
       'https://sad.example.test/alumnos/students/detail/A%2F1/grade-reports/grades');
   });
 
+  it('construye el enlace de avance con la ruta nueva de SADAlumnos', async () => {
+    await load({ studentsMenuUrl: 'https://sad.example.test/alumnos' });
+    expect(navigation.studentProgressUrl('A/1')).toBe(
+      'https://sad.example.test/alumnos/students/detail/A%2F1/grade-reports/progress');
+  });
+
   it('construye el enlace de apertura de expediente con la ruta nueva de SADAlumnos', async () => {
     await load({ studentsMenuUrl: 'https://sad.example.test/alumnos' });
     expect(navigation.studentFileOpeningUrl('A/1')).toBe(
@@ -94,6 +100,7 @@ describe('Menú central', () => {
     expect(navigation.studentGradesUrl('A1')).toBeNull();
     expect(navigation.studentRequestsUrl('A1')).toBeNull();
     expect(navigation.studentFileOpeningUrl('A1')).toBeNull();
+    expect(navigation.studentProgressUrl('A1')).toBeNull();
   });
 
   it('no inventa enlaces ante un contrato vacío', async () => {

@@ -25,4 +25,12 @@ export const REGULATION_REPORTS: readonly PostgraduateReport[] = [
     available: true,
     permission: 'REPORT_VIEW_REGULATION',
   },
+  {
+    slug: 'ranking',
+    title: 'Ranking de Licenciatura y Egreso',
+    description: 'Ranking de alumnos de licenciatura y egreso por grupo, período, tipo de selección, orden y dirección.',
+    legacyPath: 'Informes/AplicacionReglamento/Ranking.aspx',
+    available: true,
+    permission: 'REPORT_VIEW_REGULATION',
+  },
 ];

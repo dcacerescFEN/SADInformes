@@ -162,6 +162,12 @@ export const routes: Routes = [
     loadComponent: () => import('./regulation/opened-files-by-period/opened-files-by-period')
       .then((module) => module.OpenedFilesByPeriod),
   },
+  {
+    path: 'regulation/ranking',
+    canActivate: [authGuard],
+    loadComponent: () => import('./regulation/ranking/ranking')
+      .then((module) => module.Ranking),
+  },
   ...REQUESTS_REPORTS.map(report => ({
     path: 'requests/' + report.slug,
     canActivate: [authGuard],

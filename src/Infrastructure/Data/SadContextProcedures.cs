@@ -836,6 +836,27 @@ public partial class SadContextProcedures(SadContext context) : ISadContextProce
         return result;
     }
 
+    public virtual async Task<List<SpRecRankingEgresoXGrupoResult>?> SpRec_RankingEgresoXGrupoAsync(
+        string? grupo, string? periodo, string? rankingPorPeriodo, string? ordenarPor, string? orden,
+        OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
+    {
+        var parameterreturnValue = new SqlParameter { ParameterName = "returnValue", Direction = ParameterDirection.Output, SqlDbType = SqlDbType.Int };
+        var sqlParameters = new object[]
+        {
+            new SqlParameter { ParameterName = "Grupo", Size = 10, Value = grupo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Periodo", Size = 5, Value = periodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "RankingPorPeriodo", Size = 10, Value = rankingPorPeriodo ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "OrdenarPor", Size = 10, Value = ordenarPor ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            new SqlParameter { ParameterName = "Orden", Size = 10, Value = orden ?? (object)DBNull.Value, SqlDbType = SqlDbType.VarChar },
+            parameterreturnValue,
+        };
+        var result = await context.SqlQueryAsync<SpRecRankingEgresoXGrupoResult>(
+            "EXEC [dbo].[spRec_RankingEgresoXGrupo] @Grupo = @Grupo, @Periodo = @Periodo, @RankingPorPeriodo = @RankingPorPeriodo, @OrdenarPor = @OrdenarPor, @Orden = @Orden",
+            sqlParameters, cancellationToken ?? default);
+        returnValue?.SetValue(parameterreturnValue.Value);
+        return result;
+    }
+
     public virtual async Task<int> SpMod_Solicitud_ImpresaAsync(
         string? codSolicitud,
         OutputParameter<int>? returnValue = null, CancellationToken? cancellationToken = default)
